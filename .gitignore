@@ -2,20 +2,49 @@
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
 
-## User settings
-xcuserdata/
+# MARK: - macOS
+.DS_Store
 
-## Obj-C/Swift specific
+# MARK: - Backup & temporära filer
+*.save
+*.log
+*.orig
+*.swp
+
+# MARK: - User settings
+xcuserdata/
+*.xcuserstate
+
+# Ignorera xcshareddata
+**/xcshareddata/
+
+# MARK: - Obj-C/Swift specific
 *.hmap
 
-## App packaging
+# MARK: - App packaging
 *.ipa
 *.dSYM.zip
 *.dSYM
 
-## Playgrounds
+# MARK: - Playgrounds
 timeline.xctimeline
 playground.xcworkspace
+
+# MARK: - Firebase & miljöfiler
+GoogleService-Info.plist
+*.env
+
+# MARK: - Xcode delad data
+*.xcworkspace/xcshareddata/
+
+# MARK: - Xcode previews
+*/Preview Content/
+
+# MARK: - Fastlane (om du använder det)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+
 
 # Swift Package Manager
 #

@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import Firebase
+let db = Firestore.firestore()
 
 struct ContentView: View {
     var body: some View {
@@ -14,6 +16,8 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+        }.onAppear() {
+            db.collection("test").addDocument(data: ["name": "Test"])
         }
         .padding()
     }
@@ -22,8 +26,3 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
-//hejhej
-
-//hej på dig
-
-//hej

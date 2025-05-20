@@ -53,12 +53,12 @@ struct GameView: View {
                             HStack (spacing: 25){
                                 Spacer()
                                 Button(firebaseViewModel.optionA) {
-                                    //check if answer is correct
+                                    checkAnswer(firebaseViewModel.optionA)
                                 }
                                 .customAnswerOptions()
                                 
                                 Button(firebaseViewModel.optionB) {
-                                    //check if answer is correct
+                                    checkAnswer(firebaseViewModel.optionB)
                                 }
                                 .customAnswerOptions()
                                 
@@ -69,12 +69,11 @@ struct GameView: View {
                             HStack (spacing: 25){
                                 Spacer()
                                 Button(firebaseViewModel.optionC) {
-                                    //check if answer is correct
-                                }
+                                    checkAnswer(firebaseViewModel.optionC)                                }
                                 .customAnswerOptions()
                                 
                                 Button(firebaseViewModel.optionD) {
-                                    //check if answer is correct
+                                    checkAnswer(firebaseViewModel.optionD)
                                 }
                                 .customAnswerOptions()
                                 
@@ -92,7 +91,19 @@ struct GameView: View {
         }
     }
     
+    func checkAnswer(_ selected: String) {
         
+        if selected == firebaseViewModel.currentQuestion?.answer {
+            
+            print("Correct")
+            
+            firebaseViewModel.fetchQuestionAndAnswer()
+            
+        } else {
+            print("Wrong")
+            
+        }
+    }
 }
 
 

@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import Firebase
+import FirebaseFirestore
 
 struct GameView: View {
     
-    @State var question = "what is...."
+    @ObservedObject var firebaseViewModel = FirebaseViewModel()
     
     var body: some View {
         
@@ -20,73 +22,77 @@ struct GameView: View {
             VStack{
                 Spacer()
             
-                Text(question)
-                    .padding()
-                    .frame(width: 250, height: 60)
-                    .foregroundStyle(Color.black)
-                    .background(Color.white)
-                    .foregroundStyle(.white)
-                    .clipShape(.rect(cornerRadius: 15))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
-                    )
-                    .shadow(radius: 10.0, x: 20, y: 10)
-                    .fontDesign(.monospaced)
-                    .padding(.top, 100)
-            
-                ZStack {
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(Color.white)
-                        .frame(width: 350, height: 300)
+                if let question = firebaseViewModel.currentQuestion {
+                    
+                    Text(question.question)
+                        .padding()
+                        .frame(width: 300, height: 100)
+                        .foregroundStyle(Color.black)
+                        .background(Color.white)
+                        .foregroundStyle(.white)
+                        .clipShape(.rect(cornerRadius: 15))
                         .overlay(
                             RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                                .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
                         )
-                    
-                    VStack (spacing: 25){
-                        Spacer()
-                        HStack (spacing: 25){
+                        .shadow(radius: 10.0, x: 20, y: 10)
+                        .fontDesign(.monospaced)
+                        .padding(.top, 100)
+                
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.white)
+                            .frame(width: 350, height: 300)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                            )
+                        
+                        VStack (spacing: 25){
                             Spacer()
-                            Button("A") {
-                                //check if answer is correct
+                            HStack (spacing: 25){
+                                Spacer()
+                                Button(firebaseViewModel.optionA) {
+                                    //check if answer is correct
+                                }
+                                .customAnswerOptions()
+                                
+                                Button(firebaseViewModel.optionB) {
+                                    //check if answer is correct
+                                }
+                                .customAnswerOptions()
+                                
+                                
+                                Spacer()
                             }
-                            .customAnswerOptions()
                             
-                            Button("B") {
-                                //check if answer is correct
+                            HStack (spacing: 25){
+                                Spacer()
+                                Button(firebaseViewModel.optionC) {
+                                    //check if answer is correct
+                                }
+                                .customAnswerOptions()
+                                
+                                Button(firebaseViewModel.optionD) {
+                                    //check if answer is correct
+                                }
+                                .customAnswerOptions()
+                                
+                                Spacer()
                             }
-                            .customAnswerOptions()
-                            
                             
                             Spacer()
                         }
-                        
-                        HStack (spacing: 25){
-                            Spacer()
-                            Button("C") {
-                                //check if answer is correct
-                            }
-                            .customAnswerOptions()
-                            
-                            Button("D") {
-                                //check if answer is correct
-                            }
-                            .customAnswerOptions()
-                            
-                            Spacer()
-                        }
-                        
-                        Spacer()
                     }
                 }
             }
         }
+        .onAppear{
+            firebaseViewModel.fetchQuestionAndAnswer()
+        }
     }
-}
-
-#Preview {
-    GameView()
+    
+        
 }
 
 
@@ -103,7 +109,7 @@ extension View {
             .clipShape(.rect(cornerRadius: 15))
             .overlay(
                 RoundedRectangle(cornerRadius: 15)
-                    .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                    .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
             )
 
             .fontDesign(.monospaced)

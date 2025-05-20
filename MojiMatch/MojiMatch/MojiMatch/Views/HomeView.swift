@@ -43,7 +43,7 @@ struct HomeView: View {
                 Spacer()
             }
             .fullScreenCover(isPresented: $showGameView){
-                GameView()
+                GameView(firebaseViewModel: FirebaseViewModel())
             }
         }
     }

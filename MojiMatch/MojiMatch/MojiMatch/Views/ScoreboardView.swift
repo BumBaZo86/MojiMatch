@@ -6,12 +6,21 @@
 //
 
 import SwiftUI
+import Firebase
+import FirebaseFirestore
 
 struct ScoreboardView: View {
+    
+    
     var body: some View {
-        Text("ScoreboardView")
+        
+        VStack{
+            Text("ScoreboardView")
+        }
+        
     }
 }
+
 
 #Preview {
     ScoreboardView()

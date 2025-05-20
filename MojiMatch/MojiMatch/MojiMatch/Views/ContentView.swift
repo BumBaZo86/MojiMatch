@@ -30,101 +30,107 @@ struct ContentView: View {
     @State private var showSignup = false
     
     var body: some View {
-        VStack {
-            if isLoggedIn {
-                TabView{
-                    
-                    HomeView()
-                        .tabItem {
-                            Image("HomeImage")
-                                
-                            Text("Home")
-                        }
-                    
-                    StoreView()
-                        .tabItem{
-                            Image("StoreImage")
-                            Text("Store")
-                        }
-                    
-                    GameSettingsView()
-                        .tabItem {
-                            Image("GameSettings")
-                            Text("Play")
-                        }
-                   
-                    ScoreboardView()
-                        .tabItem {
-                            Image("ScoreboardImage")
-                            Text("Scoreboard")
-                        }
-                    
-                    ProfileView()
-                        .tabItem {
-                            Image("ProfileImage")
-                            Text("Profile")
-                        }
-                   
-                }
-                .tint(.green)
+        
+        ZStack{
+            Color(red: 113/256, green: 162/256, blue: 114/256)
+                .ignoresSafeArea()
             
-                   /* Text("You're logged in!")
-                    Button("Add Item to Firestore") {
-                        addItemToFirestore()
-                    }*/
-                
-            } else {
-                if showSignup {
-                    // Signup view
-                    VStack {
-                        TextField("Email", text: $email)
-                            .padding()
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                        SecureField("Password", text: $password)
-                            .padding()
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+            
+            VStack {
+                if isLoggedIn {
+                    TabView{
                         
-                        Button("Sign Up") {
-                            signUp()
-                        }
-                        .padding()
+                        HomeView()
+                            .tabItem {
+                                Image("HomeImage")
+                                
+                                Text("Home")
+                            }
                         
-                        Button("Already have an account? Log in") {
-                            showSignup.toggle()
-                        }
+                        StoreView()
+                            .tabItem{
+                                Image("StoreImage")
+                                Text("Store")
+                            }
                         
-                        Text(errorMessage)
-                            .foregroundColor(.red)
+                        GameSettingsView()
+                            .tabItem {
+                                Image("GameSettings")
+                                Text("Play")
+                            }
+                        
+                        ScoreboardView()
+                            .tabItem {
+                                Image("ScoreboardImage")
+                                Text("Scoreboard")
+                            }
+                        
+                        ProfileView()
+                            .tabItem {
+                                Image("ProfileImage")
+                                Text("Profile")
+                            }
+                        
                     }
+                    .tint(.green)
+                    
+                    /* Text("You're logged in!")
+                     Button("Add Item to Firestore") {
+                     addItemToFirestore()
+                     }*/
+                    
                 } else {
-                
-                    VStack {
-                        TextField("Email", text: $email)
+                    if showSignup {
+                        // Signup view
+                        VStack {
+                            TextField("Email", text: $email)
+                                .padding()
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            SecureField("Password", text: $password)
+                                .padding()
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            
+                            Button("Sign Up") {
+                                signUp()
+                            }
                             .padding()
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                        SecureField("Password", text: $password)
+                            
+                            Button("Already have an account? Log in") {
+                                showSignup.toggle()
+                            }
+                            
+                            Text(errorMessage)
+                                .foregroundColor(.red)
+                        }
+                    } else {
+                        
+                        VStack {
+                            TextField("Email", text: $email)
+                                .padding()
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            SecureField("Password", text: $password)
+                                .padding()
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                            
+                            Button("Log In") {
+                                logIn()
+                            }
                             .padding()
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                        
-                        Button("Log In") {
-                            logIn()
+                            
+                            Button("Don't have an account? Sign up") {
+                                showSignup.toggle()
+                            }
+                            
+                            Text(errorMessage)
+                                .foregroundColor(.red)
                         }
-                        .padding()
-                        
-                        Button("Don't have an account? Sign up") {
-                            showSignup.toggle()
-                        }
-                        
-                        Text(errorMessage)
-                            .foregroundColor(.red)
                     }
                 }
             }
+            .padding()
         }
-        .padding()
+        
     }
-    
-    
     func logIn() {
         Auth.auth().signIn(withEmail: email, password: password) { result, error in
             if let error = error {

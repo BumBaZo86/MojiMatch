@@ -10,13 +10,16 @@ import Firebase
 import FirebaseAuth
 
 struct SignUpView: View {
+    @Binding var isLoggedIn: Bool
+    @Binding var showSignup: Bool
+
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var username: String = ""
     @State private var errorMessage: String = ""
     @State private var isLoading: Bool = false
     @State private var showLoginView = false
-    
+
     var body: some View {
         NavigationView {
             ZStack {
@@ -30,7 +33,6 @@ struct SignUpView: View {
                             .foregroundColor(.white)
                             .padding(.top)
 
-                    
                         TextField("Email", text: $email)
                             .padding()
                             .background(Color.white)
@@ -48,7 +50,6 @@ struct SignUpView: View {
                             .padding(.horizontal)
                             .frame(height: 50)
 
-                   
                         TextField("Username", text: $username)
                             .padding()
                             .background(Color.white)
@@ -57,7 +58,6 @@ struct SignUpView: View {
                             .padding(.horizontal)
                             .frame(height: 50)
 
-                        
                         if !errorMessage.isEmpty {
                             Text(errorMessage)
                                 .foregroundColor(.red)
@@ -65,8 +65,7 @@ struct SignUpView: View {
                         }
 
                         Spacer()
-                        
-                
+
                         Button(action: {
                             signUp()
                         }) {
@@ -93,14 +92,14 @@ struct SignUpView: View {
                         .disabled(isLoading)
                         .padding(.top)
 
-               
                         Button(action: {
-                            showLoginView = true
+                           
+                            showSignup = false
                         }) {
                             Text("Login")
                                 .padding()
                                 .frame(width: 250, height: 60)
-                                .background(Color.white) //
+                                .background(Color.white)
                                 .foregroundColor(.black)
                                 .clipShape(RoundedRectangle(cornerRadius: 15))
                                 .overlay(
@@ -111,9 +110,6 @@ struct SignUpView: View {
                                 .fontDesign(.monospaced)
                         }
                         .padding(.top)
-                        
-                       
-                        NavigationLink("", destination: LoginView(), isActive: $showLoginView)
                     }
                     .padding(.horizontal)
                     .padding(.bottom)
@@ -121,16 +117,16 @@ struct SignUpView: View {
             }
         }
     }
-    
+
     func signUp() {
         guard !email.isEmpty, !password.isEmpty, !username.isEmpty else {
             errorMessage = "All fields are required"
             return
         }
-        
+
         isLoading = true
         errorMessage = ""
-        
+
         Auth.auth().createUser(withEmail: email, password: password) { result, error in
             isLoading = false
             if let error = error {
@@ -142,10 +138,10 @@ struct SignUpView: View {
             }
         }
     }
-    
+
     func createUserProfile(user: FirebaseAuth.User) {
         let mojiMatchUser = MojiMatchUser(from: user)
-        
+
         let userData: [String: Any] = [
             "email": mojiMatchUser.email,
             "username": mojiMatchUser.username,
@@ -155,13 +151,14 @@ struct SignUpView: View {
             "unlockedLevels": mojiMatchUser.unlockedLevels,
             "unlockedQuestionCounts": mojiMatchUser.unlockedQuestionCounts
         ]
-        
+
         Firestore.firestore().collection("users").document(user.email ?? "").setData(userData) { error in
             if let error = error {
                 errorMessage = "Failed to create user profile: \(error.localizedDescription)"
             } else {
                 print("User profile created successfully!")
-                showLoginView = true
+           
+                isLoggedIn = true
             }
         }
     }

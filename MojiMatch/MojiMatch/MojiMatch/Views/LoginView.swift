@@ -10,11 +10,13 @@ import Firebase
 import FirebaseAuth
 
 struct LoginView: View {
+    @Binding var isLoggedIn: Bool
+    @Binding var showSignup: Bool
+
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var errorMessage: String = ""
     @State private var isLoading: Bool = false
-    @State private var isLoggedIn: Bool = false
 
     var body: some View {
         VStack {
@@ -22,24 +24,20 @@ struct LoginView: View {
                 .font(.largeTitle)
                 .padding()
 
-          
             TextField("Email", text: $email)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .autocapitalization(.none)
 
-         
             SecureField("Password", text: $password)
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
 
-          
             if !errorMessage.isEmpty {
                 Text(errorMessage)
                     .foregroundColor(.red)
             }
 
-       
             Button(action: {
                 logIn()
             }) {
@@ -57,11 +55,15 @@ struct LoginView: View {
             }
             .disabled(isLoading)
             .padding()
+
+            Button(action: {
             
-           
-            if isLoggedIn {
-                ContentView()
+                showSignup = true
+            }) {
+                Text("Don't have an account? Sign up")
+                    .foregroundColor(.blue)
             }
+            .padding(.top)
         }
         .padding()
     }
@@ -75,13 +77,11 @@ struct LoginView: View {
         isLoading = true
         errorMessage = ""
 
-   
         Auth.auth().signIn(withEmail: email, password: password) { result, error in
             isLoading = false
             if let error = error {
                 errorMessage = error.localizedDescription
             } else {
-                
                 isLoggedIn = true
                 print("Logged in successfully!")
             }

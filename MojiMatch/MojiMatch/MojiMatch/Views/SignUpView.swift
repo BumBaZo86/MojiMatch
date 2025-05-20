@@ -4,6 +4,7 @@
 //
 //  Created by Natalie S on 2025-05-20.
 //
+
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -18,57 +19,106 @@ struct SignUpView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                Text("Sign Up")
-                    .font(.largeTitle)
-                    .padding()
-                
-               
-                TextField("Email", text: $email)
-                    .padding()
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .autocapitalization(.none)
-                
-              
-                SecureField("Password", text: $password)
-                    .padding()
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                
-           
-                TextField("Username", text: $username)
-                    .padding()
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                
-             
-                if !errorMessage.isEmpty {
-                    Text(errorMessage)
-                        .foregroundColor(.red)
-                }
-                
-            
-                Button(action: {
-                    signUp()
-                }) {
-                    if isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                    } else {
+            ZStack {
+                Color(red: 113/256, green: 162/256, blue: 114/256)
+                    .ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: 20) {
                         Text("Sign Up")
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
+                            .font(.largeTitle)
                             .foregroundColor(.white)
+                            .padding(.top)
+
+                    
+                        TextField("Email", text: $email)
+                            .padding()
+                            .background(Color.white)
                             .cornerRadius(8)
+                            .keyboardType(.emailAddress)
+                            .foregroundColor(.black)
+                            .padding(.horizontal)
+                            .frame(height: 50)
+
+                        SecureField("Password", text: $password)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .foregroundColor(.black)
+                            .padding(.horizontal)
+                            .frame(height: 50)
+
+                   
+                        TextField("Username", text: $username)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(8)
+                            .foregroundColor(.black)
+                            .padding(.horizontal)
+                            .frame(height: 50)
+
+                        
+                        if !errorMessage.isEmpty {
+                            Text(errorMessage)
+                                .foregroundColor(.red)
+                                .padding(.top)
+                        }
+
+                        Spacer()
+                        
+                
+                        Button(action: {
+                            signUp()
+                        }) {
+                            if isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle())
+                                    .frame(width: 250, height: 60)
+                                    .foregroundColor(.black)
+                            } else {
+                                Text("Sign Up")
+                                    .padding()
+                                    .frame(width: 250, height: 60)
+                                    .background(Color.white)
+                                    .foregroundColor(.black)
+                                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                                    )
+                                    .shadow(radius: 10.0, x: 20, y: 10)
+                                    .fontDesign(.monospaced)
+                            }
+                        }
+                        .disabled(isLoading)
+                        .padding(.top)
+
+               
+                        Button(action: {
+                            showLoginView = true
+                        }) {
+                            Text("Login")
+                                .padding()
+                                .frame(width: 250, height: 60)
+                                .background(Color.white) //
+                                .foregroundColor(.black)
+                                .clipShape(RoundedRectangle(cornerRadius: 15))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                                )
+                                .shadow(radius: 10.0, x: 20, y: 10)
+                                .fontDesign(.monospaced)
+                        }
+                        .padding(.top)
+                        
+                       
+                        NavigationLink("", destination: LoginView(), isActive: $showLoginView)
                     }
+                    .padding(.horizontal)
+                    .padding(.bottom)
                 }
-                .disabled(isLoading)
-                .padding()
-                
-                
-                NavigationLink("", destination: LoginView(), isActive: $showLoginView)
             }
-            .padding()
-            .navigationBarBackButtonHidden(true)
         }
     }
     
@@ -81,45 +131,36 @@ struct SignUpView: View {
         isLoading = true
         errorMessage = ""
         
-       
         Auth.auth().createUser(withEmail: email, password: password) { result, error in
             isLoading = false
             if let error = error {
                 errorMessage = error.localizedDescription
             } else {
-             
-                if let user = result?.user {
-                    createUserProfile(user: user)
+                if let firebaseUser = result?.user {
+                    createUserProfile(user: firebaseUser)
                 }
             }
         }
     }
     
     func createUserProfile(user: FirebaseAuth.User) {
-      
-        let defaultLevel = "Easy"
-        let defaultCategories: [String] = ["Animals"]
-        let defaultLevels: [String] = ["Easy"]
-        let defaultQuestionCounts: [Int] = [5]
-        let defaultPoints = 0
+        let mojiMatchUser = MojiMatchUser(from: user)
         
         let userData: [String: Any] = [
-            "email": email,
-            "username": username,
-            "points": defaultPoints,
-            "level": defaultLevel,
-            "unlockedCategories": defaultCategories,
-            "unlockedLevels": defaultLevels,
-            "unlockedQuestionCounts": defaultQuestionCounts
+            "email": mojiMatchUser.email,
+            "username": mojiMatchUser.username,
+            "points": mojiMatchUser.points,
+            "level": mojiMatchUser.level,
+            "unlockedCategories": mojiMatchUser.unlockedCategories,
+            "unlockedLevels": mojiMatchUser.unlockedLevels,
+            "unlockedQuestionCounts": mojiMatchUser.unlockedQuestionCounts
         ]
         
-   
         Firestore.firestore().collection("users").document(user.email ?? "").setData(userData) { error in
             if let error = error {
                 errorMessage = "Failed to create user profile: \(error.localizedDescription)"
             } else {
                 print("User profile created successfully!")
-           
                 showLoginView = true
             }
         }

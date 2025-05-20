@@ -9,19 +9,6 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 
-
-struct MyApp: App {
-    init() {
-        FirebaseApp.configure()
-    }
-    
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-}
-
 struct ContentView: View {
     @State private var isLoggedIn = false
     @State private var email = ""
@@ -32,50 +19,43 @@ struct ContentView: View {
     var body: some View {
         VStack {
             if isLoggedIn {
-                TabView{
-                    
+        
+                TabView {
                     HomeView()
                         .tabItem {
-                            Image("HomeImage")
-                                
+                            Image(systemName: "house")
                             Text("Home")
                         }
                     
                     StoreView()
                         .tabItem{
-                            Image("StoreImage")
+                            Image(systemName: "cart")
                             Text("Store")
                         }
                     
                     GameSettingsView()
                         .tabItem {
-                            Image("GameSettings")
+                            Image(systemName: "gear")
                             Text("Play")
                         }
-                   
+                    
                     ScoreboardView()
                         .tabItem {
-                            Image("ScoreboardImage")
+                            Image(systemName: "list.number")
                             Text("Scoreboard")
                         }
                     
                     ProfileView()
                         .tabItem {
-                            Image("ProfileImage")
+                            Image(systemName: "person")
                             Text("Profile")
                         }
-                   
                 }
                 .tint(.green)
-            
-                   /* Text("You're logged in!")
-                    Button("Add Item to Firestore") {
-                        addItemToFirestore()
-                    }*/
-                
             } else {
+    
                 if showSignup {
-                    // Signup view
+                    // Registreringsvy
                     VStack {
                         TextField("Email", text: $email)
                             .padding()
@@ -97,7 +77,7 @@ struct ContentView: View {
                             .foregroundColor(.red)
                     }
                 } else {
-                
+               
                     VStack {
                         TextField("Email", text: $email)
                             .padding()
@@ -124,7 +104,7 @@ struct ContentView: View {
         .padding()
     }
     
-    
+
     func logIn() {
         Auth.auth().signIn(withEmail: email, password: password) { result, error in
             if let error = error {
@@ -135,6 +115,7 @@ struct ContentView: View {
         }
     }
     
+
     func signUp() {
         Auth.auth().createUser(withEmail: email, password: password) { result, error in
             if let error = error {
@@ -144,19 +125,4 @@ struct ContentView: View {
             }
         }
     }
-    
-    func addItemToFirestore() {
-        let db = Firestore.firestore()
-        db.collection("items").addDocument(data: [
-            "name": "New Item",
-            "createdAt": Timestamp()
-        ]) { error in
-            if let error = error {
-                print("Error adding document: \(error)")
-            } else {
-                print("Item added successfully")
-            }
-        }
-    }
 }
-

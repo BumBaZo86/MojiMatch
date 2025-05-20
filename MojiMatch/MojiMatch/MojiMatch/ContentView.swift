@@ -40,7 +40,7 @@ struct ContentView: View {
                 }
             } else {
                 if showSignup {
-                    // Signup view
+                 
                     VStack {
                         TextField("Email", text: $email)
                             .padding()

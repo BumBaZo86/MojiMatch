@@ -32,12 +32,47 @@ struct ContentView: View {
     var body: some View {
         VStack {
             if isLoggedIn {
-                VStack {
-                    Text("You're logged in!")
+                TabView{
+                    
+                    HomeView()
+                        .tabItem {
+                            Image("HomeImage")
+                                
+                            Text("Home")
+                        }
+                    
+                    StoreView()
+                        .tabItem{
+                            Image("StoreImage")
+                            Text("Store")
+                        }
+                    
+                    GameSettingsView()
+                        .tabItem {
+                            Image("GameSettings")
+                            Text("Play")
+                        }
+                   
+                    ScoreboardView()
+                        .tabItem {
+                            Image("ScoreboardImage")
+                            Text("Scoreboard")
+                        }
+                    
+                    ProfileView()
+                        .tabItem {
+                            Image("ProfileImage")
+                            Text("Profile")
+                        }
+                   
+                }
+                .tint(.green)
+            
+                   /* Text("You're logged in!")
                     Button("Add Item to Firestore") {
                         addItemToFirestore()
-                    }
-                }
+                    }*/
+                
             } else {
                 if showSignup {
                     // Signup view
@@ -124,3 +159,4 @@ struct ContentView: View {
         }
     }
 }
+

@@ -17,14 +17,14 @@ struct MojiMatchUser {
     var unlockedLevels: [String]
     var unlockedQuestionCounts: [Int]
     
-    // Initializer från FirebaseAuth.User
+  
     init(from firebaseUser: FirebaseAuth.User) {
         self.email = firebaseUser.email ?? ""
         self.username = firebaseUser.displayName ?? "Anonymous"
-        self.points = 0  // Du kan sätta ett standardvärde eller hämta det från Firestore om det finns
-        self.level = "Easy"  // Standardvärde
-        self.unlockedCategories = ["Animals"]  // Standardvärde
-        self.unlockedLevels = ["Easy"]  // Standardvärde
-        self.unlockedQuestionCounts = [5]  // Standardvärde
+        self.points = 0  // get from Firebase, need testing
+        self.level = "Easy"  // default
+        self.unlockedCategories = ["Animals"]  // default
+        self.unlockedLevels = ["Easy"]  // get upd when purchase, need testing
+        self.unlockedQuestionCounts = [5]  // default
     }
 }

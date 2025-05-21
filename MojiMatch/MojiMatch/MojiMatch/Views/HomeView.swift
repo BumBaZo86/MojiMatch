@@ -11,7 +11,7 @@ struct HomeView: View {
     
     @State var showGameView = false
     @State var category = "Animals"
-    @State var time = 10
+    @State var time = 10.0
     @State var noOfQuestions = 5
  
     

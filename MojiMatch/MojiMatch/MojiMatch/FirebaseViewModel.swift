@@ -18,11 +18,12 @@ class FirebaseViewModel : ObservableObject {
     @Published var optionC : String = ""
     @Published var optionD : String = ""
     
+    
     var db = Firestore.firestore()
     
-    func fetchQuestionAndAnswer() {
+    func fetchQuestionAndAnswer(category : String) {
         
-        db.collection("Animals").getDocuments() { snapshot, error in
+        db.collection(category).getDocuments() { snapshot, error in
             if let error = error {
                 print("Error:: \(error.localizedDescription)")
                 return

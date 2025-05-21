@@ -6,10 +6,14 @@
 //
 
 import SwiftUI
-
+//commit
 struct HomeView: View {
     
     @State var showGameView = false
+    @State var category = "Animals"
+    @State var time = 10
+    @State var noOfQuestions = 5
+ 
     
     var body: some View {
         
@@ -43,7 +47,7 @@ struct HomeView: View {
                 Spacer()
             }
             .fullScreenCover(isPresented: $showGameView){
-                GameView(firebaseViewModel: FirebaseViewModel())
+                GameView(firebaseViewModel: FirebaseViewModel(), category: $category, time: $time, noOfQuestions: $noOfQuestions)
             }
         }
     }

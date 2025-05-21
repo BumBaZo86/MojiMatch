@@ -4,7 +4,6 @@
 //
 //  Created by Camilla Falk on 2025-05-20.
 //
-
 import SwiftUI
 import Firebase
 import FirebaseFirestore
@@ -13,20 +12,22 @@ struct GameView: View {
     
     @ObservedObject var firebaseViewModel = FirebaseViewModel()
     
-    @Binding var category : String
-    @Binding var time : Int
-    @Binding var noOfQuestions : Int
+    @Binding var category: String
+    @Binding var time: Double
+    @Binding var noOfQuestions: Int
     
     @State var questionCount = 0
     @State var score = 0
     @State private var isGameOver = false
+    @State var timeRemaining = 10.0
+    @State var timer: Timer?
     
     var body: some View {
         NavigationStack {
             ZStack {
                 Color(red: 113/256, green: 162/256, blue: 114/256)
                     .ignoresSafeArea()
-               
+                
                 VStack {
                     HStack {
                         Spacer()
@@ -35,22 +36,12 @@ struct GameView: View {
                             .fontDesign(.monospaced)
                     }
                     
-                    Spacer()
-                    
                     if let question = firebaseViewModel.currentQuestion {
-                        if question.question.count < 3 {
-                            Text(question.question)
-                                .customQuestionText()
-                                .font(.system(size: 90))
-                        } else if question.question.count < 8 {
-                            Text(question.question)
-                                .customQuestionText()
-                                .font(.system(size: 50))
-                        } else {
-                            Text(question.question)
-                                .customQuestionText()
-                                .font(.system(size: 20))
-                        }
+                        Text(question.question)
+                            .customQuestionText()
+                            .font(.system(size: fontSize(for: question.question)))
+                        
+                        Spacer(minLength: 80)
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)
@@ -78,8 +69,22 @@ struct GameView: View {
                                 Spacer()
                             }
                         }
+                        
+                        HStack {
+                            Spacer()
+                            Text(String(format: "%02d:%02d", Int(ceil(timeRemaining)) / 60, Int(ceil(timeRemaining)) % 60))
+                                .padding(.horizontal)
+                                .padding(.top)
+                        }
+                        
+                        ProgressView(value: Double(timeRemaining), total: Double(time))
+                            .progressViewStyle(LinearProgressViewStyle())
+                            .tint(.black)
+                            .padding(.horizontal)
                     }
-
+                    
+                    Spacer(minLength: 90)
+                    
                     NavigationLink(destination: GameOverView(score: score), isActive: $isGameOver) {
                         EmptyView()
                     }
@@ -87,10 +92,11 @@ struct GameView: View {
             }
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
+                startTimer()
             }
         }
     }
-
+    
     func optionButton(text: String) -> some View {
         Button(action: {
             checkAnswer(text)
@@ -101,17 +107,54 @@ struct GameView: View {
         .font(.system(size: text.count < 2 ? 70 : 10))
     }
 
+    func fontSize(for text: String) -> CGFloat {
+        if text.count < 3 {
+            return 90
+        } else if text.count < 8 {
+            return 50
+        } else {
+            return 20
+        }
+    }
+    
     func checkAnswer(_ selected: String) {
+        timer?.invalidate()
+        
         if selected == firebaseViewModel.currentQuestion?.answer {
             score += 10
         }
-
+        
         questionCount += 1
-
+        
         if questionCount < noOfQuestions {
             firebaseViewModel.fetchQuestionAndAnswer(category: category)
+            startTimer()
         } else {
             isGameOver = true
         }
     }
+    
+    func startTimer() {
+        timer?.invalidate()
+        timeRemaining = time
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { tim in
+            if timeRemaining <= 0 {
+                tim.invalidate()
+                self.timer = nil
+                self.questionCount += 1
+                
+                if self.questionCount < self.noOfQuestions {
+                    firebaseViewModel.fetchQuestionAndAnswer(category: category)
+                    startTimer()
+                } else {
+                    isGameOver = true
+                }
+            } else {
+                self.timeRemaining -= 0.1
+            }
+        }
+    }
 }
+
+

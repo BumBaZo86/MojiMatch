@@ -11,120 +11,61 @@ import FirebaseAuth
 
 struct ContentView: View {
     @State private var isLoggedIn = false
-    @State private var email = ""
-    @State private var password = ""
-    @State private var errorMessage = ""
     @State private var showSignup = false
 
     var body: some View {
-        ZStack{
+        ZStack {
             Color(red: 113/256, green: 162/256, blue: 114/256)
                 .ignoresSafeArea()
             
-            VStack {
-                if isLoggedIn {
-                    TabView{
-                        HomeView()
-                            .tabItem {
-                                Image("HomeImage")
-                                Text("Home")
-                            }
-                        
-                        StoreView()
-                            .tabItem{
-                                Image("StoreImage")
-                                Text("Store")
-                            }
-                        
-                        GameSettingsView()
-                            .tabItem {
-                                Image("GameSettings")
-                                Text("Play")
-                            }
-                        
-                        ScoreboardView()
-                            .tabItem {
-                                Image("ScoreboardImage")
-                                Text("Scoreboard")
-                            }
-                        
-                        ProfileView()
-                            .tabItem {
-                                Image("ProfileImage")
-                                Text("Profile")
-                            }
-                    }
+            if isLoggedIn {
+              
+                MainTabView()
                     .tint(.green)
-                    
+            } else {
+                if showSignup {
+                    SignUpView(isLoggedIn: $isLoggedIn, showSignup: $showSignup)
                 } else {
-                    if showSignup {
-                        // Signup view
-                        VStack {
-                            TextField("Email", text: $email)
-                                .padding()
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                            SecureField("Password", text: $password)
-                                .padding()
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                            
-                            Button("Sign Up") {
-                                signUp()
-                            }
-                            .padding()
-                            
-                            Button("Already have an account? Log in") {
-                                showSignup.toggle()
-                            }
-                            
-                            Text(errorMessage)
-                                .foregroundColor(.red)
-                        }
-                    } else {
-                        // Login view
-                        VStack {
-                            TextField("Email", text: $email)
-                                .padding()
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                            SecureField("Password", text: $password)
-                                .padding()
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                            
-                            Button("Log In") {
-                                logIn()
-                            }
-                            .padding()
-                            
-                            Button("Don't have an account? Sign up") {
-                                showSignup.toggle()
-                            }
-                            
-                            Text(errorMessage)
-                                .foregroundColor(.red)
-                        }
-                    }
+                    LoginView(isLoggedIn: $isLoggedIn, showSignup: $showSignup)
                 }
             }
-            .padding()
         }
     }
+}
 
-    func logIn() {
-        Auth.auth().signIn(withEmail: email, password: password) { result, error in
-            if let error = error {
-                errorMessage = error.localizedDescription
-            } else {
-                isLoggedIn = true
-            }
-        }
-    }
 
-    func signUp() {
-        Auth.auth().createUser(withEmail: email, password: password) { result, error in
-            if let error = error {
-                errorMessage = error.localizedDescription
-            } else {
-                isLoggedIn = true
-            }
+struct MainTabView: View {
+    var body: some View {
+        TabView {
+            HomeView()
+                .tabItem {
+                    Image("HomeImage")
+                    Text("Home")
+                }
+
+            StoreView()
+                .tabItem {
+                    Image("StoreImage")
+                    Text("Store")
+                }
+
+            GameSettingsView()
+                .tabItem {
+                    Image("GameSettings")
+                    Text("Play")
+                }
+
+            ScoreboardView()
+                .tabItem {
+                    Image("ScoreboardImage")
+                    Text("Scoreboard")
+                }
+
+            ProfileView()
+                .tabItem {
+                    Image("ProfileImage")
+                    Text("Profile")
+                }
         }
     }
 }

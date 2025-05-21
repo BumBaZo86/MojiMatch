@@ -25,76 +25,104 @@ struct ProfileView: View {
     private var db = Firestore.firestore()
 
     var body: some View {
-        VStack {
-            Text("Email: \(user?.email ?? "No Email")")
-                .font(.headline)
-                .padding()
-
+        ZStack {
            
-            if let avatarUIImage = avatarUIImage {
-                avatarUIImage
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
-                    .clipShape(Circle())
-            } else {
-                Image(systemName: "person.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 100, height: 100)
-                    .clipShape(Circle())
+            Color(red: 113/256, green: 162/256, blue: 114/256)
+                .ignoresSafeArea()
+
+            ScrollView {
+                VStack(spacing: 20) {
+                    Text("Email: \(user?.email ?? "No Email")")
+                        .font(.headline)
+                        .foregroundColor(.white)
+
+             
+                    if let avatarUIImage = avatarUIImage {
+                        avatarUIImage
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 100, height: 100)
+                            .clipShape(Circle())
+                            .foregroundColor(.white)
+                    }
+
+                    Button("Change Avatar") {
+                        isImagePickerPresented.toggle()
+                    }
+                    .padding()
+                    .foregroundColor(.white)
+                    .sheet(isPresented: $isImagePickerPresented) {
+                        ImagePicker(selectedImage: $avatarImage, isImagePickerPresented: $isImagePickerPresented)
+                    }
+
+                    Group {
+                        Text("Points: \(points)")
+                        Text("Level: \(level)")
+                        Text("Unlocked Categories: \(unlockedCategories.joined(separator: ", "))")
+                        Text("Unlocked Levels: \(unlockedLevels.joined(separator: ", "))")
+                        Text("Unlocked Question Counts: \(unlockedQuestionCounts.map { String($0) }.joined(separator: ", "))")
+                    }
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Recent Games")
+                            .font(.headline)
+                            .foregroundColor(.white)
+
+                        ForEach(recentGames, id: \.self) { game in
+                            Text(game)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(Color.white.opacity(0.2))
+                                .cornerRadius(10)
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .padding(.top)
+
+                    if !errorMessage.isEmpty {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .padding()
+                    }
+
+                    Button(action: {
+                        print("Continue button pressed!")
+                    }) {
+                        Text("Continue")
+                            .padding()
+                            .frame(width: 250, height: 60)
+                            .foregroundStyle(Color.black)
+                            .foregroundStyle(.white)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                            )
+                            .shadow(radius: 10.0, x: 20, y: 10)
+                            .fontDesign(.monospaced)
+                    }
+                    .padding(.top)
+                }
+                .padding()
             }
-
-            Button("Change Avatar") {
-                isImagePickerPresented.toggle()
-            }
-            .padding()
-            .sheet(isPresented: $isImagePickerPresented) {
-                ImagePicker(selectedImage: $avatarImage, isImagePickerPresented: $isImagePickerPresented)
-            }
-
-            Text("Points: \(points)")
-
-            Text("Level: \(level)")
-                .padding(.top)
-
-            Text("Unlocked Categories: \(unlockedCategories.joined(separator: ", "))")
-                .padding(.top)
-
-            Text("Unlocked Levels: \(unlockedLevels.joined(separator: ", "))")
-                .padding(.top)
-
-            Text("Unlocked Question Counts: \(unlockedQuestionCounts.map { String($0) }.joined(separator: ", "))")
-                .padding(.top)
-
-            Text("Recent Games")
-                .font(.headline)
-                .padding(.top)
-
-            List(recentGames, id: \.self) { game in
-                Text(game)
-            }
-
-            if !errorMessage.isEmpty {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-            }
-
-            Button("Continue") {
-                print("Continue button pressed!")
-            }
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(8)
-            .padding(.top)
         }
         .onAppear {
             loadUserData()
             loadRecentGames()
+            //
+            /*
             loadAvatarImage()
+            */  // if we using ex 5 avatars images for user to choose or other images
         }
-        .padding()
     }
 
     func loadUserData() {
@@ -128,6 +156,8 @@ struct ProfileView: View {
             }
     }
 
+    // if we using ex 5 avatars images for user to choose or other images
+    /*
     func loadAvatarImage() {
         guard let user = Auth.auth().currentUser else { return }
 
@@ -143,4 +173,5 @@ struct ProfileView: View {
             }
         }
     }
+    */
 }

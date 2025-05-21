@@ -13,6 +13,12 @@ struct GameView: View {
     
     @ObservedObject var firebaseViewModel = FirebaseViewModel()
     
+    @Binding var category : String
+    @Binding var time : Int
+    @Binding var noOfQuestions : Int
+    @State var questionCount = 0
+    @State var score = 0
+    
     var body: some View {
         
         ZStack{
@@ -20,8 +26,18 @@ struct GameView: View {
                 .ignoresSafeArea()
            
             VStack{
+                
+                HStack {
+                    Spacer()
+                    Text("Score: \(score)")
+                        .padding()
+                        .fontDesign(.monospaced)
+                    
+                }
                 Spacer()
             
+                
+                
                 if let question = firebaseViewModel.currentQuestion {
                     
                     if (question.question.count < 3){
@@ -129,7 +145,7 @@ struct GameView: View {
             }
         }
         .onAppear{
-            firebaseViewModel.fetchQuestionAndAnswer()
+            firebaseViewModel.fetchQuestionAndAnswer(category: category)
         }
     }
     
@@ -139,10 +155,30 @@ struct GameView: View {
             
             print("Correct")
             
-            firebaseViewModel.fetchQuestionAndAnswer()
+            questionCount += 1
+            score += 10
+            print(questionCount)
+            
+            if (noOfQuestions > questionCount) {
+                firebaseViewModel.fetchQuestionAndAnswer(category: category)
+            } else {
+                print("Game over")
+                
+                //GO TO GAMEOVERVIEW
+            }
             
         } else {
             print("Wrong")
+            questionCount += 1
+            print(questionCount)
+            
+            if (noOfQuestions > questionCount) {
+                firebaseViewModel.fetchQuestionAndAnswer(category: category)
+            } else {
+                
+                print("Game over")
+                //GO TO GAMEOVERVIEW
+            }
             
         }
     }

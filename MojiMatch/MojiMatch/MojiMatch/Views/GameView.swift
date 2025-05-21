@@ -14,10 +14,14 @@ struct GameView: View {
     @ObservedObject var firebaseViewModel = FirebaseViewModel()
     
     @Binding var category : String
-    @Binding var time : Int
+    @Binding var time : Double
     @Binding var noOfQuestions : Int
     @State var questionCount = 0
     @State var score = 0
+    
+    @State var timeRemaining = 10.0
+    
+    @State var timer : Timer?
     
     var body: some View {
         
@@ -26,7 +30,7 @@ struct GameView: View {
                 .ignoresSafeArea()
            
             VStack{
-                
+                Spacer(minLength: 50)
                 HStack {
                     Spacer()
                     Text("Score: \(score)")
@@ -34,10 +38,7 @@ struct GameView: View {
                         .fontDesign(.monospaced)
                     
                 }
-                Spacer()
-            
-                
-                
+                                
                 if let question = firebaseViewModel.currentQuestion {
                     
                     if (question.question.count < 3){
@@ -58,6 +59,8 @@ struct GameView: View {
                             .font(.system(size: 20))
                         
                     }
+                    Spacer(minLength: 80)
+                    
                     ZStack {
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color.white)
@@ -68,7 +71,7 @@ struct GameView: View {
                             )
                         
                         VStack (spacing: 25){
-                            Spacer()
+                           Spacer()
                             HStack (spacing: 25){
                                 Spacer()
                                 
@@ -138,14 +141,31 @@ struct GameView: View {
                                 Spacer()
                             }
                             
-                            Spacer()
+                            
+                            
+                           Spacer()
                         }
+                      
                     }
+                    HStack{
+                        Spacer()
+                        Text(String(format: "%02d:%02d", Int(ceil(timeRemaining)) / 60, Int(ceil(timeRemaining)) % 60))
+                            .padding(.horizontal)
+                            .padding(.top)
+                    }
+                   
+                    ProgressView(value: Double(timeRemaining), total: Double(time))
+                        .progressViewStyle(LinearProgressViewStyle())
+                        .tint(.black)
+                        .padding(.horizontal)
                 }
+                Spacer(minLength: 90)
             }
+           
         }
         .onAppear{
             firebaseViewModel.fetchQuestionAndAnswer(category: category)
+            startTimer()
         }
     }
     
@@ -161,6 +181,7 @@ struct GameView: View {
             
             if (noOfQuestions > questionCount) {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
+                startTimer()
             } else {
                 print("Game over")
                 
@@ -174,12 +195,40 @@ struct GameView: View {
             
             if (noOfQuestions > questionCount) {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
+                startTimer()
             } else {
                 
                 print("Game over")
                 //GO TO GAMEOVERVIEW
             }
             
+        }
+    }
+    
+    func startTimer() {
+        
+        timer?.invalidate()
+        timeRemaining = time
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { tim in
+           
+            if (timeRemaining <= 0) {
+                tim.invalidate()
+                self.timer = nil
+                self.questionCount += 1
+                print(self.questionCount)
+                
+                if (self.noOfQuestions > self.questionCount) {
+                    firebaseViewModel.fetchQuestionAndAnswer(category: category)
+                    startTimer()
+                } else {
+                    
+                    print("Game over")
+                    //GO TO GAMEOVERVIEW
+                }
+            } else {
+                self.timeRemaining -= 0.1
+            }
         }
     }
 }
@@ -200,7 +249,7 @@ extension View {
                 RoundedRectangle(cornerRadius: 15)
                     .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
             )
-
+            .shadow(radius: 10.0, x: 20, y: 10)
             .fontDesign(.monospaced)
             
     }

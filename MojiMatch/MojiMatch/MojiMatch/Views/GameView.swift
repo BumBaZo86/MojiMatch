@@ -24,21 +24,24 @@ struct GameView: View {
             
                 if let question = firebaseViewModel.currentQuestion {
                     
-                    Text(question.question)
-                        .padding()
-                        .frame(width: 300, height: 100)
-                        .foregroundStyle(Color.black)
-                        .background(Color.white)
-                        .foregroundStyle(.white)
-                        .clipShape(.rect(cornerRadius: 15))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
-                        )
-                        .shadow(radius: 10.0, x: 20, y: 10)
-                        .fontDesign(.monospaced)
-                        .padding(.top, 100)
-                
+                    if (question.question.count < 3){
+                        Text(question.question)
+                            .customQuestionText()
+                            .font(.system(size: 90))
+                            
+                    } else if (question.question.count > 2 && question.question.count < 8) {
+                        
+                        Text(question.question)
+                            .customQuestionText()
+                            .font(.system(size: 50))
+                        
+                        
+                    } else if (question.question.count > 7) {
+                        Text(question.question)
+                            .customQuestionText()
+                            .font(.system(size: 20))
+                        
+                    }
                     ZStack {
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color.white)
@@ -52,15 +55,34 @@ struct GameView: View {
                             Spacer()
                             HStack (spacing: 25){
                                 Spacer()
-                                Button(firebaseViewModel.optionA) {
-                                    checkAnswer(firebaseViewModel.optionA)
-                                }
-                                .customAnswerOptions()
                                 
-                                Button(firebaseViewModel.optionB) {
-                                    checkAnswer(firebaseViewModel.optionB)
+                                if (firebaseViewModel.optionA.count < 2){
+                                    Button(firebaseViewModel.optionA) {
+                                        checkAnswer(firebaseViewModel.optionA)
+                                    }
+                                    .customAnswerOptions()
+                                    .font(.system(size: 70))
+                                } else {
+                                    Button(firebaseViewModel.optionA) {
+                                        checkAnswer(firebaseViewModel.optionA)
+                                    }
+                                    .customAnswerOptions()
+                                    .font(.system(size: 10))
                                 }
-                                .customAnswerOptions()
+                                
+                                if (firebaseViewModel.optionB.count < 2){
+                                    Button(firebaseViewModel.optionB) {
+                                        checkAnswer(firebaseViewModel.optionB)
+                                    }
+                                    .customAnswerOptions()
+                                    .font(.system(size: 70))
+                                } else {
+                                    Button(firebaseViewModel.optionB) {
+                                        checkAnswer(firebaseViewModel.optionB)
+                                    }
+                                    .customAnswerOptions()
+                                    .font(.system(size: 10))
+                                }
                                 
                                 
                                 Spacer()
@@ -68,14 +90,34 @@ struct GameView: View {
                             
                             HStack (spacing: 25){
                                 Spacer()
-                                Button(firebaseViewModel.optionC) {
-                                    checkAnswer(firebaseViewModel.optionC)                                }
-                                .customAnswerOptions()
-                                
-                                Button(firebaseViewModel.optionD) {
-                                    checkAnswer(firebaseViewModel.optionD)
+                                if (firebaseViewModel.optionC.count < 2){
+                                    Button(firebaseViewModel.optionC) {
+                                        checkAnswer(firebaseViewModel.optionC)
+                                    }
+                                    .customAnswerOptions()
+                                    .font(.system(size: 70))
+                                } else {
+                                    Button(firebaseViewModel.optionC) {
+                                        checkAnswer(firebaseViewModel.optionC)
+                                    }
+                                    .customAnswerOptions()
+                                    .font(.system(size: 10))
                                 }
-                                .customAnswerOptions()
+                                
+                                
+                                if (firebaseViewModel.optionD.count < 2){
+                                    Button(firebaseViewModel.optionD) {
+                                        checkAnswer(firebaseViewModel.optionD)
+                                    }
+                                    .customAnswerOptions()
+                                    .font(.system(size: 70))
+                                } else {
+                                    Button(firebaseViewModel.optionD) {
+                                        checkAnswer(firebaseViewModel.optionD)
+                                    }
+                                    .customAnswerOptions()
+                                    .font(.system(size: 10))
+                                }
                                 
                                 Spacer()
                             }
@@ -124,6 +166,26 @@ extension View {
             )
 
             .fontDesign(.monospaced)
+            
+    }
+    
+    func customQuestionText () -> some View {
+        
+        
+        self
+            .padding()
+            .frame(width: 300, height: 200)
+            .foregroundStyle(Color.black)
+            .background(Color.white)
+            .foregroundStyle(.white)
+            .clipShape(.rect(cornerRadius: 15))
+            .overlay(
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
+            )
+            .shadow(radius: 10.0, x: 20, y: 10)
+            .fontDesign(.monospaced)
+            .padding(.top, 100)
     }
     
 }

@@ -17,55 +17,94 @@ struct LoginView: View {
     @State private var password: String = ""
     @State private var errorMessage: String = ""
     @State private var isLoading: Bool = false
+    @State private var rememberEmail: Bool = false
+
+    @AppStorage("isLoggedIn") private var storedLoggedIn: Bool = false
+    @AppStorage("rememberedEmail") private var rememberedEmail: String = ""
 
     var body: some View {
-        VStack {
-            Text("Log In")
-                .font(.largeTitle)
-                .padding()
+        ZStack {
+            Color(red: 113/256, green: 162/256, blue: 114/256) // Bakgrundsfärg (oförändrad)
+                .ignoresSafeArea()
 
-            TextField("Email", text: $email)
-                .padding()
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .autocapitalization(.none)
+            VStack(spacing: 20) {
 
-            SecureField("Password", text: $password)
-                .padding()
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                // Logotyp (SF Symbol som placeholder)
+                Image(systemName: "face.smiling")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 80, height: 80)
+                    .foregroundColor(.white)
+                    .padding(.top, 40)
 
-            if !errorMessage.isEmpty {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-            }
+                Text("MojiMatch")
+                    .font(.system(size: 34, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
 
-            Button(action: {
-                logIn()
-            }) {
-                if isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                } else {
+                VStack(spacing: 16) {
                     Text("Log In")
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
+                        .font(.title)
                         .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
-            }
-            .disabled(isLoading)
-            .padding()
 
-            Button(action: {
-            
-                showSignup = true
-            }) {
-                Text("Don't have an account? Sign up")
-                    .foregroundColor(.blue)
+                    TextField("Email", text: $email)
+                        .padding()
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .autocapitalization(.none)
+
+                    SecureField("Password", text: $password)
+                        .padding()
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                    Toggle("Remember email", isOn: $rememberEmail)
+                        .toggleStyle(SwitchToggleStyle(tint: .white))
+                        .foregroundColor(.white)
+
+                    if !errorMessage.isEmpty {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+
+                    Button(action: {
+                        logIn()
+                    }) {
+                        if isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        } else {
+                            Text("Log In")
+                                .font(.headline)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color(red: 186/256, green: 221/256, blue: 186/256)) 
+                                .foregroundColor(.black)
+                                .cornerRadius(10)
+                                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                                .scaleEffect(isLoading ? 0.95 : 1.0)
+                                .animation(.easeInOut(duration: 0.2), value: isLoading)
+                        }
+                    }
+                    .disabled(isLoading)
+                    .padding(.top)
+
+                    Button(action: {
+                        showSignup = true
+                    }) {
+                        Text("Don't have an account? Sign up")
+                            .foregroundColor(.white)
+                            .underline()
+                    }
+                    .padding(.top, 8)
+                }
+                .padding(.horizontal, 30)
+
+                Spacer()
             }
-            .padding(.top)
         }
-        .padding()
+        .onAppear {
+            email = rememberedEmail
+            rememberEmail = !rememberedEmail.isEmpty
+        }
     }
 
     func logIn() {
@@ -82,6 +121,12 @@ struct LoginView: View {
             if let error = error {
                 errorMessage = error.localizedDescription
             } else {
+                if rememberEmail {
+                    rememberedEmail = email
+                } else {
+                    rememberedEmail = ""
+                }
+                storedLoggedIn = true
                 isLoggedIn = true
                 print("Logged in successfully!")
             }

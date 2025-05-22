@@ -78,7 +78,7 @@ struct GameView: View {
                                 .padding(.top)
                         }
                         
-                        ProgressView(value: Double(timeRemaining), total: Double(time))
+                        ProgressView(value: max(0, timeRemaining), total: time)
                             .progressViewStyle(LinearProgressViewStyle())
                             .tint(.black)
                             .padding(.horizontal)

@@ -34,7 +34,7 @@ struct GameView: View {
                         Spacer()
                         Text("Score: \(score)")
                             .padding()
-                            .fontDesign(.monospaced)
+                            .padding(.top, 50)                            .fontDesign(.monospaced)
                     }
                     
                     if let question = firebaseViewModel.currentQuestion {

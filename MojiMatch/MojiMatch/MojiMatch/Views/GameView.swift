@@ -15,6 +15,7 @@ struct GameView: View {
     @Binding var category: String
     @Binding var time: Double
     @Binding var noOfQuestions: Int
+    @Binding var showGameView: Bool
     
     @State var questionCount = 0
     @State var score = 0
@@ -85,7 +86,7 @@ struct GameView: View {
                     
                     Spacer(minLength: 90)
                     
-                    NavigationLink(destination: GameOverView(score: score), isActive: $isGameOver) {
+                    NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions), isActive: $isGameOver) {
                         EmptyView()
                     }
                 }

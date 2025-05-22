@@ -28,6 +28,14 @@ struct SignUpView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
+                        // Endast cirkel – ingen logga längre
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.2))
+                                .frame(width: 160, height: 160)
+                        }
+                        .padding(.top, 30)
+
                         Text("Sign Up")
                             .font(.largeTitle)
                             .foregroundColor(.white)
@@ -93,7 +101,6 @@ struct SignUpView: View {
                         .padding(.top)
 
                         Button(action: {
-                           
                             showSignup = false
                         }) {
                             Text("Login")
@@ -157,7 +164,6 @@ struct SignUpView: View {
                 errorMessage = "Failed to create user profile: \(error.localizedDescription)"
             } else {
                 print("User profile created successfully!")
-           
                 isLoggedIn = true
             }
         }

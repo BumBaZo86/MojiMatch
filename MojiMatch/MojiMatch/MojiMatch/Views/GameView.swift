@@ -4,7 +4,6 @@
 //
 //  Created by Camilla Falk on 2025-05-20.
 //
-
 import SwiftUI
 import Firebase
 import FirebaseFirestore
@@ -13,117 +12,150 @@ struct GameView: View {
     
     @ObservedObject var firebaseViewModel = FirebaseViewModel()
     
+    @Binding var category: String
+    @Binding var time: Double
+    @Binding var noOfQuestions: Int
+    @Binding var showGameView: Bool
+    
+    @State var questionCount = 0
+    @State var score = 0
+    @State private var isGameOver = false
+    @State var timeRemaining = 10.0
+    @State var timer: Timer?
+    
     var body: some View {
-        
-        ZStack{
-            Color(red: 113/256, green: 162/256, blue: 114/256)
-                .ignoresSafeArea()
-           
-            VStack{
-                Spacer()
-            
-                if let question = firebaseViewModel.currentQuestion {
-                    
-                    Text(question.question)
-                        .padding()
-                        .frame(width: 300, height: 100)
-                        .foregroundStyle(Color.black)
-                        .background(Color.white)
-                        .foregroundStyle(.white)
-                        .clipShape(.rect(cornerRadius: 15))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
-                        )
-                        .shadow(radius: 10.0, x: 20, y: 10)
-                        .fontDesign(.monospaced)
-                        .padding(.top, 100)
+        NavigationStack {
+            ZStack {
+                Color(red: 113/256, green: 162/256, blue: 114/256)
+                    .ignoresSafeArea()
                 
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.white)
-                            .frame(width: 350, height: 300)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
-                            )
+                VStack {
+                    HStack {
+                        Spacer()
+                        Text("Score: \(score)")
+                            .padding()
+                            .padding(.top, 50)
+                            .fontDesign(.monospaced)
+                    }
+                    
+                    if let question = firebaseViewModel.currentQuestion {
+                        Text(question.question)
+                            .customQuestionText()
+                            .font(.system(size: fontSize(for: question.question)))
                         
-                        VStack (spacing: 25){
-                            Spacer()
-                            HStack (spacing: 25){
+                        Spacer(minLength: 80)
+                        
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.white)
+                                .frame(width: 350, height: 300)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                                )
+                            
+                            VStack(spacing: 25) {
                                 Spacer()
-                                Button(firebaseViewModel.optionA) {
-                                    checkAnswer(firebaseViewModel.optionA)
+                                HStack(spacing: 25) {
+                                    Spacer()
+                                    optionButton(text: firebaseViewModel.optionA)
+                                    optionButton(text: firebaseViewModel.optionB)
+                                    Spacer()
                                 }
-                                .customAnswerOptions()
-                                
-                                Button(firebaseViewModel.optionB) {
-                                    checkAnswer(firebaseViewModel.optionB)
+                                HStack(spacing: 25) {
+                                    Spacer()
+                                    optionButton(text: firebaseViewModel.optionC)
+                                    optionButton(text: firebaseViewModel.optionD)
+                                    Spacer()
                                 }
-                                .customAnswerOptions()
-                                
-                                
                                 Spacer()
                             }
-                            
-                            HStack (spacing: 25){
-                                Spacer()
-                                Button(firebaseViewModel.optionC) {
-                                    checkAnswer(firebaseViewModel.optionC)                                }
-                                .customAnswerOptions()
-                                
-                                Button(firebaseViewModel.optionD) {
-                                    checkAnswer(firebaseViewModel.optionD)
-                                }
-                                .customAnswerOptions()
-                                
-                                Spacer()
-                            }
-                            
-                            Spacer()
                         }
+                        
+                        HStack {
+                            Spacer()
+                            Text(String(format: "%02d:%02d", Int(ceil(timeRemaining)) / 60, Int(ceil(timeRemaining)) % 60))
+                                .padding(.horizontal)
+                                .padding(.top)
+                        }
+                        
+                        ProgressView(value: max(0, timeRemaining), total: time)
+                            .progressViewStyle(LinearProgressViewStyle())
+                            .tint(.black)
+                            .padding(.horizontal)
+                    }
+                    
+                    Spacer(minLength: 90)
+                    
+                    NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions), isActive: $isGameOver) {
+                        EmptyView()
                     }
                 }
             }
+            .onAppear {
+                firebaseViewModel.fetchQuestionAndAnswer(category: category)
+                startTimer()
+            }
         }
-        .onAppear{
-            firebaseViewModel.fetchQuestionAndAnswer()
+    }
+    
+    func optionButton(text: String) -> some View {
+        Button(action: {
+            checkAnswer(text)
+        }) {
+            Text(text)
+        }
+        .customAnswerOptions()
+        .font(.system(size: text.count < 2 ? 70 : 10))
+    }
+
+    func fontSize(for text: String) -> CGFloat {
+        if text.count < 3 {
+            return 90
+        } else if text.count < 8 {
+            return 50
+        } else {
+            return 20
         }
     }
     
     func checkAnswer(_ selected: String) {
+        timer?.invalidate()
         
         if selected == firebaseViewModel.currentQuestion?.answer {
-            
-            print("Correct")
-            
-            firebaseViewModel.fetchQuestionAndAnswer()
-            
+            score += 10
+        }
+        
+        questionCount += 1
+        
+        if questionCount < noOfQuestions {
+            firebaseViewModel.fetchQuestionAndAnswer(category: category)
+            startTimer()
         } else {
-            print("Wrong")
-            
+            isGameOver = true
+        }
+    }
+    
+    func startTimer() {
+        timer?.invalidate()
+        timeRemaining = time
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { tim in
+            if timeRemaining <= 0 {
+                tim.invalidate()
+                self.timer = nil
+                self.questionCount += 1
+                
+                if self.questionCount < self.noOfQuestions {
+                    firebaseViewModel.fetchQuestionAndAnswer(category: category)
+                    startTimer()
+                } else {
+                    isGameOver = true
+                }
+            } else {
+                self.timeRemaining -= 0.1
+            }
         }
     }
 }
 
-
-extension View {
-    
-    func customAnswerOptions () -> some View {
-        
-        self
-            .padding()
-            .frame(width: 130, height: 100)
-            .foregroundStyle(Color.black)
-            .background(Color.white)
-            .foregroundStyle(.white)
-            .clipShape(.rect(cornerRadius: 15))
-            .overlay(
-                RoundedRectangle(cornerRadius: 15)
-                    .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
-            )
-
-            .fontDesign(.monospaced)
-    }
-    
-}

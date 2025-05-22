@@ -38,12 +38,30 @@ class FirebaseViewModel : ObservableObject {
             let shuffledQuestions = allQuestions.shuffled()
             let correctQuestion = shuffledQuestions.first!
             
-            let incorrectAnswers = shuffledQuestions.dropFirst().prefix(3).map { $0.answer}
+            let incorrectAnswers = Array(shuffledQuestions.dropFirst().prefix(3).map { $0.answer})
+            print(incorrectAnswers, correctQuestion.question, correctQuestion.answer)
             
             var answerOptions = ([correctQuestion.answer] + incorrectAnswers).shuffled()
             answerOptions.shuffle()
             
             
+            if (incorrectAnswers.contains(correctQuestion.answer)) {
+                print("incorrect answers contain correct answer \(incorrectAnswers) and \(correctQuestion.answer)")
+                self.fetchQuestionAndAnswer(category: category)
+                return
+            }
+            
+            
+            //Set filters away duplicates
+            let uniqueAnswers = Array(Set(answerOptions)).shuffled()
+            
+            guard uniqueAnswers.count == 4 else {
+                print("Try again. Duplicates found.")
+                self.fetchQuestionAndAnswer(category: category)
+                return
+    
+            }
+          
             DispatchQueue.main.async {
                 self.currentQuestion = correctQuestion
                 self.optionA = answerOptions[0]

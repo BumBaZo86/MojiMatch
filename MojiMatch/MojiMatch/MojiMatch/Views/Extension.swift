@@ -37,4 +37,21 @@ extension View {
             .fontDesign(.monospaced)
             .padding(.top, 100)
     }
+    
+    func buttonStyleCustom() -> some View {
+        self
+            .padding()
+            .frame(width: 250, height: 60)
+            .foregroundStyle(Color.black)
+            .background(Color.white)
+            .foregroundStyle(.white)
+            .clipShape(.rect(cornerRadius: 15))
+            .overlay(
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+            )
+            .shadow(radius: 10.0, x: 20, y: 10)
+            .fontDesign(.monospaced)
+        
+    }
 }

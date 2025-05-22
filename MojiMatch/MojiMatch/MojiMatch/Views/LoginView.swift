@@ -30,16 +30,14 @@ struct LoginView: View {
             VStack(spacing: 20) {
 
                 // Logotyp (SF Symbol som placeholder)
-                Image(systemName: "face.smiling")
+                Image("MojiMatchLogo")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 80, height: 80)
+                    .frame(width: 300, height: 300)
                     .foregroundColor(.white)
-                    .padding(.top, 40)
+                   // .padding(.top, 40)
 
-                Text("MojiMatch")
-                    .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+                
 
                 VStack(spacing: 16) {
                     Text("Log In")

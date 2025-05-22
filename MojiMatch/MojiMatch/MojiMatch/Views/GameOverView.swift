@@ -23,17 +23,23 @@ struct GameOverView: View {
             
             VStack(spacing: 30) {
                 Spacer()
-                Text("Game Over")
+                Text("Game Over!")
                     .font(.largeTitle)
                 
+                //Score from previous game is shown
                 Text("Your score: \(score) !!")
                     .font(.title2)
                 
+                //TODO Save score to users profile.
+                
+                
+                //Navigate back to the game with the same arguments as previous game.
                 NavigationLink(destination: GameView(category: $category, time: $time, noOfQuestions: $noOfQuestions, showGameView: $showGameView)) {
                     Text("Play Again")
                         .buttonStyleCustom()
                 }
                 
+                // Closes GameView and GameOverView. Goes back to HomeView.
                 Button("Home") {
                     showGameView = false
                 }

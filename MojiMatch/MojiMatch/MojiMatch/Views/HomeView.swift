@@ -33,6 +33,7 @@ struct HomeView: View {
                     }
                 Spacer()
             }
+            // fullscreen makes tabview dissapear during the game and gameOverView. 
             .fullScreenCover(isPresented: $showGameView){
                 GameView(firebaseViewModel: FirebaseViewModel(), category: $category, time: $time, noOfQuestions: $noOfQuestions, showGameView: $showGameView)
             }

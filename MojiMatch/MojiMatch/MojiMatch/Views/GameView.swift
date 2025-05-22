@@ -32,11 +32,13 @@ struct GameView: View {
                 VStack {
                     HStack {
                         Spacer()
+                        
                         Text("Score: \(score)")
                             .padding()
                             .padding(.top, 50)                            .fontDesign(.monospaced)
                     }
                     
+                    //Fetch game question and show it.
                     if let question = firebaseViewModel.currentQuestion {
                         Text(question.question)
                             .customQuestionText()
@@ -53,6 +55,7 @@ struct GameView: View {
                                         .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                                 )
                             
+                            //Show answerOptions as buttons
                             VStack(spacing: 25) {
                                 Spacer()
                                 HStack(spacing: 25) {
@@ -71,6 +74,7 @@ struct GameView: View {
                             }
                         }
                         
+                        //Active timer show ticking down in MM:SS format.
                         HStack {
                             Spacer()
                             Text(String(format: "%02d:%02d", Int(ceil(timeRemaining)) / 60, Int(ceil(timeRemaining)) % 60))
@@ -78,6 +82,7 @@ struct GameView: View {
                                 .padding(.top)
                         }
                         
+                        //Progressbar works together with the timer to show remaining time.
                         ProgressView(value: max(0, timeRemaining), total: time)
                             .progressViewStyle(LinearProgressViewStyle())
                             .tint(.black)
@@ -86,11 +91,13 @@ struct GameView: View {
                     
                     Spacer(minLength: 90)
                     
+                    //Navigate to GameOverView after game over.
                     NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions), isActive: $isGameOver) {
                         EmptyView()
                     }
                 }
             }
+            //Fetch first question, answerOptions and start timer.
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
                 startTimer()
@@ -98,6 +105,13 @@ struct GameView: View {
         }
     }
     
+    
+    /**
+     * Show answerOptions
+     * Check if answer is correct
+     * Adapt text size depending on how many characters each string has.
+    
+     */
     func optionButton(text: String) -> some View {
         Button(action: {
             checkAnswer(text)
@@ -108,6 +122,9 @@ struct GameView: View {
         .font(.system(size: text.count < 2 ? 70 : 10))
     }
 
+    /**
+     * Adapts the text size depending on how many characters each string has.
+     */
     func fontSize(for text: String) -> CGFloat {
         if text.count < 3 {
             return 90
@@ -117,6 +134,13 @@ struct GameView: View {
             return 20
         }
     }
+    
+    /**
+     * Check if answer is correct or not
+     * If correct = score + 10 points.
+     * After question is answered, either a new question is fetched or GameOverView is shown.
+     * New timer starts again if a new question is fetched.
+     */
     
     func checkAnswer(_ selected: String) {
         timer?.invalidate()
@@ -134,6 +158,14 @@ struct GameView: View {
             isGameOver = true
         }
     }
+    
+    
+    /**
+     * Timer starts.
+     * If a timer is already running, stops it and then starts a new one.
+     * If timer runs out of time, checks if a new question is being fetched or if it is GameOver.
+     * Updates every 0.1 seconds. 
+     */
     
     func startTimer() {
         timer?.invalidate()

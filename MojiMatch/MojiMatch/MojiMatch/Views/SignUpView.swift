@@ -25,65 +25,88 @@ struct SignUpView: View {
             ZStack {
                 Color(red: 113/256, green: 162/256, blue: 114/256)
                     .ignoresSafeArea()
-
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // Endast cirkel – ingen logga längre
-                        ZStack {
-                            Circle()
-                                .fill(Color.white.opacity(0.2))
-                                .frame(width: 160, height: 160)
-                        }
-                        .padding(.top, 30)
-
-                        Text("Sign Up")
-                            .font(.largeTitle)
-                            .foregroundColor(.white)
-                            .padding(.top)
-
-                        TextField("Email", text: $email)
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            .keyboardType(.emailAddress)
-                            .foregroundColor(.black)
-                            .padding(.horizontal)
-                            .frame(height: 50)
-
-                        SecureField("Password", text: $password)
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            .foregroundColor(.black)
-                            .padding(.horizontal)
-                            .frame(height: 50)
-
-                        TextField("Username", text: $username)
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            .foregroundColor(.black)
-                            .padding(.horizontal)
-                            .frame(height: 50)
-
-                        if !errorMessage.isEmpty {
-                            Text(errorMessage)
-                                .foregroundColor(.red)
+                
+                VStack {
+                    Image("MojiMatchLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 300, height: 300)
+                        .foregroundColor(.white)
+                        //.padding(.top, 40)
+                    
+                    ScrollView {
+                        VStack(spacing: 15) {
+                            // Endast cirkel – ingen logga längre
+                            
+                            
+                            Text("Sign Up")
+                                .font(.largeTitle)
+                                .foregroundColor(.white)
                                 .padding(.top)
-                        }
-
-                        Spacer()
-
-                        Button(action: {
-                            signUp()
-                        }) {
-                            if isLoading {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle())
-                                    .frame(width: 250, height: 60)
-                                    .foregroundColor(.black)
-                            } else {
-                                Text("Sign Up")
+                            
+                            TextField("Email", text: $email)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .keyboardType(.emailAddress)
+                                .foregroundColor(.black)
+                                .padding(.horizontal)
+                                .frame(height: 50)
+                            
+                            SecureField("Password", text: $password)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .foregroundColor(.black)
+                                .padding(.horizontal)
+                                .frame(height: 50)
+                            
+                            TextField("Username", text: $username)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(8)
+                                .foregroundColor(.black)
+                                .padding(.horizontal)
+                                .frame(height: 50)
+                            
+                            if !errorMessage.isEmpty {
+                                Text(errorMessage)
+                                    .foregroundColor(.red)
+                                    .padding(.top)
+                            }
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                signUp()
+                            }) {
+                                if isLoading {
+                                    ProgressView()
+                                        .progressViewStyle(CircularProgressViewStyle())
+                                        .frame(width: 250, height: 60)
+                                        .foregroundColor(.black)
+                                } else {
+                                    Text("Sign Up")
+                                        .padding()
+                                        .frame(width: 250, height: 60)
+                                        .background(Color.white)
+                                        .foregroundColor(.black)
+                                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                                        )
+                                        .shadow(radius: 10.0, x: 20, y: 10)
+                                        .fontDesign(.monospaced)
+                                }
+                            }
+                            .disabled(isLoading)
+                            .padding(.top)
+                            
+                            Button(action: {
+                                showSignup = false
+                            }) {
+                                Text("Login")
                                     .padding()
                                     .frame(width: 250, height: 60)
                                     .background(Color.white)
@@ -96,30 +119,11 @@ struct SignUpView: View {
                                     .shadow(radius: 10.0, x: 20, y: 10)
                                     .fontDesign(.monospaced)
                             }
+                            .padding(.top)
                         }
-                        .disabled(isLoading)
-                        .padding(.top)
-
-                        Button(action: {
-                            showSignup = false
-                        }) {
-                            Text("Login")
-                                .padding()
-                                .frame(width: 250, height: 60)
-                                .background(Color.white)
-                                .foregroundColor(.black)
-                                .clipShape(RoundedRectangle(cornerRadius: 15))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 15)
-                                        .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
-                                )
-                                .shadow(radius: 10.0, x: 20, y: 10)
-                                .fontDesign(.monospaced)
-                        }
-                        .padding(.top)
+                        .padding(.horizontal)
+                        .padding(.bottom)
                     }
-                    .padding(.horizontal)
-                    .padding(.bottom)
                 }
             }
         }

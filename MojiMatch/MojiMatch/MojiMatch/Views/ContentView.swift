@@ -3,14 +3,13 @@
 //  MojiMatch
 //
 //  Created by Lina Bergsten on 2025-05-14.
-//
 
 import SwiftUI
 import Firebase
 import FirebaseAuth
 
 struct ContentView: View {
-    @State private var isLoggedIn = false
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var showSignup = false
 
     var body: some View {
@@ -19,7 +18,6 @@ struct ContentView: View {
                 .ignoresSafeArea()
             
             if isLoggedIn {
-              
                 MainTabView()
                     .tint(.green)
             } else {
@@ -30,9 +28,14 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear {
+            // Kontrollera om användaren fortfarande är inloggad i Firebase
+            if Auth.auth().currentUser != nil {
+                isLoggedIn = true
+            }
+        }
     }
 }
-
 
 struct MainTabView: View {
     var body: some View {

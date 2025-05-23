@@ -3,6 +3,7 @@
 //  MojiMatch
 //
 //  Created by Camilla Falk on 2025-05-20.
+
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -22,11 +23,12 @@ struct ProfileView: View {
     @State private var unlockedQuestionCounts: [Int] = [5]
     @State private var isImagePickerPresented = false
 
+    @AppStorage("isLoggedIn") private var isLoggedIn: Bool = true
+
     private var db = Firestore.firestore()
 
     var body: some View {
         ZStack {
-           
             Color(red: 113/256, green: 162/256, blue: 114/256)
                 .ignoresSafeArea()
 
@@ -36,7 +38,6 @@ struct ProfileView: View {
                         .font(.headline)
                         .foregroundColor(.white)
 
-             
                     if let avatarUIImage = avatarUIImage {
                         avatarUIImage
                             .resizable()
@@ -94,9 +95,15 @@ struct ProfileView: View {
                     }
 
                     Button(action: {
-                        print("Continue button pressed!")
+                        do {
+                            try Auth.auth().signOut()
+                            isLoggedIn = false
+                            print("User logged out successfully.")
+                        } catch {
+                            errorMessage = "Misslyckades logga ut: \(error.localizedDescription)"
+                        }
                     }) {
-                        Text("Continue")
+                        Text("Logga ut")
                             .padding()
                             .frame(width: 250, height: 60)
                             .foregroundStyle(Color.black)
@@ -118,10 +125,6 @@ struct ProfileView: View {
         .onAppear {
             loadUserData()
             loadRecentGames()
-            //
-            /*
-            loadAvatarImage()
-            */  // if we using ex 5 avatars images for user to choose or other images
         }
     }
 
@@ -156,7 +159,7 @@ struct ProfileView: View {
             }
     }
 
-    // if we using ex 5 avatars images for user to choose or other images
+    // Placeholder if you later want to load a stored profile image from Firebase Storage
     /*
     func loadAvatarImage() {
         guard let user = Auth.auth().currentUser else { return }

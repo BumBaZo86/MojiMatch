@@ -24,12 +24,12 @@ struct LoginView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 113/256, green: 162/256, blue: 114/256) // Bakgrundsfärg (oförändrad)
+            Color(red: 113/256, green: 162/256, blue: 114/256)
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
 
-                // Logotyp (SF Symbol som placeholder)
+
                 Image("MojiMatchLogo")
                     .resizable()
                     .scaledToFit()
@@ -74,7 +74,7 @@ struct LoginView: View {
                                 .font(.headline)
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color(red: 186/256, green: 221/256, blue: 186/256)) 
+                                .background(Color(red: 186/256, green: 221/256, blue: 186/256))
                                 .foregroundColor(.black)
                                 .cornerRadius(10)
                                 .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)

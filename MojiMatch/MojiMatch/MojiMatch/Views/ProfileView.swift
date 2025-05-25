@@ -32,68 +32,26 @@ struct ProfileView: View {
             Color(red: 113/256, green: 162/256, blue: 114/256)
                 .ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 20) {
-                    Text("Email: \(user?.email ?? "No Email")")
-                        .font(.headline)
-                        .foregroundColor(.white)
-
-                    if let avatarUIImage = avatarUIImage {
-                        avatarUIImage
+            VStack {
+         
+                HStack {
+               
+                    Button(action: {
+                        print("Settings tapped")
+                     
+                    }) {
+                        Image("Settings")
                             .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
+                            .frame(width: 24, height: 24)
+                            .padding(10)
+                            .background(Color.white)
                             .clipShape(Circle())
-                    } else {
-                        Image(systemName: "person.circle.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 100, height: 100)
-                            .clipShape(Circle())
-                            .foregroundColor(.white)
+                            .shadow(radius: 2)
                     }
 
-                    Button("Change Avatar") {
-                        isImagePickerPresented.toggle()
-                    }
-                    .padding()
-                    .foregroundColor(.white)
-                    .sheet(isPresented: $isImagePickerPresented) {
-                        ImagePicker(selectedImage: $avatarImage, isImagePickerPresented: $isImagePickerPresented)
-                    }
+                    Spacer()
 
-                    Group {
-                        Text("Points: \(points)")
-                        Text("Level: \(level)")
-                        Text("Unlocked Categories: \(unlockedCategories.joined(separator: ", "))")
-                        Text("Unlocked Levels: \(unlockedLevels.joined(separator: ", "))")
-                        Text("Unlocked Question Counts: \(unlockedQuestionCounts.map { String($0) }.joined(separator: ", "))")
-                    }
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Recent Games")
-                            .font(.headline)
-                            .foregroundColor(.white)
-
-                        ForEach(recentGames, id: \.self) { game in
-                            Text(game)
-                                .padding()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.white.opacity(0.2))
-                                .cornerRadius(10)
-                                .foregroundColor(.white)
-                        }
-                    }
-                    .padding(.top)
-
-                    if !errorMessage.isEmpty {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .padding()
-                    }
-
+                  
                     Button(action: {
                         do {
                             try Auth.auth().signOut()
@@ -103,23 +61,91 @@ struct ProfileView: View {
                             errorMessage = "Misslyckades logga ut: \(error.localizedDescription)"
                         }
                     }) {
-                        Text("Logga ut")
-                            .padding()
-                            .frame(width: 250, height: 60)
-                            .foregroundStyle(Color.black)
-                            .foregroundStyle(.white)
+                        Text("Log out")
+                            .foregroundColor(.black)
+                            .font(.system(.body, design: .monospaced))
+                            .fontWeight(.semibold)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 16)
                             .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
+                            .cornerRadius(6)
                             .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                                RoundedRectangle(cornerRadius: 6)
+                                    .stroke(Color.black.opacity(0.2), lineWidth: 1)
                             )
-                            .shadow(radius: 10.0, x: 20, y: 10)
-                            .fontDesign(.monospaced)
                     }
-                    .padding(.top)
                 }
-                .padding()
+                .padding(.horizontal, 16)
+                .padding(.top, 16)
+
+                ScrollView {
+                    VStack(spacing: 20) {
+                        Text("Email: \(user?.email ?? "No Email")")
+                            .font(.headline)
+                            .foregroundColor(.white)
+
+                        if let avatarUIImage = avatarUIImage {
+                            avatarUIImage
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .clipShape(Circle())
+                        } else {
+                            Image(systemName: "person.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 100, height: 100)
+                                .clipShape(Circle())
+                                .foregroundColor(.white)
+                        }
+
+                        Button("Change Avatar") {
+                            isImagePickerPresented.toggle()
+                        }
+                        .padding()
+                        .foregroundColor(.white)
+                        .sheet(isPresented: $isImagePickerPresented) {
+                            ImagePicker(selectedImage: $avatarImage, isImagePickerPresented: $isImagePickerPresented)
+                        }
+
+                        Group {
+                            VStack(spacing: 8) {
+                                Text("Points: \(points)")
+                                Text("Level: \(level)")
+                                Text("Unlocked Categories: \(unlockedCategories.joined(separator: ", "))")
+                                Text("Unlocked Levels: \(unlockedLevels.joined(separator: ", "))")
+                                Text("Unlocked Question Counts: \(unlockedQuestionCounts.map { String($0) }.joined(separator: ", "))")
+                            }
+                            .foregroundColor(.black)
+                            .multilineTextAlignment(.center)
+                        }
+                        .customGroupStyle()
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Recent Games")
+                                .font(.headline)
+                                .foregroundColor(.white)
+
+                            ForEach(Array(recentGames.enumerated()), id: \.offset) { index, game in
+                                Text(game)
+                                    .padding()
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(Color.white.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        .padding(.top)
+
+                        if !errorMessage.isEmpty {
+                            Text(errorMessage)
+                                .foregroundColor(.red)
+                                .padding()
+                        }
+                    }
+                    .padding(.top, 20)
+                    .padding(.horizontal)
+                }
             }
         }
         .onAppear {
@@ -158,23 +184,4 @@ struct ProfileView: View {
                 }
             }
     }
-
-    // Placeholder if you later want to load a stored profile image from Firebase Storage
-    /*
-    func loadAvatarImage() {
-        guard let user = Auth.auth().currentUser else { return }
-
-        let storageRef = Storage.storage().reference().child("profile_images/\(user.uid).jpg")
-        storageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
-            if let error = error {
-                self.errorMessage = "Failed to load avatar image: \(error.localizedDescription)"
-            } else if let data = data {
-                if let image = UIImage(data: data) {
-                    self.avatarImage = image
-                    self.avatarUIImage = Image(uiImage: image)
-                }
-            }
-        }
-    }
-    */
 }

@@ -89,7 +89,7 @@ struct GameOverView: View {
             }
         }
 
-        let gameDetails = "Kategori: \(category), Tid: \(Int(time)) sek, Frågor: \(noOfQuestions), Poäng: \(score)"
+        let gameDetails = "Category: \(category), Time: \(Int(time)) sek, Questions: \(noOfQuestions), Points: \(score)"
         let recentGame = ["gameDetails": gameDetails, "timestamp": Timestamp()] as [String : Any]
         userRef.collection("recentGames").addDocument(data: recentGame) { err in
             if let err = err {

@@ -58,7 +58,7 @@ struct ProfileView: View {
                             isLoggedIn = false
                             print("User logged out successfully.")
                         } catch {
-                            errorMessage = "Misslyckades logga ut: \(error.localizedDescription)"
+                            errorMessage = "Failed logging out: \(error.localizedDescription)"
                         }
                     }) {
                         Text("Log out")
@@ -80,9 +80,11 @@ struct ProfileView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
-                        Text("Email: \(user?.email ?? "No Email")")
-                            .font(.headline)
+                        Text("Username: \(user?.email ?? "No Email")")
+                            .font(.system(.body, design: .monospaced))
                             .foregroundColor(.white)
+                        
+                        
 
                         if let avatarUIImage = avatarUIImage {
                             avatarUIImage
@@ -103,6 +105,7 @@ struct ProfileView: View {
                             isImagePickerPresented.toggle()
                         }
                         .padding()
+                        .font(.system(.body, design: .monospaced))
                         .foregroundColor(.white)
                         .sheet(isPresented: $isImagePickerPresented) {
                             ImagePicker(selectedImage: $avatarImage, isImagePickerPresented: $isImagePickerPresented)
@@ -123,17 +126,23 @@ struct ProfileView: View {
 
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Recent Games")
-                                .font(.headline)
+                                .font(.system(.body, design: .monospaced))
                                 .foregroundColor(.white)
 
                             ForEach(Array(recentGames.enumerated()), id: \.offset) { index, game in
                                 Text(game)
-                                    .padding()
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(Color.white.opacity(0.2))
-                                    .cornerRadius(10)
-                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .fontDesign(.monospaced)
+                                    .foregroundStyle(.black)
+                                    .frame(width: 350)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5))
                             }
+                                        
+
                         }
                         .padding(.top)
 

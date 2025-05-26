@@ -8,6 +8,24 @@
 import SwiftUI
 
 extension View {
+    
+    
+    func customGameSettings(isSelected: Bool) -> some View {
+        self
+        
+            .padding()
+            .frame(width: 80, height: 80)
+            .foregroundStyle(Color.black)
+            .background(isSelected ? Color(red: 113/256, green: 162/256, blue: 114/256) : Color.white)
+            .clipShape(.rect(cornerRadius: 15))
+            .overlay(
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+            )
+            .fontDesign(.monospaced)
+        
+    }
+    
     func customAnswerOptions() -> some View {
         self
             .padding()

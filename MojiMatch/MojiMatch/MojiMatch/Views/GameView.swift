@@ -30,12 +30,25 @@ struct GameView: View {
                     .ignoresSafeArea()
                 
                 VStack {
+                    
+                    Spacer(minLength: 70)
                     HStack {
-                        Spacer()
-                        
-                        Text("Score: \(score)")
+                        VStack{
+                            Text("Score: \(score)")
+                        }
                             .padding()
-                            .padding(.top, 50)                            .fontDesign(.monospaced)
+                            .frame(width: 350, height: 100)
+                            .foregroundStyle(Color.black)
+                            .background(Color.white)
+                            .clipShape(.rect(cornerRadius: 15))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
+                            )
+                            .shadow(radius: 10.0, x: 20, y: 10)
+                            .fontDesign(.monospaced)
+                            .padding(.top)
+                        
                     }
                     
                     //Fetch game question and show it.
@@ -44,7 +57,7 @@ struct GameView: View {
                             .customQuestionText()
                             .font(.system(size: fontSize(for: question.question)))
                         
-                        Spacer(minLength: 80)
+                        Spacer(minLength: 20)
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)

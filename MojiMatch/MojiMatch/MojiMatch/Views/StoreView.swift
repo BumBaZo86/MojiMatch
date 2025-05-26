@@ -18,9 +18,9 @@ struct StoreView: View {
     @State private var lockedQuestionCounts = [10, 15]
     
 
-    private let categoryPrices: [String: Int] = ["Flags": 30, "Countries": 40, "Food": 35, "Riddles": 25, "Movies": 30]
-    private let levelPrices: [String: Int] = ["Medium": 50, "Hard": 70]
-    private let questionCountPrices: [Int: Int] = [10: 20, 15: 30]
+    private let categoryPrices: [String: Int] = ["Flags": 10000, "Countries": 200, "Food": 1000, "Riddles": 15000, "Movies": 3000]
+    private let levelPrices: [String: Int] = ["Medium": 500, "Hard": 5000]
+    private let questionCountPrices: [Int: Int] = [10: 700, 15: 5000]
     
     @State private var userUnlockedCategories: [String] = []
     @State private var userUnlockedLevels: [String] = []
@@ -206,7 +206,7 @@ struct StoreItemView: View {
             Text("🔒")
                 .font(.largeTitle) 
                          .padding(.bottom, -6)
-                         .padding(.trailing, -30)
+                         .padding(.trailing, -20)
                  }
              }
          }

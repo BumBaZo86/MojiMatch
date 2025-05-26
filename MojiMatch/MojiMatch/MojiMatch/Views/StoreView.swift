@@ -5,6 +5,7 @@
 //  Created by Camilla Falk on 2025-05-20.
 //
 
+
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -24,169 +25,90 @@ struct StoreView: View {
     
     var body: some View {
         NavigationView {
-            ZStack {
-                Color(red: 124/255, green: 172/255, blue: 125/255)
-                    .ignoresSafeArea()
-                
+            ScrollView {
                 VStack(spacing: 20) {
-            
                     Text("Store")
-                        .font(.largeTitle)
+                        .font(.title2)
                         .fontDesign(.monospaced)
                         .foregroundStyle(.black)
-                        .padding()
-                        .frame(width: 250, height: 60)
+                        .padding(8)
+                        .frame(width: 200)
                         .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
                         )
-                        .shadow(radius: 10, x: 5, y: 5)
                     
                     Text("💰 \(points)")
-                        .font(.title3)
+                        .font(.body)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
-                        .padding()
-                        .frame(width: 250, height: 50)
+                        .padding(8)
+                        .frame(width: 150)
                         .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
                         )
-                        .shadow(radius: 10, x: 5, y: 5)
                     
-                 
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Category")
-                            .font(.headline)
-                            .foregroundColor(.black)
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 15) {
-                                ForEach(lockedCategories, id: \.self) { category in
-                                    if !userUnlockedCategories.contains(category) {
-                                        StoreItemView(name: category, emoji: textToEmoji(for: category)) {
-                                            unlockItem(item: category, field: "unlockedCategories")
-                                        }
-                                        .frame(width: 200)
-                                        .background(Color.white)
-                                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 15)
-                                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 4)
-                                        )
-                                        .shadow(radius: 5, x: 2, y: 2)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding(.vertical, 20)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
-                    )
-                    .shadow(radius: 10, x: 5, y: 5)
-                    .padding(.horizontal)
-                    .frame(minHeight: 150)
+                    storeSection(title: "Category", items: lockedCategories, unlocked: userUnlockedCategories, field: "unlockedCategories")
                     
-        
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("Difficulty")
-                            .font(.headline)
-                            .foregroundColor(.black)
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 15) {
-                                ForEach(lockedLevels, id: \.self) { level in
-                                    if !userUnlockedLevels.contains(level) {
-                                        StoreItemView(name: level, emoji: textToEmoji(for: level)) {
-                                            unlockItem(item: level, field: "unlockedLevels")
-                                        }
-                                        .frame(width: 200)
-                                        .background(Color.white)
-                                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 15)
-                                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 4)
-                                        )
-                                        .shadow(radius: 5, x: 2, y: 2)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding(.vertical, 20)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
-                    )
-                    .shadow(radius: 10, x: 5, y: 5)
-                    .padding(.horizontal)
-                    .frame(minHeight: 150)
+                    storeSection(title: "Difficulty", items: lockedLevels, unlocked: userUnlockedLevels, field: "unlockedLevels")
                     
-    
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text("No of questions")
-                            .font(.headline)
-                            .foregroundColor(.black)
-                            .padding(.horizontal)
-                            .padding(.top, 8)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 15) {
-                                ForEach(lockedQuestionCounts, id: \.self) { count in
-                                    if !userUnlockedQuestionCounts.contains(count) {
-                                        StoreItemView(name: "\(count)", emoji: textToEmoji(for: "\(count)")) {
-                                            unlockItem(item: count, field: "unlockedQuestionCounts")
-                                        }
-                                        .frame(width: 200)
-                                        .background(Color.white)
-                                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 15)
-                                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 4)
-                                        )
-                                        .shadow(radius: 5, x: 2, y: 2)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding(.vertical, 20)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
-                    )
-                    .shadow(radius: 10, x: 5, y: 5)
-                    .padding(.horizontal)
-                    .frame(minHeight: 150)
-                    
-                    Spacer()
+                    storeSection(title: "No of questions", items: lockedQuestionCounts.map { "\($0)" }, unlocked: userUnlockedQuestionCounts.map { "\($0)" }, field: "unlockedQuestionCounts")
                 }
-                .padding(.vertical)
+                .padding()
             }
+            .background(Color(red: 124/255, green: 172/255, blue: 125/255).ignoresSafeArea())
             .navigationBarHidden(true)
-            .onAppear {
-                loadUserData()
+            .onAppear { loadUserData() }
+        }
+    }
+    
+    func storeSection(title: String, items: [String], unlocked: [String], field: String) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.black)
+                .padding(.horizontal)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(items, id: \.self) { item in
+                        if !unlocked.contains(item) {
+                            StoreItemView(name: item, emoji: textToEmoji(for: item)) {
+                                if field == "unlockedQuestionCounts" {
+                                    if let intItem = Int(item) {
+                                        unlockItem(item: intItem, field: field)
+                                    }
+                                } else {
+                                    unlockItem(item: item, field: field)
+                                }
+                            }
+                            .frame(width: 120, height: 120)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 3)
+                            )
+                            .shadow(radius: 3)
+                        }
+                    }
+                }
+                .padding(.horizontal, 10)
             }
         }
+        .padding()
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+        .overlay(
+            RoundedRectangle(cornerRadius: 15)
+                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
+        )
+        .shadow(radius: 5)
     }
     
     func loadUserData() {
@@ -211,10 +133,7 @@ struct StoreView: View {
         userRef.updateData([
             field: FieldValue.arrayUnion([item])
         ]) { error in
-            if let error = error {
-                print("Error unlocking \(item): \(error.localizedDescription)")
-            } else {
-                print("\(item) unlocked successfully.")
+            if error == nil {
                 loadUserData()
             }
         }
@@ -245,30 +164,31 @@ struct StoreItemView: View {
     let onBuy: () -> Void
     
     var body: some View {
-        HStack {
+        VStack(spacing: 6) {
             Text(emoji)
-                .font(.largeTitle)
+                .font(.title)
+
             Text(name)
-                .font(.headline)
+                .font(.subheadline)
                 .foregroundColor(.black)
-            Spacer()
+
             Button(action: onBuy) {
                 Text("Buy")
+                    .font(.caption)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
+                    .padding(.vertical, 4)
                     .background(Color.blue)
-                    .cornerRadius(8)
+                    .cornerRadius(6)
             }
         }
-        .padding(.vertical, 5)
-        .padding(.horizontal)
+        .padding(6)
     }
 }
+
 
 #Preview {
     StoreView()
 }
-
 

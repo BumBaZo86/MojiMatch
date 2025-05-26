@@ -181,27 +181,35 @@ struct StoreItemView: View {
     let emoji: String
     let price: Int
     let onBuy: () -> Void
-    
+
     var body: some View {
-        VStack(spacing: 6) {
-            Text(emoji)
-                .font(.title)
-            Text(name)
-                .font(.subheadline)
-                .foregroundColor(.black)
-            Button(action: onBuy) {
-                Text("💰 \(price)")
-                    .font(.caption)
-                    .fontWeight(.bold)
+        ZStack(alignment: .bottomTrailing) {
+            VStack(spacing: 6) {
+                Text(emoji)
+                    .font(.title)
+                Text(name)
+                    .font(.subheadline)
                     .foregroundColor(.black)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 4)
-                    .background(Color.white)
-                    .cornerRadius(6)
+                Button(action: onBuy) {
+                    Text("💰 \(price)")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 4)
+                        .background(Color.white)
+                        .cornerRadius(6)
+                }
             }
-        }
-        .padding(8)
-    }
-}
+            .padding(8)
+
+            Text("🔒")
+                .font(.largeTitle) 
+                         .padding(.bottom, -6)
+                         .padding(.trailing, -30)
+                 }
+             }
+         }
+
 
 

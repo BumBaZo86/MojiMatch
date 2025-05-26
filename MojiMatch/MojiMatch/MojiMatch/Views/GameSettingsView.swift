@@ -18,12 +18,13 @@ struct GameSettingsView: View {
     @State var category = "Animals"
     @State var time = 10.0
     @State var difficulty = "Easy"
+    @State var numberOfQuestions = "5"
     @State var noOfQuestions = 5
     @State private var unlockedCategories: [String] = ["Animals"]
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
     
-    let columns = Array(repeating: GridItem(.fixed(80), spacing: 10), count: 3)
+    let columns = Array(repeating: GridItem(.fixed(80), spacing: 10), count: 4)
     
     var body: some View {
         
@@ -36,50 +37,94 @@ struct GameSettingsView: View {
                 
                 HStack() {
                     Text("Category")
+                        .fontDesign(.monospaced)
                     Spacer()
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top)
                 
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
                     
                     ForEach(unlockedCategories, id: \.self) { cat in
                     
-                        Text(textToEmoji(for: cat))
-                            .customGameSettings(isSelected: category == cat)
-                            .font(.largeTitle)
-                            .onTapGesture {
-                                category = cat
-                            }
+                        VStack{
+                            Text(textToEmoji(for: cat))
+                                .font(.largeTitle)
+                            
+                            Text(cat)
+                                .font(.system(size: 8))
+                        }
+                        .customGameSettings(isSelected: category == cat)
+                        .onTapGesture {
+                            category = cat
+                        }
                     }
                 }
                 .padding()
                 
                 HStack{
                     Text("Difficulty")
+                        .fontDesign(.monospaced)
                     Spacer()
                 }
-                .padding()
+                .padding(.horizontal)
+                .padding(.top)
                 
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
                     
                     ForEach(unlockedLevels, id: \.self) { level in
-                    
-                        Text(textToEmoji(for: level))
-                            .customGameSettings(isSelected: difficulty == level)
-                            .font(.largeTitle)
-                            .onTapGesture {
-                                difficulty = level
+                        VStack{
+                            Text(textToEmoji(for: level))
+                                .font(.largeTitle)
+                            Text(level)
+                                .font(.system(size: 8))
+                        }
+                        .customGameSettings(isSelected: difficulty == level)
+                        .onTapGesture {
+                            difficulty = level
+                            
+                            if (level == "Hard"){
+                                time = 5.0
+                            } else if (level == "Medium"){
+                                time = 7.0
+                            } else {
+                                time = 10.0
                             }
+                        }
                     }
                 }
                 .padding()
                 
                 
+                HStack{
+                    Text("Number of Questions")
+                        .fontDesign(.monospaced)
+                    Spacer()
+                }
+                .padding(.horizontal)
+                .padding(.top)
+                
+                LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
+                    
+                    ForEach(unlockedQuestionCounts, id: \.self) { q in
+                        Text(textToEmoji(for: String(q)))
+                            .font(.system(size: 19))
+                            .customGameSettings(isSelected: numberOfQuestions  == String(q))
+                            .onTapGesture {
+                                numberOfQuestions = String(q)
+                                noOfQuestions = Int(numberOfQuestions) ?? 5
+                        }
+                    }
+                }
+                .padding()
+                
                 
                 Spacer()
                 
                 Button(action: {
-                    showGameView = true }) {
+                    showGameView = true
+                    
+                }) {
                         Text("Play")
                             .buttonStyleCustom()
                     }
@@ -132,6 +177,16 @@ struct GameSettingsView: View {
             return "🎥"
         case "Easy":
             return "🍼"
+        case "Medium":
+            return "🐵"
+        case "Hard":
+            return "🔥"
+        case "5":
+            return "5️⃣"
+        case "10":
+            return "🔟"
+        case "15":
+            return "1️⃣5️⃣"
             
         default:
             return "?"

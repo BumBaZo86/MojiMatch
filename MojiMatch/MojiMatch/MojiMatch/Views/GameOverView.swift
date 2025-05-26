@@ -44,7 +44,7 @@ struct GameOverView: View {
                         .buttonStyleCustom()
                 }
 
-                Button("Home") {
+                Button("Close game") {
                     showGameView = false
                 }
                 .buttonStyleCustom()

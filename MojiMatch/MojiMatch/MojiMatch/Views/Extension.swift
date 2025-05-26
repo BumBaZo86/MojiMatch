@@ -14,7 +14,7 @@ extension View {
         self
         
             .padding()
-            .frame(width: 70, height: 70)
+            .frame(width: 80, height: 80)
             .foregroundStyle(Color.black)
             .background(isSelected ? Color(red: 113/256, green: 162/256, blue: 114/256) : Color.white)
             .clipShape(.rect(cornerRadius: 15))

@@ -15,6 +15,7 @@ struct GameView: View {
     @Binding var category: String
     @Binding var time: Double
     @Binding var noOfQuestions: Int
+    @Binding var maxPoints : Int
     @Binding var showGameView: Bool
     
     @State var questionCount = 0
@@ -23,20 +24,75 @@ struct GameView: View {
     @State var timeRemaining = 10.0
     @State var timer: Timer?
     
+    @State var starOne : Bool = false
+    @State var starTwo : Bool = false
+    @State var starThree : Bool = false
+    
     var body: some View {
         NavigationStack {
+            
             ZStack {
                 Color(red: 113/256, green: 162/256, blue: 114/256)
                     .ignoresSafeArea()
                 
                 VStack {
                     
-                    Spacer(minLength: 70)
-                    HStack {
                         VStack{
+                            
                             Text("Score: \(score)")
+                            
+                            ZStack {
+                                
+                                ProgressView(value: Double(score), total: Double(noOfQuestions * maxPoints))
+                                        .progressViewStyle(LinearProgressViewStyle())
+                                        .tint(Color(red: 113/256, green: 162/256, blue: 114/256))
+                                        .scaleEffect(y: 2)
+                                        .padding(.horizontal)
+                                       
+                                
+                                GeometryReader { geometry in
+                                    
+                                    let progressViewWidth = geometry.size.width
+                                    
+                                    Group {
+                                        
+                                        Image(systemName: "star.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(
+                                                width: starOne ? 45 : 25,
+                                                height: starOne ? 45 : 25)
+                                        
+                                            .position(x: progressViewWidth * 0.2, y: 7)
+                                            .foregroundStyle(starOne ? Color.yellow : Color.gray)
+                                            
+                                        Image(systemName: "star.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundStyle(starTwo ? Color.yellow : Color.gray)
+                                            .frame(
+                                                width: starTwo ? 45 : 25,
+                                                height: starTwo ? 45 : 25)
+                                            .position(x: progressViewWidth * 0.6, y: 7)
+                                      
+                                        
+                                        Image(systemName: "star.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundStyle(starThree ? Color.yellow : Color.gray)
+                                            .frame(
+                                                width: starThree ? 45 : 25,
+                                                height: starThree ? 45 : 25)
+                                            .position(x: progressViewWidth * 1.0, y: 7)
+                                       
+                                    }
+                                }
+                                .frame(height: 20)
+                                .padding(.horizontal)
+                            }
+                            .frame(height: 40)
                         }
-                            .padding()
+                        .padding()
                             .frame(width: 350, height: 100)
                             .foregroundStyle(Color.black)
                             .background(Color.white)
@@ -48,16 +104,13 @@ struct GameView: View {
                             .shadow(radius: 10.0, x: 20, y: 10)
                             .fontDesign(.monospaced)
                             .padding(.top)
-                        
-                    }
+                    
                     
                     //Fetch game question and show it.
                     if let question = firebaseViewModel.currentQuestion {
                         Text(question.question)
                             .customQuestionText()
                             .font(.system(size: fontSize(for: question.question)))
-                        
-                        Spacer(minLength: 20)
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)
@@ -70,7 +123,7 @@ struct GameView: View {
                             
                             //Show answerOptions as buttons
                             VStack(spacing: 25) {
-                                Spacer()
+                                
                                 HStack(spacing: 25) {
                                     Spacer()
                                     optionButton(text: firebaseViewModel.optionA)
@@ -83,9 +136,9 @@ struct GameView: View {
                                     optionButton(text: firebaseViewModel.optionD)
                                     Spacer()
                                 }
-                                Spacer()
                             }
                         }
+                        .padding(.top, 20)
                         
                         //Active timer show ticking down in MM:SS format.
                         HStack {
@@ -100,20 +153,23 @@ struct GameView: View {
                             .progressViewStyle(LinearProgressViewStyle())
                             .tint(.black)
                             .padding(.horizontal)
+                            .padding(.bottom, 50)
+                        
                     }
-                    
-                    Spacer(minLength: 90)
                     
                     //Navigate to GameOverView after game over.
-                    NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions), isActive: $isGameOver) {
+                    NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints), isActive: $isGameOver) {
                         EmptyView()
                     }
+                   
                 }
             }
             //Fetch first question, answerOptions and start timer.
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
                 startTimer()
+                
+               
             }
         }
     }
@@ -159,8 +215,17 @@ struct GameView: View {
         timer?.invalidate()
         
         if selected == firebaseViewModel.currentQuestion?.answer {
-            score += 10
+           
+            if time == 5.0 {
+                score += 30
+            } else if time == 7.0 {
+                score += 20
+            } else {
+                score += 10
+            }
         }
+        
+        checkStars()
         
         questionCount += 1
         
@@ -199,6 +264,17 @@ struct GameView: View {
             } else {
                 self.timeRemaining -= 0.1
             }
+        }
+    }
+    
+    func checkStars() {
+        
+        if score == (maxPoints * noOfQuestions) / 5 {
+            starOne = true
+        } else if score == ((maxPoints * noOfQuestions) / 5) * 3 {
+            starTwo = true
+        } else if score == (maxPoints * noOfQuestions) {
+            starThree = true
         }
     }
 }

@@ -17,6 +17,7 @@ struct GameOverView: View {
     @Binding var category: String
     @Binding var time: Double
     @Binding var noOfQuestions: Int
+    @Binding var maxPoints : Int
 
     var body: some View {
         ZStack {
@@ -38,7 +39,10 @@ struct GameOverView: View {
                     category: $category,
                     time: $time,
                     noOfQuestions: $noOfQuestions,
+                    maxPoints: $maxPoints,
                     showGameView: $showGameView
+                    
+                    
                 )) {
                     Text("Play Again")
                         .buttonStyleCustom()

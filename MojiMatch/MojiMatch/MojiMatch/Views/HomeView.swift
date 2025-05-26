@@ -6,14 +6,9 @@
 //
 
 import SwiftUI
+
 struct HomeView: View {
-    
-    @State var showGameView = false
-    @State var category = "Animals"
-    @State var time = 10.0
-    @State var noOfQuestions = 5
  
-    
     var body: some View {
         
         ZStack{
@@ -24,18 +19,6 @@ struct HomeView: View {
             VStack{
                 Text("HomeView")
                 
-                Spacer()
-                
-                Button(action: {
-                    showGameView = true }) {
-                        Text("Play")
-                            .buttonStyleCustom()
-                    }
-                Spacer()
-            }
-            // fullscreen makes tabview dissapear during the game and gameOverView. 
-            .fullScreenCover(isPresented: $showGameView){
-                GameView(firebaseViewModel: FirebaseViewModel(), category: $category, time: $time, noOfQuestions: $noOfQuestions, showGameView: $showGameView)
             }
         }
     }

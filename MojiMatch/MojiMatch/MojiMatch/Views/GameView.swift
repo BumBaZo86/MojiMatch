@@ -35,7 +35,8 @@ struct GameView: View {
                         
                         Text("Score: \(score)")
                             .padding()
-                            .padding(.top, 50)                            .fontDesign(.monospaced)
+                            .padding(.top, 50)
+                            .fontDesign(.monospaced)
                     }
                     
                     //Fetch game question and show it.

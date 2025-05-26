@@ -42,7 +42,7 @@ struct ProfileView: View {
                     }) {
                         Image("Settings")
                             .resizable()
-                            .frame(width: 40, height: 40)
+                            .frame(width: 30, height: 30)
                              .padding(12)
                             .clipShape(Circle())
                             .shadow(radius: 2)

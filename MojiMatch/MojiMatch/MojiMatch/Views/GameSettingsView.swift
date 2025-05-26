@@ -20,6 +20,7 @@ struct GameSettingsView: View {
     @State var difficulty = "Easy"
     @State var numberOfQuestions = "5"
     @State var noOfQuestions = 5
+    @State var maxPoints = 10
     @State private var unlockedCategories: [String] = ["Animals"]
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
@@ -85,10 +86,13 @@ struct GameSettingsView: View {
                             
                             if (level == "Hard"){
                                 time = 5.0
+                                maxPoints = 30
                             } else if (level == "Medium"){
                                 time = 7.0
+                                maxPoints = 20
                             } else {
                                 time = 10.0
+                                maxPoints = 10
                             }
                         }
                     }
@@ -132,7 +136,7 @@ struct GameSettingsView: View {
                 Spacer()
                 
                     .fullScreenCover(isPresented: $showGameView){
-                        GameView(firebaseViewModel: FirebaseViewModel(), category: $category, time: $time, noOfQuestions: $noOfQuestions, showGameView: $showGameView)
+                        GameView(firebaseViewModel: FirebaseViewModel(), category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints, showGameView: $showGameView)
                     }
             }
         }

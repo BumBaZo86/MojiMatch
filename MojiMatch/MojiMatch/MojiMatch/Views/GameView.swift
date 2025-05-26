@@ -15,6 +15,7 @@ struct GameView: View {
     @Binding var category: String
     @Binding var time: Double
     @Binding var noOfQuestions: Int
+    @Binding var maxPoints : Int
     @Binding var showGameView: Bool
     
     @State var questionCount = 0
@@ -22,6 +23,10 @@ struct GameView: View {
     @State private var isGameOver = false
     @State var timeRemaining = 10.0
     @State var timer: Timer?
+    
+    @State var starOne : Bool = false
+    @State var starTwo : Bool = false
+    @State var starThree : Bool = false
     
     var body: some View {
         NavigationStack {
@@ -37,7 +42,8 @@ struct GameView: View {
                             Text("Score: \(score)")
                             
                             ZStack {
-                                    ProgressView(value: Double(score), total: Double(noOfQuestions * 10))
+                                
+                                ProgressView(value: Double(score), total: Double(noOfQuestions * maxPoints))
                                         .progressViewStyle(LinearProgressViewStyle())
                                         .tint(Color(red: 113/256, green: 162/256, blue: 114/256))
                                         .scaleEffect(y: 2)
@@ -53,15 +59,14 @@ struct GameView: View {
                                         Image(systemName: "star.fill")
                                             .resizable()
                                             .scaledToFit()
-                                            .foregroundStyle(Color(.gray))
                                             .frame(width: 25, height: 25)
                                             .position(x: progressViewWidth * 0.2, y: 7)
-                                      
-                                        
+                                            .foregroundStyle(starOne ? Color.yellow : Color.gray)
+                                            
                                         Image(systemName: "star.fill")
                                             .resizable()
                                             .scaledToFit()
-                                            .foregroundStyle(Color(.gray))
+                                            .foregroundStyle(starTwo ? Color.yellow : Color.gray)
                                             .frame(width: 25, height: 25)
                                             .position(x: progressViewWidth * 0.6, y: 7)
                                       
@@ -69,7 +74,7 @@ struct GameView: View {
                                         Image(systemName: "star.fill")
                                             .resizable()
                                             .scaledToFit()
-                                            .foregroundStyle(Color(.gray))
+                                            .foregroundStyle(starThree ? Color.yellow : Color.gray)
                                             .frame(width: 25, height: 25)
                                             .position(x: progressViewWidth * 1.0, y: 7)
                                        
@@ -146,7 +151,7 @@ struct GameView: View {
                     }
                     
                     //Navigate to GameOverView after game over.
-                    NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions), isActive: $isGameOver) {
+                    NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints), isActive: $isGameOver) {
                         EmptyView()
                     }
                    
@@ -156,6 +161,8 @@ struct GameView: View {
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
                 startTimer()
+                
+               
             }
         }
     }
@@ -201,8 +208,17 @@ struct GameView: View {
         timer?.invalidate()
         
         if selected == firebaseViewModel.currentQuestion?.answer {
-            score += 10
+           
+            if time == 5.0 {
+                score += 30
+            } else if time == 7.0 {
+                score += 20
+            } else {
+                score += 10
+            }
         }
+        
+        checkStars()
         
         questionCount += 1
         
@@ -241,6 +257,17 @@ struct GameView: View {
             } else {
                 self.timeRemaining -= 0.1
             }
+        }
+    }
+    
+    func checkStars() {
+        
+        if score == (maxPoints * noOfQuestions) / 5 {
+            starOne = true
+        } else if score == ((maxPoints * noOfQuestions) / 5) * 3 {
+            starTwo = true
+        } else if score == (maxPoints * noOfQuestions) {
+            starThree = true
         }
     }
 }

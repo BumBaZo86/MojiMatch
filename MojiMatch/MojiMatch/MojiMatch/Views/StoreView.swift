@@ -44,8 +44,7 @@ struct StoreView: View {
                         )
                         .shadow(radius: 10, x: 5, y: 5)
                     
-                  
-                    Text("Points: \(points)")
+                    Text("💰 \(points)")
                         .font(.title3)
                         .fontWeight(.semibold)
                         .foregroundColor(.black)
@@ -59,23 +58,36 @@ struct StoreView: View {
                         )
                         .shadow(radius: 10, x: 5, y: 5)
                     
-          
+                 
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Categories")
+                        Text("Category")
                             .font(.headline)
                             .foregroundColor(.black)
                             .padding(.horizontal)
                             .padding(.top, 8)
                         
-                        ForEach(lockedCategories, id: \.self) { category in
-                            if !userUnlockedCategories.contains(category) {
-                                StoreItemView(name: category, emoji: textToEmoji(for: category)) {
-                                    unlockItem(item: category, field: "unlockedCategories")
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 15) {
+                                ForEach(lockedCategories, id: \.self) { category in
+                                    if !userUnlockedCategories.contains(category) {
+                                        StoreItemView(name: category, emoji: textToEmoji(for: category)) {
+                                            unlockItem(item: category, field: "unlockedCategories")
+                                        }
+                                        .frame(width: 200)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 4)
+                                        )
+                                        .shadow(radius: 5, x: 2, y: 2)
+                                    }
                                 }
                             }
+                            .padding(.horizontal)
                         }
                     }
-                    .padding(.vertical)
+                    .padding(.vertical, 20)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 15))
                     .overlay(
@@ -84,24 +96,38 @@ struct StoreView: View {
                     )
                     .shadow(radius: 10, x: 5, y: 5)
                     .padding(.horizontal)
+                    .frame(minHeight: 150)
                     
-          
+        
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Difficulties")
+                        Text("Difficulty")
                             .font(.headline)
                             .foregroundColor(.black)
                             .padding(.horizontal)
                             .padding(.top, 8)
                         
-                        ForEach(lockedLevels, id: \.self) { level in
-                            if !userUnlockedLevels.contains(level) {
-                                StoreItemView(name: level, emoji: textToEmoji(for: level)) {
-                                    unlockItem(item: level, field: "unlockedLevels")
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 15) {
+                                ForEach(lockedLevels, id: \.self) { level in
+                                    if !userUnlockedLevels.contains(level) {
+                                        StoreItemView(name: level, emoji: textToEmoji(for: level)) {
+                                            unlockItem(item: level, field: "unlockedLevels")
+                                        }
+                                        .frame(width: 200)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 4)
+                                        )
+                                        .shadow(radius: 5, x: 2, y: 2)
+                                    }
                                 }
                             }
+                            .padding(.horizontal)
                         }
                     }
-                    .padding(.vertical)
+                    .padding(.vertical, 20)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 15))
                     .overlay(
@@ -110,24 +136,38 @@ struct StoreView: View {
                     )
                     .shadow(radius: 10, x: 5, y: 5)
                     .padding(.horizontal)
+                    .frame(minHeight: 150)
                     
-              
+    
                     VStack(alignment: .leading, spacing: 10) {
-                        Text("Question Counts")
+                        Text("No of questions")
                             .font(.headline)
                             .foregroundColor(.black)
                             .padding(.horizontal)
                             .padding(.top, 8)
                         
-                        ForEach(lockedQuestionCounts, id: \.self) { count in
-                            if !userUnlockedQuestionCounts.contains(count) {
-                                StoreItemView(name: "\(count)", emoji: textToEmoji(for: "\(count)")) {
-                                    unlockItem(item: count, field: "unlockedQuestionCounts")
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 15) {
+                                ForEach(lockedQuestionCounts, id: \.self) { count in
+                                    if !userUnlockedQuestionCounts.contains(count) {
+                                        StoreItemView(name: "\(count)", emoji: textToEmoji(for: "\(count)")) {
+                                            unlockItem(item: count, field: "unlockedQuestionCounts")
+                                        }
+                                        .frame(width: 200)
+                                        .background(Color.white)
+                                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 15)
+                                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 4)
+                                        )
+                                        .shadow(radius: 5, x: 2, y: 2)
+                                    }
                                 }
                             }
+                            .padding(.horizontal)
                         }
                     }
-                    .padding(.vertical)
+                    .padding(.vertical, 20)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 15))
                     .overlay(
@@ -136,6 +176,7 @@ struct StoreView: View {
                     )
                     .shadow(radius: 10, x: 5, y: 5)
                     .padding(.horizontal)
+                    .frame(minHeight: 150)
                     
                     Spacer()
                 }
@@ -188,7 +229,7 @@ struct StoreView: View {
         case "Riddles": return "❓"
         case "Movies": return "🎥"
         case "Easy": return "🍼"
-        case "Medium": return "🐵"
+        case "Medium": return "😐"
         case "Hard": return "🔥"
         case "5": return "5️⃣"
         case "10": return "🔟"
@@ -226,7 +267,8 @@ struct StoreItemView: View {
     }
 }
 
-
 #Preview {
     StoreView()
 }
+
+

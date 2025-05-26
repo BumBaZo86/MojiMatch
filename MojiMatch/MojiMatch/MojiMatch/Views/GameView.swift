@@ -59,7 +59,10 @@ struct GameView: View {
                                         Image(systemName: "star.fill")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 25, height: 25)
+                                            .frame(
+                                                width: starOne ? 45 : 25,
+                                                height: starOne ? 45 : 25)
+                                        
                                             .position(x: progressViewWidth * 0.2, y: 7)
                                             .foregroundStyle(starOne ? Color.yellow : Color.gray)
                                             
@@ -67,7 +70,9 @@ struct GameView: View {
                                             .resizable()
                                             .scaledToFit()
                                             .foregroundStyle(starTwo ? Color.yellow : Color.gray)
-                                            .frame(width: 25, height: 25)
+                                            .frame(
+                                                width: starTwo ? 45 : 25,
+                                                height: starTwo ? 45 : 25)
                                             .position(x: progressViewWidth * 0.6, y: 7)
                                       
                                         
@@ -75,7 +80,9 @@ struct GameView: View {
                                             .resizable()
                                             .scaledToFit()
                                             .foregroundStyle(starThree ? Color.yellow : Color.gray)
-                                            .frame(width: 25, height: 25)
+                                            .frame(
+                                                width: starThree ? 45 : 25,
+                                                height: starThree ? 45 : 25)
                                             .position(x: progressViewWidth * 1.0, y: 7)
                                        
                                     }

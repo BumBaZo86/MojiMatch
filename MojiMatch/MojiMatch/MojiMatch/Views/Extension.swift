@@ -55,3 +55,24 @@ extension View {
         
     }
 }
+struct CustomGroupStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding()
+            .frame(maxWidth: 350)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 15))
+            .overlay(
+                RoundedRectangle(cornerRadius: 15)
+                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+            )
+            .shadow(radius: 10.0, x: 20, y: 10)
+            .fontDesign(.monospaced)
+    }
+}
+
+extension View {
+    func customGroupStyle() -> some View {
+        self.modifier(CustomGroupStyle())
+    }
+}

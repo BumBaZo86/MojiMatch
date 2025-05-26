@@ -17,6 +17,11 @@ struct StoreView: View {
     @State private var lockedLevels = ["Medium", "Hard"]
     @State private var lockedQuestionCounts = [10, 15]
     
+
+    private let categoryPrices: [String: Int] = ["Flags": 30, "Countries": 40, "Food": 35, "Riddles": 25, "Movies": 30]
+    private let levelPrices: [String: Int] = ["Medium": 50, "Hard": 70]
+    private let questionCountPrices: [Int: Int] = [10: 20, 15: 30]
+    
     @State private var userUnlockedCategories: [String] = []
     @State private var userUnlockedLevels: [String] = []
     @State private var userUnlockedQuestionCounts: [Int] = []
@@ -78,13 +83,25 @@ struct StoreView: View {
                 HStack(spacing: 12) {
                     ForEach(items, id: \.self) { item in
                         if !unlocked.contains(item) {
-                            StoreItemView(name: item, emoji: textToEmoji(for: item)) {
-                                if field == "unlockedQuestionCounts" {
-                                    if let intItem = Int(item) {
-                                        unlockItem(item: intItem, field: field)
+                            let price: Int = {
+                                switch field {
+                                case "unlockedCategories": return categoryPrices[item] ?? 0
+                                case "unlockedLevels": return levelPrices[item] ?? 0
+                                case "unlockedQuestionCounts":
+                                    return questionCountPrices[Int(item) ?? 0] ?? 0
+                                default: return 0
+                                }
+                            }()
+                            
+                            StoreItemView(name: item, emoji: textToEmoji(for: item), price: price) {
+                                if points >= price {
+                                    if field == "unlockedQuestionCounts" {
+                                        if let intItem = Int(item) {
+                                            unlockItem(item: intItem, field: field, cost: price)
+                                        }
+                                    } else {
+                                        unlockItem(item: item, field: field, cost: price)
                                     }
-                                } else {
-                                    unlockItem(item: item, field: field)
                                 }
                             }
                             .frame(width: 120, height: 120)
@@ -125,13 +142,14 @@ struct StoreView: View {
         }
     }
     
-    func unlockItem<T: Hashable>(item: T, field: String) {
+    func unlockItem<T: Hashable>(item: T, field: String, cost: Int) {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
         let db = Firestore.firestore()
         let userRef = db.collection("users").document(userEmail)
         
         userRef.updateData([
-            field: FieldValue.arrayUnion([item])
+            field: FieldValue.arrayUnion([item]),
+            "points": FieldValue.increment(Int64(-cost))
         ]) { error in
             if error == nil {
                 loadUserData()
@@ -161,25 +179,24 @@ struct StoreView: View {
 struct StoreItemView: View {
     let name: String
     let emoji: String
+    let price: Int
     let onBuy: () -> Void
     
     var body: some View {
         VStack(spacing: 6) {
             Text(emoji)
                 .font(.title)
-
             Text(name)
                 .font(.subheadline)
                 .foregroundColor(.black)
-
             Button(action: onBuy) {
-                Text("Buy")
+                Text("💰 \(price)")
                     .font(.caption)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 4)
-                    .background(Color.blue)
+                    .background(Color.white)
                     .cornerRadius(6)
             }
         }
@@ -187,8 +204,4 @@ struct StoreItemView: View {
     }
 }
 
-
-#Preview {
-    StoreView()
-}
 

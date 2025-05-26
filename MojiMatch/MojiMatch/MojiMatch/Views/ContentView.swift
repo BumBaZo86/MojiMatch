@@ -7,16 +7,29 @@
 import SwiftUI
 import Firebase
 import FirebaseAuth
+import UIKit
 
 struct ContentView: View {
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var showSignup = false
 
+  
+    init() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(red: 194/255, green: 225/255, blue: 194/255, alpha: 1)
+
+        UITabBar.appearance().standardAppearance = appearance
+        if #available(iOS 15.0, *) {
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+    }
+
     var body: some View {
         ZStack {
             Color(red: 113/256, green: 162/256, blue: 114/256)
                 .ignoresSafeArea()
-            
+
             if isLoggedIn {
                 MainTabView()
                     .tint(.green)
@@ -29,7 +42,6 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            // Kontrollera om användaren fortfarande är inloggad i Firebase
             if Auth.auth().currentUser != nil {
                 isLoggedIn = true
             }

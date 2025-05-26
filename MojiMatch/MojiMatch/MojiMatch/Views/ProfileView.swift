@@ -22,6 +22,7 @@ struct ProfileView: View {
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
     @State private var isImagePickerPresented = false
+    @State private var isSettingsMode: Bool = false
 
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = true
 
@@ -29,36 +30,33 @@ struct ProfileView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 113/256, green: 162/256, blue: 114/256)
+            Color(isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
 
             VStack {
-         
                 HStack {
-               
                     Button(action: {
-                        print("Settings tapped")
-                     
+                        isSettingsMode.toggle()
+                        print("Settings tapped, isSettingsMode = \(isSettingsMode)")
                     }) {
                         Image("Settings")
                             .resizable()
-                            .frame(width: 24, height: 24)
-                            .padding(10)
-                            .background(Color.white)
-                            .clipShape(Circle())
-                            .shadow(radius: 2)
+                                  .frame(width: 30, height: 30)
+                                  .padding(12)
+                                  .clipShape(Circle())
+                                  .shadow(radius: 2)
+                          
                     }
 
                     Spacer()
 
-                  
                     Button(action: {
                         do {
                             try Auth.auth().signOut()
                             isLoggedIn = false
                             print("User logged out successfully.")
                         } catch {
-                            errorMessage = "Misslyckades logga ut: \(error.localizedDescription)"
+                            errorMessage = "Failed logging out: \(error.localizedDescription)"
                         }
                     }) {
                         Text("Log out")
@@ -80,8 +78,9 @@ struct ProfileView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
-                        Text("Email: \(user?.email ?? "No Email")")
-                            .font(.headline)
+                        Text("Username: \(user?.email ?? "No Email")")
+                            .font(.system(.body, design: .monospaced))
+                            .fontWeight(.semibold)
                             .foregroundColor(.white)
 
                         if let avatarUIImage = avatarUIImage {
@@ -103,6 +102,7 @@ struct ProfileView: View {
                             isImagePickerPresented.toggle()
                         }
                         .padding()
+                        .font(.system(.body, design: .monospaced))
                         .foregroundColor(.white)
                         .sheet(isPresented: $isImagePickerPresented) {
                             ImagePicker(selectedImage: $avatarImage, isImagePickerPresented: $isImagePickerPresented)
@@ -123,16 +123,20 @@ struct ProfileView: View {
 
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Recent Games")
-                                .font(.headline)
+                                .font(.system(.body, design: .monospaced))
                                 .foregroundColor(.white)
 
                             ForEach(Array(recentGames.enumerated()), id: \.offset) { index, game in
                                 Text(game)
-                                    .padding()
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(Color.white.opacity(0.2))
-                                    .cornerRadius(10)
-                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .fontDesign(.monospaced)
+                                    .foregroundStyle(.black)
+                                    .frame(width: 350)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5))
                             }
                         }
                         .padding(.top)
@@ -185,3 +189,4 @@ struct ProfileView: View {
             }
     }
 }
+

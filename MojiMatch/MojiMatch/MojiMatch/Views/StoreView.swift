@@ -20,13 +20,16 @@ struct StoreView: View {
     @State private var userUnlockedLevels: [String] = []
     @State private var userUnlockedQuestionCounts: [Int] = []
     
+    @State private var points: Int = 0
+    
     var body: some View {
         NavigationView {
             ZStack {
-                Color(red: 124/255, green: 172/255, blue: 125/255) 
+                Color(red: 124/255, green: 172/255, blue: 125/255)
                     .ignoresSafeArea()
                 
-                VStack {
+                VStack(spacing: 20) {
+            
                     Text("Store")
                         .font(.largeTitle)
                         .fontDesign(.monospaced)
@@ -40,52 +43,103 @@ struct StoreView: View {
                                 .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
                         )
                         .shadow(radius: 10, x: 5, y: 5)
-
                     
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 20) {
-                            Section(header: Text("Categories")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            ) {
-                                ForEach(lockedCategories, id: \.self) { category in
-                                    if !userUnlockedCategories.contains(category) {
-                                        StoreItemView(name: category, emoji: textToEmoji(for: category)) {
-                                            unlockItem(item: category, field: "unlockedCategories")
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            Section(header: Text("Difficulties")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            ) {
-                                ForEach(lockedLevels, id: \.self) { level in
-                                    if !userUnlockedLevels.contains(level) {
-                                        StoreItemView(name: level, emoji: textToEmoji(for: level)) {
-                                            unlockItem(item: level, field: "unlockedLevels")
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            Section(header: Text("Question Counts")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                            ) {
-                                ForEach(lockedQuestionCounts, id: \.self) { count in
-                                    if !userUnlockedQuestionCounts.contains(count) {
-                                        StoreItemView(name: "\(count)", emoji: textToEmoji(for: "\(count)")) {
-                                            unlockItem(item: count, field: "unlockedQuestionCounts")
-                                        }
-                                    }
+                  
+                    Text("Points: \(points)")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.black)
+                        .padding()
+                        .frame(width: 250, height: 50)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
+                        )
+                        .shadow(radius: 10, x: 5, y: 5)
+                    
+          
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Categories")
+                            .font(.headline)
+                            .foregroundColor(.black)
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                        
+                        ForEach(lockedCategories, id: \.self) { category in
+                            if !userUnlockedCategories.contains(category) {
+                                StoreItemView(name: category, emoji: textToEmoji(for: category)) {
+                                    unlockItem(item: category, field: "unlockedCategories")
                                 }
                             }
                         }
-                        .padding(.horizontal)
                     }
+                    .padding(.vertical)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
+                    )
+                    .shadow(radius: 10, x: 5, y: 5)
+                    .padding(.horizontal)
+                    
+          
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Difficulties")
+                            .font(.headline)
+                            .foregroundColor(.black)
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                        
+                        ForEach(lockedLevels, id: \.self) { level in
+                            if !userUnlockedLevels.contains(level) {
+                                StoreItemView(name: level, emoji: textToEmoji(for: level)) {
+                                    unlockItem(item: level, field: "unlockedLevels")
+                                }
+                            }
+                        }
+                    }
+                    .padding(.vertical)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
+                    )
+                    .shadow(radius: 10, x: 5, y: 5)
+                    .padding(.horizontal)
+                    
+              
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("Question Counts")
+                            .font(.headline)
+                            .foregroundColor(.black)
+                            .padding(.horizontal)
+                            .padding(.top, 8)
+                        
+                        ForEach(lockedQuestionCounts, id: \.self) { count in
+                            if !userUnlockedQuestionCounts.contains(count) {
+                                StoreItemView(name: "\(count)", emoji: textToEmoji(for: "\(count)")) {
+                                    unlockItem(item: count, field: "unlockedQuestionCounts")
+                                }
+                            }
+                        }
+                    }
+                    .padding(.vertical)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
+                    )
+                    .shadow(radius: 10, x: 5, y: 5)
+                    .padding(.horizontal)
+                    
+                    Spacer()
                 }
+                .padding(.vertical)
             }
             .navigationBarHidden(true)
             .onAppear {
@@ -100,6 +154,7 @@ struct StoreView: View {
         let db = Firestore.firestore()
         db.collection("users").document(userEmail).getDocument { document, error in
             if let document = document, document.exists {
+                self.points = document["points"] as? Int ?? 0
                 self.userUnlockedCategories = document["unlockedCategories"] as? [String] ?? []
                 self.userUnlockedLevels = document["unlockedLevels"] as? [String] ?? []
                 self.userUnlockedQuestionCounts = document["unlockedQuestionCounts"] as? [Int] ?? []
@@ -154,7 +209,7 @@ struct StoreItemView: View {
                 .font(.largeTitle)
             Text(name)
                 .font(.headline)
-                .foregroundColor(.white)
+                .foregroundColor(.black)
             Spacer()
             Button(action: onBuy) {
                 Text("Buy")
@@ -167,8 +222,10 @@ struct StoreItemView: View {
             }
         }
         .padding(.vertical, 5)
+        .padding(.horizontal)
     }
 }
+
 
 #Preview {
     StoreView()

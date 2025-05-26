@@ -9,7 +9,7 @@ import SwiftUI
 
 struct StoreView: View {
     var body: some View {
-        Text("StoreView")
+        Text("StoreView init")
     }
 }
 

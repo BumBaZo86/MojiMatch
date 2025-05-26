@@ -53,7 +53,7 @@ extension View {
             )
             .shadow(radius: 10.0, x: 20, y: 10)
             .fontDesign(.monospaced)
-            .padding(.top, 100)
+            .padding(.top, 20)
     }
     
     func buttonStyleCustom() -> some View {

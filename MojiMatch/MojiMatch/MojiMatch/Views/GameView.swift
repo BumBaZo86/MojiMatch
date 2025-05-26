@@ -25,18 +25,62 @@ struct GameView: View {
     
     var body: some View {
         NavigationStack {
+            
             ZStack {
                 Color(red: 113/256, green: 162/256, blue: 114/256)
                     .ignoresSafeArea()
                 
                 VStack {
                     
-                    Spacer(minLength: 70)
-                    HStack {
                         VStack{
+                            
                             Text("Score: \(score)")
+                            
+                            ZStack {
+                                    ProgressView(value: Double(score), total: Double(noOfQuestions * 10))
+                                        .progressViewStyle(LinearProgressViewStyle())
+                                        .tint(Color(red: 113/256, green: 162/256, blue: 114/256))
+                                        .scaleEffect(y: 2)
+                                        .padding(.horizontal)
+                                       
+                                
+                                GeometryReader { geometry in
+                                    
+                                    let progressViewWidth = geometry.size.width
+                                    
+                                    Group {
+                                        
+                                        Image(systemName: "star.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundStyle(Color(.gray))
+                                            .frame(width: 25, height: 25)
+                                            .position(x: progressViewWidth * 0.2, y: 7)
+                                      
+                                        
+                                        Image(systemName: "star.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundStyle(Color(.gray))
+                                            .frame(width: 25, height: 25)
+                                            .position(x: progressViewWidth * 0.6, y: 7)
+                                      
+                                        
+                                        Image(systemName: "star.fill")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .foregroundStyle(Color(.gray))
+                                            .frame(width: 25, height: 25)
+                                            .position(x: progressViewWidth * 1.0, y: 7)
+                                       
+                                    }
+                                }
+                                .frame(height: 20)
+                                .padding(.horizontal)
+                            }
+                            .frame(height: 40)
                         }
-                            .padding()
+                        .padding()
                             .frame(width: 350, height: 100)
                             .foregroundStyle(Color.black)
                             .background(Color.white)
@@ -48,16 +92,13 @@ struct GameView: View {
                             .shadow(radius: 10.0, x: 20, y: 10)
                             .fontDesign(.monospaced)
                             .padding(.top)
-                        
-                    }
+                    
                     
                     //Fetch game question and show it.
                     if let question = firebaseViewModel.currentQuestion {
                         Text(question.question)
                             .customQuestionText()
                             .font(.system(size: fontSize(for: question.question)))
-                        
-                        Spacer(minLength: 20)
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)
@@ -70,7 +111,7 @@ struct GameView: View {
                             
                             //Show answerOptions as buttons
                             VStack(spacing: 25) {
-                                Spacer()
+                                
                                 HStack(spacing: 25) {
                                     Spacer()
                                     optionButton(text: firebaseViewModel.optionA)
@@ -83,9 +124,9 @@ struct GameView: View {
                                     optionButton(text: firebaseViewModel.optionD)
                                     Spacer()
                                 }
-                                Spacer()
                             }
                         }
+                        .padding(.top, 20)
                         
                         //Active timer show ticking down in MM:SS format.
                         HStack {
@@ -100,14 +141,15 @@ struct GameView: View {
                             .progressViewStyle(LinearProgressViewStyle())
                             .tint(.black)
                             .padding(.horizontal)
+                            .padding(.bottom, 50)
+                        
                     }
-                    
-                    Spacer(minLength: 90)
                     
                     //Navigate to GameOverView after game over.
                     NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions), isActive: $isGameOver) {
                         EmptyView()
                     }
+                   
                 }
             }
             //Fetch first question, answerOptions and start timer.

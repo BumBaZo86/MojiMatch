@@ -106,12 +106,12 @@ struct StoreView: View {
                             }
                             .frame(width: 120, height: 120)
                             .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .clipShape(RoundedRectangle(cornerRadius: 25))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 3)
+                                RoundedRectangle(cornerRadius: 25)
+                                    .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 1)
                             )
-                            .shadow(radius: 3)
+                            
                         }
                     }
                 }
@@ -120,9 +120,9 @@ struct StoreView: View {
         }
         .padding()
         .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 15))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 12)
                 .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
         )
         .shadow(radius: 5)
@@ -200,7 +200,7 @@ struct StoreItemView: View {
                     .cornerRadius(6)
             }
         }
-        .padding(6)
+        .padding(8)
     }
 }
 

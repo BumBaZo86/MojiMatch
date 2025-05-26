@@ -22,6 +22,7 @@ struct ProfileView: View {
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
     @State private var isImagePickerPresented = false
+    @State private var isSettingsMode: Bool = false
 
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = true
 
@@ -29,28 +30,26 @@ struct ProfileView: View {
 
     var body: some View {
         ZStack {
-            Color(red: 113/256, green: 162/256, blue: 114/256)
+            Color(isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
 
             VStack {
-         
                 HStack {
-               
                     Button(action: {
-                        print("Settings tapped")
-                     
+                        isSettingsMode.toggle()
+                        print("Settings tapped, isSettingsMode = \(isSettingsMode)")
                     }) {
                         Image("Settings")
                             .resizable()
-                            .frame(width: 30, height: 30)
-                             .padding(12)
-                            .clipShape(Circle())
-                            .shadow(radius: 2)
+                                  .frame(width: 30, height: 30)
+                                  .padding(12)
+                                  .clipShape(Circle())
+                                  .shadow(radius: 2)
+                          
                     }
 
                     Spacer()
 
-                  
                     Button(action: {
                         do {
                             try Auth.auth().signOut()
@@ -81,9 +80,8 @@ struct ProfileView: View {
                     VStack(spacing: 20) {
                         Text("Username: \(user?.email ?? "No Email")")
                             .font(.system(.body, design: .monospaced))
+                            .fontWeight(.semibold)
                             .foregroundColor(.white)
-                        
-                        
 
                         if let avatarUIImage = avatarUIImage {
                             avatarUIImage
@@ -140,8 +138,6 @@ struct ProfileView: View {
                                         RoundedRectangle(cornerRadius: 12)
                                             .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5))
                             }
-                                        
-
                         }
                         .padding(.top)
 
@@ -193,3 +189,4 @@ struct ProfileView: View {
             }
     }
 }
+

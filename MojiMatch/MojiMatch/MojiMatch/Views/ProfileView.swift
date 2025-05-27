@@ -23,16 +23,16 @@ struct ProfileView: View {
     @State private var unlockedQuestionCounts: [Int] = [5]
     @State private var isImagePickerPresented = false
     @State private var isSettingsMode: Bool = false
-
+    
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = true
-
+    
     private var db = Firestore.firestore()
-
+    
     var body: some View {
         ZStack {
             Color(isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
-
+            
             VStack {
                 HStack {
                     Button(action: {
@@ -41,15 +41,15 @@ struct ProfileView: View {
                     }) {
                         Image("Settings")
                             .resizable()
-                                  .frame(width: 30, height: 30)
-                                  .padding(12)
-                                  .clipShape(Circle())
-                                  .shadow(radius: 2)
-                          
+                            .frame(width: 30, height: 30)
+                            .padding(12)
+                            .clipShape(Circle())
+                            .shadow(radius: 2)
+                        
                     }
-
+                    
                     Spacer()
-
+                    
                     Button(action: {
                         do {
                             try Auth.auth().signOut()
@@ -75,14 +75,14 @@ struct ProfileView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
-
+                
                 ScrollView {
                     VStack(spacing: 20) {
                         Text("Username: \(user?.email ?? "No Email")")
                             .font(.system(.body, design: .monospaced))
                             .fontWeight(.semibold)
                             .foregroundColor(.white)
-
+                        
                         if let avatarUIImage = avatarUIImage {
                             avatarUIImage
                                 .resizable()
@@ -97,7 +97,7 @@ struct ProfileView: View {
                                 .clipShape(Circle())
                                 .foregroundColor(.white)
                         }
-
+                        
                         Button("Change Avatar") {
                             isImagePickerPresented.toggle()
                         }
@@ -107,7 +107,7 @@ struct ProfileView: View {
                         .sheet(isPresented: $isImagePickerPresented) {
                             ImagePicker(selectedImage: $avatarImage, isImagePickerPresented: $isImagePickerPresented)
                         }
-
+                        
                         Group {
                             VStack(spacing: 8) {
                                 Text("Points: \(points)")
@@ -120,12 +120,12 @@ struct ProfileView: View {
                             .multilineTextAlignment(.center)
                         }
                         .customGroupStyle()
-
+                        
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("Recent Games")
+                            Text("Recent Games Top 5")
                                 .font(.system(.body, design: .monospaced))
                                 .foregroundColor(.white)
-
+                            
                             ForEach(Array(recentGames.enumerated()), id: \.offset) { index, game in
                                 Text(game)
                                     .padding(8)
@@ -140,7 +140,7 @@ struct ProfileView: View {
                             }
                         }
                         .padding(.top)
-
+                        
                         if !errorMessage.isEmpty {
                             Text(errorMessage)
                                 .foregroundColor(.red)
@@ -157,10 +157,10 @@ struct ProfileView: View {
             loadRecentGames()
         }
     }
-
+    
     func loadUserData() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
-
+        
         db.collection("users").document(userEmail).getDocument { document, error in
             if let error = error {
                 self.errorMessage = "Failed to load user data: \(error.localizedDescription)"
@@ -173,11 +173,13 @@ struct ProfileView: View {
             }
         }
     }
-
+    
     func loadRecentGames() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
-
+        
         db.collection("users").document(userEmail).collection("recentGames")
+            .order(by: "timestamp", descending: true)
+            .limit(to: 5)
             .getDocuments { snapshot, error in
                 if let error = error {
                     self.errorMessage = "Failed to load recent games: \(error.localizedDescription)"
@@ -188,5 +190,5 @@ struct ProfileView: View {
                 }
             }
     }
+    
 }
-

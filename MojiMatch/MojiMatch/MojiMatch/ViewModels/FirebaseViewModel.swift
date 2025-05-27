@@ -71,4 +71,26 @@ class FirebaseViewModel : ObservableObject {
             }
         }
     }
+    
+    func fetchUsersAndScores() {
+        
+        
+        db.collection("users").getDocuments() { snapshot, error in
+            if let error = error {
+                print("Error:: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let documents = snapshot?.documents else { return}
+            
+            for document in documents {
+                
+                let data = document.data()
+                let username = data["username"] as? String ?? "No username"
+                let score = data["points"] as? Int ?? 0
+                
+                print(username, score)
+            }
+        }
+    }
 }

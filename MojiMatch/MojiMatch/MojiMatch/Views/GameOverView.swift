@@ -18,6 +18,13 @@ struct GameOverView: View {
     @Binding var time: Double
     @Binding var noOfQuestions: Int
     @Binding var maxPoints : Int
+    @Binding var starOne : Bool
+    @Binding var starTwo : Bool
+    @Binding var starThree : Bool
+    
+    @State var showStarOne : Bool = false
+    @State var showStarTwo : Bool = false
+    @State var showStarThree : Bool = false
 
     var body: some View {
         ZStack {
@@ -27,9 +34,42 @@ struct GameOverView: View {
             VStack(spacing: 30) {
                 Spacer()
 
-                Text("Game Over!")
+                Text("Well done!")
                     .font(.largeTitle)
                     .foregroundColor(.white)
+                
+                HStack {
+                    Spacer()
+                    if showStarOne {
+                        Image(systemName: "star.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 65, height: 65)
+                            .foregroundStyle(Color.yellow)
+                            .transition(.scale)
+                    }
+                    
+                    if showStarTwo {
+                        Image(systemName: "star.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(Color.yellow)
+                            .frame(width: 65, height: 65)
+                            .transition(.scale)
+                        
+                    }
+                    
+                    if showStarThree {
+                        Image(systemName: "star.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .foregroundStyle(Color.yellow)
+                            .frame(width: 65, height: 65)
+                            .transition(.scale)
+                    }
+                    Spacer()
+                }
+                .padding()
 
                 Text("Your score: \(score) !!")
                     .font(.title2)
@@ -60,6 +100,9 @@ struct GameOverView: View {
             .onAppear {
                 saveGameData()
             }
+        }
+        .onAppear {
+            starAnimation()
         }
     }
 
@@ -98,6 +141,34 @@ struct GameOverView: View {
         userRef.collection("recentGames").addDocument(data: recentGame) { err in
             if let err = err {
                 print("Error saving recent game: \(err.localizedDescription)")
+            }
+        }
+    }
+    
+    func starAnimation() {
+        
+        
+        if starOne {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                withAnimation {
+                    showStarOne = true
+                }
+            }
+        }
+        
+        if starTwo {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                withAnimation {
+                    showStarTwo = true
+                }
+            }
+        }
+        
+        if starThree {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                withAnimation {
+                    showStarThree = true
+                }
             }
         }
     }

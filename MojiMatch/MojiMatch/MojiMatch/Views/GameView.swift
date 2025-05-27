@@ -158,7 +158,7 @@ struct GameView: View {
                     }
                     
                     //Navigate to GameOverView after game over.
-                    NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints), isActive: $isGameOver) {
+                    NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints, starOne: $starOne, starTwo: $starTwo, starThree: $starThree), isActive: $isGameOver) {
                         EmptyView()
                     }
                    

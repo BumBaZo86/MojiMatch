@@ -12,9 +12,6 @@ import FirebaseAuth
 
 struct ScoreboardView: View {
     
-    @State var selectedFilter = "Today"
-    let filters = ["Today", "Week", "Month", "All time"]
-    
     @ObservedObject var firebaseViewModel : FirebaseViewModel
     
     var body: some View {
@@ -26,26 +23,31 @@ struct ScoreboardView: View {
             VStack{
                 Text("Scoreboard")
                     .headLinesText()
-            
-                Picker("filters", selection: $selectedFilter){
-                    ForEach(filters, id: \.self) { filter in
-                        Text(filter)
-                    }
-                }
-                .pickerStyle(SegmentedPickerStyle())
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
-                )
-                .padding()
                 
-                Spacer()
+                List(firebaseViewModel.usersAndScores.indices, id: \.self) { users in
+                    let user = firebaseViewModel.usersAndScores[users]
+                    
+                    HStack {
+                        
+                        Text("#\(users + 1)")
+                            .padding()
+                        
+                        Text(user.username)
+                        
+                        Spacer()
+                        
+                        Text(String(user.points))
+                            .padding()
+                    }
+                    .scoreboardListItems()
+                    .listRowBackground(Color.clear)
+                }
+                .scrollContentBackground(.hidden)
             }
             
         }
         .onAppear {
-            firebaseViewModel.fetchUsersAndScores()
+            firebaseViewModel.fetchUsers()
         }
     }
 }

@@ -8,7 +8,8 @@
 import Foundation
 import FirebaseAuth
 
-struct MojiMatchUser {
+struct MojiMatchUser : Identifiable{
+    var id = UUID()
     var email: String
     var username: String
     var points: Int

@@ -43,6 +43,23 @@ extension View {
             )
     }
     
+    func scoreboardListItems() -> some View {
+        
+        self
+        
+            .font(.title2)
+            .fontDesign(.monospaced)
+            .foregroundStyle(.black)
+            .frame(width: 350, height: 60)
+            .background(Color.white)
+            .shadow(radius: 10.0, x: 20, y: 10)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
+            )
+    }
+    
     func customAnswerOptions() -> some View {
         self
             .padding()

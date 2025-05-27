@@ -70,7 +70,7 @@ struct MainTabView: View {
                     Text("Play")
                 }
 
-            ScoreboardView(selectedFilter: "Today", firebaseViewModel: FirebaseViewModel())
+            ScoreboardView(firebaseViewModel: FirebaseViewModel())
                 .tabItem {
                     Image("ScoreboardImage")
                     Text("Scoreboard")

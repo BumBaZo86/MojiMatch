@@ -170,8 +170,6 @@ struct GameView: View {
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
                 startTimer()
-                
-               
             }
         }
     }

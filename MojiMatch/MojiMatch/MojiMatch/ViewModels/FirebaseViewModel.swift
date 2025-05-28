@@ -18,6 +18,12 @@ class FirebaseViewModel : ObservableObject {
     @Published var optionC : String = ""
     @Published var optionD : String = ""
     
+   
+    @Published var username: String = ""
+    @Published var points: Int = 0
+   
+    @Published var usersAndScores: [ScoreboardModel] = []
+    
     
     var db = Firestore.firestore()
     
@@ -69,6 +75,41 @@ class FirebaseViewModel : ObservableObject {
                 self.optionC = answerOptions[2]
                 self.optionD = answerOptions[3]
             }
+        }
+    }
+    
+    func fetchUsers() {
+        
+        db.collection("users").getDocuments(completion:) { snapshot, error in
+            if let error = error {
+                print("Error:: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let documents = snapshot?.documents else { return}
+            
+            var userScore : [ScoreboardModel] = []
+            
+            for document in documents {
+                
+                let data = document.data()
+                let username = data["username"] as? String ?? "No username"
+                let points = data["points"] as? Int ?? 0
+                
+                
+                let userWithScores = ScoreboardModel(
+                    
+                    username: username,
+                    points : points
+                   
+                )
+                
+                userScore.append(userWithScores)
+                
+            }
+                DispatchQueue.main.async {
+                    self.usersAndScores = userScore.sorted { $0.points > $1.points }
+                        }
         }
     }
 }

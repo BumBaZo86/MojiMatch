@@ -7,29 +7,29 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseAuth
 import UIKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
-    return true
-  }
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        FirebaseApp.configure()
+        return true
+    }
 }
 
 @main
-struct MojiMatchApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @AppStorage("isLoggedIn") private var storedLoggedIn: Bool = false
-    @State private var showSignup = false
+struct YourAppNameApp: App {
+    // Registrera AppDelegate för att få igång FirebaseApp.configure()
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
+    // Skapa AuthModel som environment object
+    @StateObject private var authModel = AuthModel()
 
     var body: some Scene {
         WindowGroup {
-            if storedLoggedIn {
-                ContentView() 
-            } else {
-                LoginView(isLoggedIn: $storedLoggedIn, showSignup: $showSignup)
-            }
+            ContentView()
+                .environmentObject(authModel)
         }
     }
 }

@@ -5,7 +5,6 @@
 //  Created by Camilla Falk on 2025-05-20.
 //
 
-
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -18,7 +17,7 @@ struct StoreView: View {
     @State private var lockedQuestionCounts = [10, 15]
     
 
-    private let categoryPrices: [String: Int] = ["Flags": 10000, "Countries": 200, "Food": 1000, "Riddles": 15000, "Movies": 3000]
+    private let categoryPrices: [String: Int] = ["Flags": 10000, "Countries": 20, "Food": 1000, "Riddles": 15000, "Movies": 3000]
     private let levelPrices: [String: Int] = ["Medium": 500, "Hard": 5000]
     private let questionCountPrices: [Int: Int] = [10: 700, 15: 5000]
     

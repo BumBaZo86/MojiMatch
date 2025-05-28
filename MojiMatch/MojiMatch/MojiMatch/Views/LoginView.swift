@@ -12,8 +12,8 @@ import FirebaseAuth
 struct LoginView: View {
     @Binding var isLoggedIn: Bool
     @Binding var showSignup: Bool
-
-    @StateObject private var authModel = AuthModel()
+    
+    @EnvironmentObject var authModel: AuthModel
 
     var body: some View {
         ZStack {
@@ -25,6 +25,7 @@ struct LoginView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 300, height: 300)
+                    .foregroundColor(.white)
 
                 VStack(spacing: 16) {
                     Text("Log In")

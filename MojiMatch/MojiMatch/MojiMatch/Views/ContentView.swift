@@ -10,9 +10,9 @@ import FirebaseAuth
 import UIKit
 
 struct ContentView: View {
+    @StateObject private var authModel = AuthModel()
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var showSignup = false
-
   
     init() {
         let appearance = UITabBarAppearance()
@@ -36,12 +36,15 @@ struct ContentView: View {
             } else {
                 if showSignup {
                     SignUpView(isLoggedIn: $isLoggedIn, showSignup: $showSignup)
+                        .environmentObject(authModel)
                 } else {
                     LoginView(isLoggedIn: $isLoggedIn, showSignup: $showSignup)
+                        .environmentObject(authModel)
                 }
             }
         }
         .onAppear {
+            authModel.onAppear()
             if Auth.auth().currentUser != nil {
                 isLoggedIn = true
             }

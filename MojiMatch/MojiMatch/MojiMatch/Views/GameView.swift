@@ -4,6 +4,7 @@
 //
 //  Created by Camilla Falk on 2025-05-20.
 //
+//
 import SwiftUI
 import Firebase
 import FirebaseFirestore
@@ -140,7 +141,7 @@ struct GameView: View {
                         }
                         .padding(.top, 20)
                         
-                        //Active timer show ticking down in MM:SS format.
+             
                         HStack {
                             Spacer()
                             Text(String(format: "%02d:%02d", Int(ceil(timeRemaining)) / 60, Int(ceil(timeRemaining)) % 60))
@@ -148,7 +149,7 @@ struct GameView: View {
                                 .padding(.top)
                         }
                         
-                        //Progressbar works together with the timer to show remaining time.
+                 
                         ProgressView(value: max(0, timeRemaining), total: time)
                             .progressViewStyle(LinearProgressViewStyle())
                             .tint(.black)
@@ -157,7 +158,7 @@ struct GameView: View {
                         
                     }
                     
-                    //Navigate to GameOverView after game over.
+            
                     NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints, starOne: $starOne, starTwo: $starTwo, starThree: $starThree), isActive: $isGameOver) {
                         EmptyView()
                     }
@@ -242,7 +243,7 @@ struct GameView: View {
      * Timer starts.
      * If a timer is already running, stops it and then starts a new one.
      * If timer runs out of time, checks if a new question is being fetched or if it is GameOver.
-     * Updates every 0.1 seconds. 
+     * Updates every 0.1 seconds.
      */
     
     func startTimer() {
@@ -278,5 +279,4 @@ struct GameView: View {
         }
     }
 }
-
 

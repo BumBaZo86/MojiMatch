@@ -11,7 +11,7 @@ import FirebaseFirestore
 import FirebaseAuth
 
 struct GameOverView: View {
-    var score: Int
+    @Binding var score: Int
 
     @Binding var showGameView: Bool
     @Binding var category: String
@@ -91,6 +91,7 @@ struct GameOverView: View {
 
                 Button("Close game") {
                     showGameView = false
+                    
                 }
                 .buttonStyleCustom()
 
@@ -98,12 +99,11 @@ struct GameOverView: View {
             }
             .padding()
             .navigationBarBackButtonHidden(true)
-            .onAppear {
-                saveGameData()
-            }
         }
         .onAppear {
             starAnimation()
+            saveGameData()
+                
         }
     }
 
@@ -143,7 +143,17 @@ struct GameOverView: View {
         }
 
         let gameDetails = "Category: \(category), Time: \(Int(time)) sek, Questions: \(noOfQuestions), Points: \(score)"
+        let gameScoreList = ["gameScore": score, "timestamp": Timestamp()] as [String : Any]
         let recentGame = ["gameDetails": gameDetails, "timestamp": Timestamp()] as [String : Any]
+        
+        print(score)
+        
+        userRef.collection("gameScore").addDocument(data: gameScoreList) { err in
+            if let err = err {
+                print("Error saving recent game score: \(err.localizedDescription)")
+            }
+        }
+        
         userRef.collection("recentGames").addDocument(data: recentGame) { err in
             if let err = err {
                 print("Error saving recent game: \(err.localizedDescription)")
@@ -152,7 +162,7 @@ struct GameOverView: View {
     }
     
     /**
-     * Makes the stars collected appear with 1 second delay after each other. First star shown at 0.5 sec, second star at 1.5 sec and third star at 2.5 sec. If only one star is collected, only one star will appear. 
+     * Makes the stars collected appear with 1 second delay after each other. First star shown at 0.5 sec, second star at 1.5 sec and third star at 2.5 sec. If only one star is collected, only one star will appear.
      */
     func starAnimation() {
         

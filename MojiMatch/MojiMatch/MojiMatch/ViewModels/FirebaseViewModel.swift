@@ -96,7 +96,6 @@ class FirebaseViewModel : ObservableObject {
                 let username = data["username"] as? String ?? "No username"
                 let points = data["points"] as? Int ?? 0
                 
-                
                 let userWithScores = ScoreboardModel(
                     
                     username: username,

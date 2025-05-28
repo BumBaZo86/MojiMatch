@@ -58,11 +58,29 @@ struct StoreView: View {
                                 .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
                         )
                     
-                    storeSection(title: "Category", items: lockedCategories, unlocked: userUnlockedCategories, field: "unlockedCategories")
-                    
-                    storeSection(title: "Difficulty", items: lockedLevels, unlocked: userUnlockedLevels, field: "unlockedLevels")
-                    
-                    storeSection(title: "No of questions", items: lockedQuestionCounts.map { "\($0)" }, unlocked: userUnlockedQuestionCounts.map { "\($0)" }, field: "unlockedQuestionCounts")
+                    storeSection(
+                        title: "Category",
+                        items: lockedCategories.sorted { (categoryPrices[$0] ?? 0) < (categoryPrices[$1] ?? 0) },
+                        unlocked: userUnlockedCategories,
+                        field: "unlockedCategories"
+                    )
+
+                    storeSection(
+                        title: "Difficulty",
+                        items: lockedLevels.sorted { (levelPrices[$0] ?? 0) < (levelPrices[$1] ?? 0) },
+                        unlocked: userUnlockedLevels,
+                        field: "unlockedLevels"
+                    )
+
+                    storeSection(
+                        title: "No of questions",
+                        items: lockedQuestionCounts
+                            .sorted { (questionCountPrices[$0] ?? 0) < (questionCountPrices[$1] ?? 0) }
+                            .map { "\($0)" },
+                        unlocked: userUnlockedQuestionCounts.map { "\($0)" },
+                        field: "unlockedQuestionCounts"
+                    )
+
                 }
                 .padding()
             }

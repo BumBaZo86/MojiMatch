@@ -25,6 +25,7 @@ struct GameSettingsView: View {
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
     
+    // Arrange the categories into 4 items in each row. Fixed space from each item to the next.
     let columns = Array(repeating: GridItem(.fixed(80), spacing: 10), count: 4)
     
     var body: some View {
@@ -44,6 +45,7 @@ struct GameSettingsView: View {
                 .padding(.horizontal)
                 .padding(.top)
                 
+                // Arrange the categories in rows.
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
                     
                     ForEach(unlockedCategories, id: \.self) { cat in
@@ -57,7 +59,8 @@ struct GameSettingsView: View {
                         }
                         .customGameSettings(isSelected: category == cat)
                         .onTapGesture {
-                            category = cat
+                            category = cat //selected category gets different background color and is updated to be ready to be sent to game.
+                            
                         }
                     }
                 }
@@ -84,6 +87,7 @@ struct GameSettingsView: View {
                         .onTapGesture {
                             difficulty = level
                             
+                            //maxPoint means how many points each correct answer will be worth.
                             if (level == "Hard"){
                                 time = 5.0
                                 maxPoints = 30
@@ -134,7 +138,7 @@ struct GameSettingsView: View {
                     }
                 
                 Spacer()
-                
+                //Sheet that does not contain the tabview. Send all the info to gameview.
                     .fullScreenCover(isPresented: $showGameView){
                         GameView(firebaseViewModel: FirebaseViewModel(), category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints, showGameView: $showGameView)
                     }
@@ -144,6 +148,10 @@ struct GameSettingsView: View {
             fetchUserCategories()
         }
     }
+    
+    /**
+     * Fetches the users unlocked categories/difficulty/noOfQs from firebase.
+     */
     
     func fetchUserCategories() {
         
@@ -162,7 +170,9 @@ struct GameSettingsView: View {
         }
     }
     
-    
+    /**
+     * Makes the squares with categories/difficulty/noOfQs to emojis instead of letters.
+     */
     func textToEmoji(for category: String) -> String {
         
         switch category {

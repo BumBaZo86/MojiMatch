@@ -13,17 +13,18 @@ struct GameView: View {
     @ObservedObject var firebaseViewModel = FirebaseViewModel()
     
     @Binding var category: String
-    @Binding var time: Double
+    @Binding var time: Double // (Difficulty)
     @Binding var noOfQuestions: Int
-    @Binding var maxPoints : Int
+    @Binding var maxPoints : Int 
     @Binding var showGameView: Bool
     
-    @State var questionCount = 0
+    @State var questionCount = 0 //keeps track on how many questions that has been shown.
     @State var score = 0
     @State private var isGameOver = false
     @State var timeRemaining = 10.0
     @State var timer: Timer?
     
+    //Affects if the stars are grey or yellow.
     @State var starOne : Bool = false
     @State var starTwo : Bool = false
     @State var starThree : Bool = false
@@ -43,13 +44,14 @@ struct GameView: View {
                             
                             ZStack {
                                 
+                                               //current score               // eg. 15 * 20 = 300 points available
                                 ProgressView(value: Double(score), total: Double(noOfQuestions * maxPoints))
                                         .progressViewStyle(LinearProgressViewStyle())
                                         .tint(Color(red: 113/256, green: 162/256, blue: 114/256))
-                                        .scaleEffect(y: 2)
+                                        .scaleEffect(y: 2) // thinkness of progressbar.
                                         .padding(.horizontal)
                                        
-                                
+                                //Reads the width of the progress bar so we know where to put the stars. Reads all type of measurements if need be.
                                 GeometryReader { geometry in
                                     
                                     let progressViewWidth = geometry.size.width
@@ -59,12 +61,12 @@ struct GameView: View {
                                         Image(systemName: "star.fill")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(
+                                            .frame( //if star is true, it is bigger, false is smaller.
                                                 width: starOne ? 45 : 25,
                                                 height: starOne ? 45 : 25)
                                         
                                             .position(x: progressViewWidth * 0.2, y: 7)
-                                            .foregroundStyle(starOne ? Color.yellow : Color.gray)
+                                            .foregroundStyle(starOne ? Color.yellow : Color.gray) //Changes color if the star depending if its true or false.
                                             
                                         Image(systemName: "star.fill")
                                             .resizable()
@@ -207,6 +209,7 @@ struct GameView: View {
     /**
      * Check if answer is correct or not
      * If correct = score + 10 points.
+     * Run checkStars()
      * After question is answered, either a new question is fetched or GameOverView is shown.
      * New timer starts again if a new question is fetched.
      */
@@ -267,6 +270,9 @@ struct GameView: View {
         }
     }
     
+    /**
+     * If you get a score of 1/5, 3/5 or 5/5, you get a new star that is shown on the progressview. 
+     */
     func checkStars() {
         
         if score == (maxPoints * noOfQuestions) / 5 {

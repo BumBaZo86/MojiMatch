@@ -40,6 +40,7 @@ struct GameOverView: View {
                 
                 HStack {
                     Spacer()
+                    //Show the number of stars collected during the game.
                     if showStarOne {
                         Image(systemName: "star.fill")
                             .resizable()
@@ -106,6 +107,11 @@ struct GameOverView: View {
         }
     }
 
+    /**
+     * Save points from the game and add it to users current points.
+     * Save game details (score, category, difficulty, noOfQs) to database.
+     */
+    
     func saveGameData() {
         guard let userEmail = Auth.auth().currentUser?.email else {
             print("No logged in user.")
@@ -145,6 +151,9 @@ struct GameOverView: View {
         }
     }
     
+    /**
+     * Makes the stars collected appear with 1 second delay after each other. First star shown at 0.5 sec, second star at 1.5 sec and third star at 2.5 sec. If only one star is collected, only one star will appear. 
+     */
     func starAnimation() {
         
         

@@ -176,7 +176,7 @@ struct GameView: View {
     }
     
     
-    /**
+    /** explanation:
      * Show answerOptions
      * Check if answer is correct
      * Adapt text size depending on how many characters each string has.
@@ -192,7 +192,7 @@ struct GameView: View {
         .font(.system(size: text.count < 2 ? 70 : 10))
     }
 
-    /**
+    /** explanation:
      * Adapts the text size depending on how many characters each string has.
      */
     func fontSize(for text: String) -> CGFloat {
@@ -205,7 +205,7 @@ struct GameView: View {
         }
     }
     
-    /**
+    /** explanation:
      * Check if answer is correct or not
      * If correct = score + 10 points.
      * After question is answered, either a new question is fetched or GameOverView is shown.
@@ -239,7 +239,7 @@ struct GameView: View {
     }
     
     
-    /**
+    /** explanation:
      * Timer starts.
      * If a timer is already running, stops it and then starts a new one.
      * If timer runs out of time, checks if a new question is being fetched or if it is GameOver.

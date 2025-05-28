@@ -81,8 +81,6 @@ struct GameOverView: View {
                     noOfQuestions: $noOfQuestions,
                     maxPoints: $maxPoints,
                     showGameView: $showGameView
-                    
-                    
                 )) {
                     Text("Play Again")
                         .buttonStyleCustom()
@@ -99,10 +97,8 @@ struct GameOverView: View {
             .navigationBarBackButtonHidden(true)
             .onAppear {
                 saveGameData()
+                starAnimation()
             }
-        }
-        .onAppear {
-            starAnimation()
         }
     }
 
@@ -115,24 +111,14 @@ struct GameOverView: View {
         let db = Firestore.firestore()
         let userRef = db.collection("users").document(userEmail)
 
-        userRef.getDocument { document, error in
-            if let error = error {
-                print("Error fetching user data: \(error.localizedDescription)")
-                return
-            }
-            if let document = document, document.exists {
-                let previousPoints = document["points"] as? Int ?? 0
-                userRef.updateData(["points": previousPoints + score]) { err in
-                    if let err = err {
-                        print("Error updating points: \(err.localizedDescription)")
-                    }
-                }
+        print("Score to add: \(score)")
+
+        // Atomisk poänguppdatering för att undvika race conditions
+        userRef.updateData(["points": FieldValue.increment(Int64(score))]) { err in
+            if let err = err {
+                print("Error updating points: \(err.localizedDescription)")
             } else {
-                userRef.setData(["points": score], merge: true) { err in
-                    if let err = err {
-                        print("Error setting points: \(err.localizedDescription)")
-                    }
-                }
+                print("Points updated by \(score) successfully.")
             }
         }
 
@@ -146,8 +132,6 @@ struct GameOverView: View {
     }
     
     func starAnimation() {
-        
-        
         if starOne {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 withAnimation {

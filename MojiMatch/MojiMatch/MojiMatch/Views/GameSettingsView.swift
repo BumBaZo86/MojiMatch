@@ -11,10 +11,10 @@ import FirebaseAuth
 import FirebaseFirestore
 
 struct GameSettingsView: View {
+    @EnvironmentObject var appSettings: AppSettings
     
     @State var showGameView = false
     
-    // Valda inställningar (med standardvärden)
     @State var category = "Animals"
     @State var time = 10.0
     @State var difficulty = "Easy"
@@ -22,7 +22,6 @@ struct GameSettingsView: View {
     @State var noOfQuestions = 5
     @State var maxPoints = 10
     
-    // Tillgängliga val, kombinerat standard + köpta
     @State private var unlockedCategories: [String] = ["Animals"]
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
@@ -31,11 +30,10 @@ struct GameSettingsView: View {
     
     var body: some View {
         ZStack {
-            Color(red: 113/256, green: 162/256, blue: 114/256)
+            Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
             
             VStack {
-            
                 HStack {
                     Text("Category")
                         .fontDesign(.monospaced)
@@ -60,7 +58,6 @@ struct GameSettingsView: View {
                 }
                 .padding()
                 
-            
                 HStack {
                     Text("Difficulty")
                         .fontDesign(.monospaced)
@@ -80,7 +77,7 @@ struct GameSettingsView: View {
                         .customGameSettings(isSelected: difficulty == level)
                         .onTapGesture {
                             difficulty = level
-                          
+                            
                             switch level {
                             case "Hard":
                                 time = 5.0
@@ -97,7 +94,6 @@ struct GameSettingsView: View {
                 }
                 .padding()
                 
-           
                 HStack {
                     Text("Number of Questions")
                         .fontDesign(.monospaced)
@@ -146,7 +142,6 @@ struct GameSettingsView: View {
         }
     }
     
-
     func fetchUserCategories() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
         
@@ -165,7 +160,6 @@ struct GameSettingsView: View {
                 let defaultLevels = ["Easy"]
                 let defaultQuestionCounts = [5]
                 
-                // Kombinera utan dubbletter och sortera
                 let combinedCategories = Array(Set(defaultCategories + boughtCategories)).sorted()
                 let combinedLevels = Array(Set(defaultLevels + boughtLevels)).sorted()
                 let combinedQuestionCounts = Array(Set(defaultQuestionCounts + boughtQuestionCounts)).sorted()
@@ -175,7 +169,6 @@ struct GameSettingsView: View {
                     self.unlockedLevels = combinedLevels
                     self.unlockedQuestionCounts = combinedQuestionCounts
                     
-                    // Säkerställ giltiga val, annars sätt förval
                     if !combinedCategories.contains(self.category) {
                         self.category = combinedCategories.first ?? "Animals"
                     }
@@ -191,7 +184,6 @@ struct GameSettingsView: View {
         }
     }
     
-
     func textToEmoji(for category: String) -> String {
         switch category {
         case "Animals": return "🦁"
@@ -214,6 +206,6 @@ struct GameSettingsView: View {
 struct GameSettingsView_Previews: PreviewProvider {
     static var previews: some View {
         GameSettingsView()
+            .environmentObject(AppSettings())
     }
 }
-

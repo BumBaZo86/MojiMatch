@@ -11,22 +11,22 @@ import FirebaseAuth
 import FirebaseFirestore
 
 struct StoreView: View {
-    
+    @EnvironmentObject var appSettings: AppSettings
+
     @State private var lockedCategories = ["Flags", "Countries", "Food", "Riddles", "Movies"]
     @State private var lockedLevels = ["Medium", "Hard"]
     @State private var lockedQuestionCounts = [10, 15]
-    
 
     private let categoryPrices: [String: Int] = ["Flags": 10000, "Countries": 20, "Food": 1000, "Riddles": 15000, "Movies": 3000]
     private let levelPrices: [String: Int] = ["Medium": 500, "Hard": 5000]
     private let questionCountPrices: [Int: Int] = [10: 700, 15: 5000]
-    
+
     @State private var userUnlockedCategories: [String] = []
     @State private var userUnlockedLevels: [String] = []
     @State private var userUnlockedQuestionCounts: [Int] = []
-    
+
     @State private var points: Int = 0
-    
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -43,7 +43,7 @@ struct StoreView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
                         )
-                    
+
                     Text("💰 \(points)")
                         .font(.body)
                         .fontWeight(.semibold)
@@ -56,7 +56,7 @@ struct StoreView: View {
                             RoundedRectangle(cornerRadius: 12)
                                 .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
                         )
-                    
+
                     storeSection(
                         title: "Category",
                         items: lockedCategories.sorted { (categoryPrices[$0] ?? 0) < (categoryPrices[$1] ?? 0) },
@@ -79,16 +79,17 @@ struct StoreView: View {
                         unlocked: userUnlockedQuestionCounts.map { "\($0)" },
                         field: "unlockedQuestionCounts"
                     )
-
                 }
+                .padding(.top, 50) 
                 .padding()
             }
-            .background(Color(red: 124/255, green: 172/255, blue: 125/255).ignoresSafeArea())
+            .background(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 124/255, green: 172/255, blue: 125/255))
+            .ignoresSafeArea()
             .navigationBarHidden(true)
             .onAppear { loadUserData() }
         }
     }
-    
+
     func storeSection(title: String, items: [String], unlocked: [String], field: String) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
@@ -109,7 +110,7 @@ struct StoreView: View {
                                 default: return 0
                                 }
                             }()
-                            
+
                             StoreItemView(name: item, emoji: textToEmoji(for: item), price: price) {
                                 if points >= price {
                                     if field == "unlockedQuestionCounts" {
@@ -128,7 +129,6 @@ struct StoreView: View {
                                 RoundedRectangle(cornerRadius: 25)
                                     .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 1)
                             )
-                            
                         }
                     }
                 }
@@ -144,10 +144,10 @@ struct StoreView: View {
         )
         .shadow(radius: 5)
     }
-    
+
     func loadUserData() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
-        
+
         let db = Firestore.firestore()
         db.collection("users").document(userEmail).getDocument { document, error in
             if let document = document, document.exists {
@@ -158,12 +158,12 @@ struct StoreView: View {
             }
         }
     }
-    
+
     func unlockItem<T: Hashable>(item: T, field: String, cost: Int) {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
         let db = Firestore.firestore()
         let userRef = db.collection("users").document(userEmail)
-        
+
         userRef.updateData([
             field: FieldValue.arrayUnion([item]),
             "points": FieldValue.increment(Int64(-cost))
@@ -173,7 +173,7 @@ struct StoreView: View {
             }
         }
     }
-    
+
     func textToEmoji(for category: String) -> String {
         switch category {
         case "Animals": return "🦁"
@@ -221,12 +221,9 @@ struct StoreItemView: View {
             .padding(8)
 
             Text("🔒")
-                .font(.largeTitle) 
-                         .padding(.bottom, -6)
-                         .padding(.trailing, -20)
-                 }
-             }
-         }
-
-
-
+                .font(.largeTitle)
+                .padding(.bottom, -6)
+                .padding(.trailing, -20)
+        }
+    }
+}

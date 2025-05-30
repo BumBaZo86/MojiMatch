@@ -11,24 +11,26 @@ import FirebaseFirestore
 import FirebaseAuth
 
 struct GameOverView: View {
+    @EnvironmentObject var appSettings: AppSettings
+
     var score: Int
 
     @Binding var showGameView: Bool
     @Binding var category: String
     @Binding var time: Double
     @Binding var noOfQuestions: Int
-    @Binding var maxPoints : Int
-    @Binding var starOne : Bool
-    @Binding var starTwo : Bool
-    @Binding var starThree : Bool
+    @Binding var maxPoints: Int
+    @Binding var starOne: Bool
+    @Binding var starTwo: Bool
+    @Binding var starThree: Bool
     
-    @State var showStarOne : Bool = false
-    @State var showStarTwo : Bool = false
-    @State var showStarThree : Bool = false
+    @State var showStarOne: Bool = false
+    @State var showStarTwo: Bool = false
+    @State var showStarThree: Bool = false
 
     var body: some View {
         ZStack {
-            Color(red: 113/255, green: 162/255, blue: 114/255)
+            Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/255, green: 162/255, blue: 114/255))
                 .ignoresSafeArea()
 
             VStack(spacing: 30) {
@@ -113,7 +115,6 @@ struct GameOverView: View {
 
         print("Score to add: \(score)")
 
-        // Atomisk poänguppdatering för att undvika race conditions
         userRef.updateData(["points": FieldValue.increment(Int64(score))]) { err in
             if let err = err {
                 print("Error updating points: \(err.localizedDescription)")

@@ -20,16 +20,18 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 
 @main
 struct YourAppNameApp: App {
-    // Registrera AppDelegate för att få igång FirebaseApp.configure()
+
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
-    // Skapa AuthModel som environment object
+
     @StateObject private var authModel = AuthModel()
+    @StateObject private var appSettings = AppSettings()
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(authModel)
+                .environmentObject(appSettings) 
         }
     }
 }
+

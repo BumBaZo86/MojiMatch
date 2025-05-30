@@ -4,32 +4,26 @@
 //
 //  Created by Natalie S on 2025-05-21.
 //
-
 import SwiftUI
 
 extension View {
     
-    
     func customGameSettings(isSelected: Bool) -> some View {
         self
-        
             .padding()
             .frame(width: 80, height: 80)
             .foregroundStyle(Color.black)
             .background(isSelected ? Color(red: 113/256, green: 162/256, blue: 114/256) : Color.white)
-            .clipShape(.rect(cornerRadius: 15))
+            .clipShape(RoundedRectangle(cornerRadius: 15))
             .overlay(
                 RoundedRectangle(cornerRadius: 15)
                     .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
             )
             .fontDesign(.monospaced)
-        
     }
     
     func headLinesText() -> some View {
-        
         self
-        
             .font(.title2)
             .fontDesign(.monospaced)
             .foregroundStyle(.black)
@@ -39,14 +33,12 @@ extension View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
+                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
             )
     }
     
     func scoreboardListItems() -> some View {
-        
         self
-        
             .font(.title2)
             .fontDesign(.monospaced)
             .foregroundStyle(.black)
@@ -56,7 +48,7 @@ extension View {
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
+                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
             )
     }
     
@@ -66,7 +58,7 @@ extension View {
             .frame(width: 130, height: 100)
             .foregroundStyle(Color.black)
             .background(Color.white)
-            .clipShape(.rect(cornerRadius: 15))
+            .clipShape(RoundedRectangle(cornerRadius: 15))
             .overlay(
                 RoundedRectangle(cornerRadius: 15)
                     .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
@@ -80,7 +72,7 @@ extension View {
             .frame(width: 300, height: 200)
             .foregroundStyle(Color.black)
             .background(Color.white)
-            .clipShape(.rect(cornerRadius: 15))
+            .clipShape(RoundedRectangle(cornerRadius: 15))
             .overlay(
                 RoundedRectangle(cornerRadius: 15)
                     .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
@@ -96,17 +88,17 @@ extension View {
             .frame(width: 250, height: 60)
             .foregroundStyle(Color.black)
             .background(Color.white)
-            .foregroundStyle(.white)
-            .clipShape(.rect(cornerRadius: 15))
+            .clipShape(RoundedRectangle(cornerRadius: 15))
             .overlay(
                 RoundedRectangle(cornerRadius: 15)
-                    .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
             )
             .shadow(radius: 10.0, x: 20, y: 10)
             .fontDesign(.monospaced)
-        
     }
 }
+
+
 struct CustomGroupStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
@@ -128,6 +120,8 @@ extension View {
         self.modifier(CustomGroupStyle())
     }
 }
+
+
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -146,3 +140,5 @@ extension Color {
         self.init(red: r, green: g, blue: b)
     }
 }
+
+

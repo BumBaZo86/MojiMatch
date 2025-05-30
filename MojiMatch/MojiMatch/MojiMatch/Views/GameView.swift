@@ -12,6 +12,7 @@ import FirebaseFirestore
 struct GameView: View {
     
     @ObservedObject var firebaseViewModel = FirebaseViewModel()
+    @EnvironmentObject var appSettings: AppSettings  //setting for darkmode.
     
     @Binding var category: String
     @Binding var time: Double
@@ -33,80 +34,81 @@ struct GameView: View {
         NavigationStack {
             
             ZStack {
-                Color(red: 113/256, green: 162/256, blue: 114/256)
+                // background color depending of setting.
+                Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                     .ignoresSafeArea()
                 
                 VStack {
                     
-                        VStack{
+                    VStack{
+                        
+                        Text("Score: \(score)")
+                        
+                        ZStack {
                             
-                            Text("Score: \(score)")
-                            
-                            ZStack {
-                                
-                                ProgressView(value: Double(score), total: Double(noOfQuestions * maxPoints))
-                                        .progressViewStyle(LinearProgressViewStyle())
-                                        .tint(Color(red: 113/256, green: 162/256, blue: 114/256))
-                                        .scaleEffect(y: 2)
-                                        .padding(.horizontal)
-                                       
-                                
-                                GeometryReader { geometry in
-                                    
-                                    let progressViewWidth = geometry.size.width
-                                    
-                                    Group {
-                                        
-                                        Image(systemName: "star.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(
-                                                width: starOne ? 45 : 25,
-                                                height: starOne ? 45 : 25)
-                                        
-                                            .position(x: progressViewWidth * 0.2, y: 7)
-                                            .foregroundStyle(starOne ? Color.yellow : Color.gray)
-                                            
-                                        Image(systemName: "star.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundStyle(starTwo ? Color.yellow : Color.gray)
-                                            .frame(
-                                                width: starTwo ? 45 : 25,
-                                                height: starTwo ? 45 : 25)
-                                            .position(x: progressViewWidth * 0.6, y: 7)
-                                      
-                                        
-                                        Image(systemName: "star.fill")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .foregroundStyle(starThree ? Color.yellow : Color.gray)
-                                            .frame(
-                                                width: starThree ? 45 : 25,
-                                                height: starThree ? 45 : 25)
-                                            .position(x: progressViewWidth * 1.0, y: 7)
-                                       
-                                    }
-                                }
-                                .frame(height: 20)
+                            ProgressView(value: Double(score), total: Double(noOfQuestions * maxPoints))
+                                .progressViewStyle(LinearProgressViewStyle())
+                                .tint(Color(red: 113/256, green: 162/256, blue: 114/256))
+                                .scaleEffect(y: 2)
                                 .padding(.horizontal)
+                               
+                            
+                            GeometryReader { geometry in
+                                
+                                let progressViewWidth = geometry.size.width
+                                
+                                Group {
+                                    
+                                    Image(systemName: "star.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(
+                                            width: starOne ? 45 : 25,
+                                            height: starOne ? 45 : 25)
+                                    
+                                        .position(x: progressViewWidth * 0.2, y: 7)
+                                        .foregroundStyle(starOne ? Color.yellow : Color.gray)
+                                        
+                                    Image(systemName: "star.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundStyle(starTwo ? Color.yellow : Color.gray)
+                                        .frame(
+                                            width: starTwo ? 45 : 25,
+                                            height: starTwo ? 45 : 25)
+                                        .position(x: progressViewWidth * 0.6, y: 7)
+                                  
+                                    
+                                    Image(systemName: "star.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .foregroundStyle(starThree ? Color.yellow : Color.gray)
+                                        .frame(
+                                            width: starThree ? 45 : 25,
+                                            height: starThree ? 45 : 25)
+                                        .position(x: progressViewWidth * 1.0, y: 7)
+                                   
+                                }
                             }
-                            .frame(height: 40)
+                            .frame(height: 20)
+                            .padding(.horizontal)
                         }
-                        .padding()
-                            .frame(width: 350, height: 100)
-                            .foregroundStyle(Color.black)
-                            .background(Color.white)
-                            .clipShape(.rect(cornerRadius: 15))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
-                            )
-                            .shadow(radius: 10.0, x: 20, y: 10)
-                            .fontDesign(.monospaced)
-                            .padding(.top)
-                    
-                    
+                        .frame(height: 40)
+                    }
+                    .padding()
+                        .frame(width: 350, height: 100)
+                        .foregroundStyle(Color.black)
+                        .background(Color.white)
+                        .clipShape(.rect(cornerRadius: 15))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
+                        )
+                        .shadow(radius: 10.0, x: 20, y: 10)
+                        .fontDesign(.monospaced)
+                        .padding(.top)
+                
+                
                     //Fetch game question and show it.
                     if let question = firebaseViewModel.currentQuestion {
                         Text(question.question)
@@ -122,7 +124,7 @@ struct GameView: View {
                                         .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                                 )
                             
-                            //Show answerOptions as buttons
+                            //Show answerOptions as buttons.
                             VStack(spacing: 25) {
                                 
                                 HStack(spacing: 25) {
@@ -169,8 +171,6 @@ struct GameView: View {
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
                 startTimer()
-                
-               
             }
         }
     }
@@ -180,7 +180,6 @@ struct GameView: View {
      * Show answerOptions
      * Check if answer is correct
      * Adapt text size depending on how many characters each string has.
-    
      */
     func optionButton(text: String) -> some View {
         Button(action: {
@@ -242,7 +241,7 @@ struct GameView: View {
     /** explanation:
      * Timer starts.
      * If a timer is already running, stops it and then starts a new one.
-     * If timer runs out of time, checks if a new question is being fetched or if it is GameOver.
+     * If timer runs out of time, checks if a new question is being fetched or if det är GameOver.
      * Updates every 0.1 seconds.
      */
     
@@ -279,4 +278,3 @@ struct GameView: View {
         }
     }
 }
-

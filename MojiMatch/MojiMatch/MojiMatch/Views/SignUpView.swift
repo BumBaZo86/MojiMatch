@@ -157,7 +157,7 @@ struct SignUpView: View {
             "unlockedQuestionCounts": [5]
         ]
         
-        // Använd email som dokument-ID för att matcha hur du hämtar i GameSettingsView
+     
         Firestore.firestore().collection("users").document(authModel.email).setData(userData) { error in
             DispatchQueue.main.async {
                 if let error = error {

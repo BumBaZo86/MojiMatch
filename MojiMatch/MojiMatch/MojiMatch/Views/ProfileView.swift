@@ -11,6 +11,8 @@ import FirebaseFirestore
 import FirebaseStorage
 
 struct ProfileView: View {
+    @EnvironmentObject var appSettings: AppSettings
+    
     @State private var user: User? = Auth.auth().currentUser
     @State private var points: Int = 0
     @State private var avatarImage: UIImage?
@@ -22,7 +24,6 @@ struct ProfileView: View {
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
     @State private var isImagePickerPresented = false
-    @State private var isSettingsMode: Bool = false
     
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = true
     
@@ -30,14 +31,14 @@ struct ProfileView: View {
     
     var body: some View {
         ZStack {
-            Color(isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
+            Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
             
             VStack {
                 HStack {
                     Button(action: {
-                        isSettingsMode.toggle()
-                        print("Settings tapped, isSettingsMode = \(isSettingsMode)")
+                        appSettings.isSettingsMode.toggle()
+                        print("Settings tapped, isSettingsMode = \(appSettings.isSettingsMode)")
                     }) {
                         Image("Settings")
                             .resizable()
@@ -45,7 +46,6 @@ struct ProfileView: View {
                             .padding(12)
                             .clipShape(Circle())
                             .shadow(radius: 2)
-                        
                     }
                     
                     Spacer()
@@ -190,5 +190,4 @@ struct ProfileView: View {
                 }
             }
     }
-    
 }

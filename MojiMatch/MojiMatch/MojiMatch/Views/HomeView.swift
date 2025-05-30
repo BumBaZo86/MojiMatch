@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
+    @EnvironmentObject var appSettings: AppSettings
+    
     @State private var showInfo = false
     @State private var showRules = false
     @State private var navigateToGameSettings = false
@@ -15,8 +17,10 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(red: 113/256, green: 162/256, blue: 114/256)
-                    .ignoresSafeArea()
+                Color(appSettings.isSettingsMode
+                      ? Color(hex: "778472")
+                      : Color(red: 113/256, green: 162/256, blue: 114/256))
+                .ignoresSafeArea()
 
                 VStack(spacing: 30) {
                     Image("MojiMatchLogo")
@@ -90,14 +94,16 @@ Think fast and aim for a high score!
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color(red: 113/256, green: 162/256, blue: 114/256))
+                    .background(Color(appSettings.isSettingsMode
+                                      ? Color(hex: "778472")
+                                      : Color(red: 113/256, green: 162/256, blue: 114/256)))
                     .foregroundColor(.white)
                     .cornerRadius(10)
                 }
                 .padding()
             }
 
-            // Info sheet
+            
             .sheet(isPresented: $showInfo) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("ℹ️ Info")
@@ -118,7 +124,9 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
-                    .background(Color(red: 113/256, green: 162/256, blue: 114/256))
+                    .background(Color(appSettings.isSettingsMode
+                                      ? Color(hex: "778472")
+                                      : Color(red: 113/256, green: 162/256, blue: 114/256)))
                     .foregroundColor(.white)
                     .cornerRadius(10)
                 }
@@ -130,4 +138,5 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
 
 #Preview {
     HomeView()
+        .environmentObject(AppSettings())
 }

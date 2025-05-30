@@ -123,7 +123,7 @@ class FirebaseViewModel: ObservableObject {
         }
     }
     
-    // Funktion för att hämta användare och scores till scoreboard
+
     func fetchUsers() {
         db.collection("users").getDocuments { snapshot, error in
             if let error = error {

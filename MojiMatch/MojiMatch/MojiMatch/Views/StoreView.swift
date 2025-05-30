@@ -24,8 +24,10 @@ struct StoreView: View {
     @State private var userUnlockedCategories: [String] = []
     @State private var userUnlockedLevels: [String] = []
     @State private var userUnlockedQuestionCounts: [Int] = []
-
     @State private var points: Int = 0
+
+    @State private var showPointChange = false
+    @State private var pointChangeAmount = 0
 
     var body: some View {
         NavigationView {
@@ -44,18 +46,30 @@ struct StoreView: View {
                                 .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
                         )
 
-                    Text("💰 \(points)")
-                        .font(.body)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.black)
-                        .padding(8)
-                        .frame(width: 150)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
-                        )
+                    ZStack(alignment: .topTrailing) {
+                        Text("💰 \(points)")
+                            .font(.body)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.black)
+                            .padding(8)
+                            .frame(width: 150)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 5)
+                            )
+
+                        if showPointChange {
+                            Text("\(pointChangeAmount)")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .padding(.trailing, 8)
+                                .padding(.top, -4)
+                                .transition(.move(edge: .top).combined(with: .opacity))
+                        }
+                    }
+                    .animation(.easeOut(duration: 0.4), value: showPointChange)
 
                     storeSection(
                         title: "Category",
@@ -80,7 +94,7 @@ struct StoreView: View {
                         field: "unlockedQuestionCounts"
                     )
                 }
-                .padding(.top, 50) 
+                .padding(.top, 50)
                 .padding()
             }
             .background(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 124/255, green: 172/255, blue: 125/255))
@@ -169,6 +183,16 @@ struct StoreView: View {
             "points": FieldValue.increment(Int64(-cost))
         ]) { error in
             if error == nil {
+                pointChangeAmount = -cost
+                withAnimation(.easeOut(duration: 0.4)) {
+                    showPointChange = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+                    withAnimation {
+                        showPointChange = false
+                    }
+                }
+
                 loadUserData()
             }
         }

@@ -62,7 +62,7 @@ struct ProfileView: View {
                         Text("Log out")
                             .foregroundColor(.black)
                             .font(.system(.body, design: .monospaced))
-                            .fontWeight(.semibold)
+                    
                             .padding(.vertical, 8)
                             .padding(.horizontal, 16)
                             .background(Color.white)

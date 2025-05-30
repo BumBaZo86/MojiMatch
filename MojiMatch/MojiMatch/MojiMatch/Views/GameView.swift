@@ -11,11 +11,12 @@ import FirebaseFirestore
 
 struct GameView: View {
     
+    @EnvironmentObject var appSettings: AppSettings
+    
     @ObservedObject var firebaseViewModel = FirebaseViewModel()
-    @EnvironmentObject var appSettings: AppSettings  //setting for darkmode.
     
     @Binding var category: String
-    @Binding var time: Double
+    @Binding var time: Double // (Difficulty)
     @Binding var noOfQuestions: Int
     @Binding var maxPoints : Int
     @Binding var showGameView: Bool
@@ -34,60 +35,45 @@ struct GameView: View {
         NavigationStack {
             
             ZStack {
-                // background color depending of setting.
-                Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
+                // backgroundcolor depending of settings
+                (appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 124/255, green: 172/255, blue: 125/255))
                     .ignoresSafeArea()
                 
                 VStack {
-                    
-                    VStack{
-                        
+                    VStack {
                         Text("Score: \(score)")
+                            .foregroundColor(.black)
                         
                         ZStack {
-                            
                             ProgressView(value: Double(score), total: Double(noOfQuestions * maxPoints))
                                 .progressViewStyle(LinearProgressViewStyle())
-                                .tint(Color(red: 113/256, green: 162/256, blue: 114/256))
+                                .tint(Color(red: 113/255, green: 162/255, blue: 114/255))
                                 .scaleEffect(y: 2)
                                 .padding(.horizontal)
-                               
                             
                             GeometryReader { geometry in
-                                
-                                let progressViewWidth = geometry.size.width
-                                
+                                let width = geometry.size.width
                                 Group {
-                                    
                                     Image(systemName: "star.fill")
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(
-                                            width: starOne ? 45 : 25,
-                                            height: starOne ? 45 : 25)
-                                    
-                                        .position(x: progressViewWidth * 0.2, y: 7)
+                                        .frame(width: starOne ? 45 : 25, height: starOne ? 45 : 25)
+                                        .position(x: width * 0.2, y: 7)
                                         .foregroundStyle(starOne ? Color.yellow : Color.gray)
-                                        
-                                    Image(systemName: "star.fill")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .foregroundStyle(starTwo ? Color.yellow : Color.gray)
-                                        .frame(
-                                            width: starTwo ? 45 : 25,
-                                            height: starTwo ? 45 : 25)
-                                        .position(x: progressViewWidth * 0.6, y: 7)
-                                  
                                     
                                     Image(systemName: "star.fill")
                                         .resizable()
                                         .scaledToFit()
+                                        .frame(width: starTwo ? 45 : 25, height: starTwo ? 45 : 25)
+                                        .position(x: width * 0.6, y: 7)
+                                        .foregroundStyle(starTwo ? Color.yellow : Color.gray)
+                                    
+                                    Image(systemName: "star.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: starThree ? 45 : 25, height: starThree ? 45 : 25)
+                                        .position(x: width, y: 7)
                                         .foregroundStyle(starThree ? Color.yellow : Color.gray)
-                                        .frame(
-                                            width: starThree ? 45 : 25,
-                                            height: starThree ? 45 : 25)
-                                        .position(x: progressViewWidth * 1.0, y: 7)
-                                   
                                 }
                             }
                             .frame(height: 20)
@@ -96,24 +82,23 @@ struct GameView: View {
                         .frame(height: 40)
                     }
                     .padding()
-                        .frame(width: 350, height: 100)
-                        .foregroundStyle(Color.black)
-                        .background(Color.white)
-                        .clipShape(.rect(cornerRadius: 15))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 10)
-                        )
-                        .shadow(radius: 10.0, x: 20, y: 10)
-                        .fontDesign(.monospaced)
-                        .padding(.top)
-                
-                
-                    //Fetch game question and show it.
+                    .frame(width: 350, height: 100)
+                    .foregroundColor(.black)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 10)
+                    )
+                    .shadow(radius: 10, x: 20, y: 10)
+                    .fontDesign(.monospaced)
+                    .padding(.top)
+                    
                     if let question = firebaseViewModel.currentQuestion {
                         Text(question.question)
                             .customQuestionText()
                             .font(.system(size: fontSize(for: question.question)))
+                            .foregroundColor(.black)
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: 15)
@@ -121,12 +106,10 @@ struct GameView: View {
                                 .frame(width: 350, height: 300)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 15)
-                                        .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                                        .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 7)
                                 )
                             
-                            //Show answerOptions as buttons.
                             VStack(spacing: 25) {
-                                
                                 HStack(spacing: 25) {
                                     Spacer()
                                     optionButton(text: firebaseViewModel.optionA)
@@ -143,31 +126,26 @@ struct GameView: View {
                         }
                         .padding(.top, 20)
                         
-             
                         HStack {
                             Spacer()
                             Text(String(format: "%02d:%02d", Int(ceil(timeRemaining)) / 60, Int(ceil(timeRemaining)) % 60))
                                 .padding(.horizontal)
                                 .padding(.top)
+                                .foregroundColor(.black)
                         }
                         
-                 
                         ProgressView(value: max(0, timeRemaining), total: time)
                             .progressViewStyle(LinearProgressViewStyle())
                             .tint(.black)
                             .padding(.horizontal)
                             .padding(.bottom, 50)
-                        
                     }
                     
-            
-                    NavigationLink(destination: GameOverView(score: score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints, starOne: $starOne, starTwo: $starTwo, starThree: $starThree), isActive: $isGameOver) {
+                    NavigationLink(destination: GameOverView(score: $score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints, starOne: $starOne, starTwo: $starTwo, starThree: $starThree), isActive: $isGameOver) {
                         EmptyView()
                     }
-                   
                 }
             }
-            //Fetch first question, answerOptions and start timer.
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
                 startTimer()
@@ -175,25 +153,17 @@ struct GameView: View {
         }
     }
     
-    
-    /** explanation:
-     * Show answerOptions
-     * Check if answer is correct
-     * Adapt text size depending on how many characters each string has.
-     */
     func optionButton(text: String) -> some View {
         Button(action: {
             checkAnswer(text)
         }) {
             Text(text)
+                .foregroundColor(.black)
         }
         .customAnswerOptions()
         .font(.system(size: text.count < 2 ? 70 : 10))
     }
-
-    /** explanation:
-     * Adapts the text size depending on how many characters each string has.
-     */
+    
     func fontSize(for text: String) -> CGFloat {
         if text.count < 3 {
             return 90
@@ -204,18 +174,10 @@ struct GameView: View {
         }
     }
     
-    /** explanation:
-     * Check if answer is correct or not
-     * If correct = score + 10 points.
-     * After question is answered, either a new question is fetched or GameOverView is shown.
-     * New timer starts again if a new question is fetched.
-     */
-    
     func checkAnswer(_ selected: String) {
         timer?.invalidate()
         
         if selected == firebaseViewModel.currentQuestion?.answer {
-           
             if time == 5.0 {
                 score += 30
             } else if time == 7.0 {
@@ -226,7 +188,6 @@ struct GameView: View {
         }
         
         checkStars()
-        
         questionCount += 1
         
         if questionCount < noOfQuestions {
@@ -236,14 +197,6 @@ struct GameView: View {
             isGameOver = true
         }
     }
-    
-    
-    /** explanation:
-     * Timer starts.
-     * If a timer is already running, stops it and then starts a new one.
-     * If timer runs out of time, checks if a new question is being fetched or if det är GameOver.
-     * Updates every 0.1 seconds.
-     */
     
     func startTimer() {
         timer?.invalidate()
@@ -268,7 +221,6 @@ struct GameView: View {
     }
     
     func checkStars() {
-        
         if score == (maxPoints * noOfQuestions) / 5 {
             starOne = true
         } else if score == ((maxPoints * noOfQuestions) / 5) * 3 {

@@ -4,7 +4,6 @@
 //
 //  Created by Camilla Falk on 2025-05-20.
 //
-
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -26,6 +25,7 @@ struct GameSettingsView: View {
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
     
+    // Arrange the categories into 4 items in each row. Fixed space from each item to the next.
     let columns = Array(repeating: GridItem(.fixed(80), spacing: 10), count: 4)
     
     var body: some View {
@@ -42,6 +42,7 @@ struct GameSettingsView: View {
                 .padding(.horizontal)
                 .padding(.top)
                 
+                // Arrange the categories in rows.
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
                     ForEach(unlockedCategories, id: \.self) { cat in
                         VStack {
@@ -52,7 +53,8 @@ struct GameSettingsView: View {
                         }
                         .customGameSettings(isSelected: category == cat)
                         .onTapGesture {
-                            category = cat
+                            category = cat   //selected category gets different background color and is updated to be ready to be sent to game.
+
                         }
                     }
                 }
@@ -77,7 +79,8 @@ struct GameSettingsView: View {
                         .customGameSettings(isSelected: difficulty == level)
                         .onTapGesture {
                             difficulty = level
-                            
+                            //maxPoint means how many points each correct answer will be worth.
+
                             switch level {
                             case "Hard":
                                 time = 5.0
@@ -125,6 +128,8 @@ struct GameSettingsView: View {
                 }
                 
                 Spacer()
+                //Sheet that does not contain the tabview. Send all the info to gameview.
+
             }
             .fullScreenCover(isPresented: $showGameView) {
                 GameView(
@@ -141,6 +146,9 @@ struct GameSettingsView: View {
             fetchUserCategories()
         }
     }
+    /**
+      * Fetches the users unlocked categories/difficulty/noOfQs from firebase.
+      */
     
     func fetchUserCategories() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
@@ -183,6 +191,9 @@ struct GameSettingsView: View {
             }
         }
     }
+    /**
+        * Makes the squares with categories/difficulty/noOfQs to emojis instead of letters.
+        */
     
     func textToEmoji(for category: String) -> String {
         switch category {

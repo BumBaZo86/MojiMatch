@@ -36,7 +36,7 @@ struct ProfileView: View {
             Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
 
-            VStack {
+            VStack(spacing: 10) {
                 HStack {
                     Spacer()
                     Button(action: {
@@ -52,14 +52,13 @@ struct ProfileView: View {
                             .shadow(radius: 2)
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.trailing, 7)
                 .padding(.top, 16)
 
-         
                 Text("Profile")
                     .font(.largeTitle)
                     .foregroundColor(.black)
-                    .padding()
+                    .padding(.vertical, 8)
                     .frame(width: 250, height: 60)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 15))
@@ -69,10 +68,10 @@ struct ProfileView: View {
                     )
                     .fontDesign(.monospaced)
                     .frame(maxWidth: .infinity, alignment: .center)
+                    .offset(y: -50) 
 
                 ScrollView {
                     VStack(spacing: 20) {
-                    
                         if let avatarUIImage = avatarUIImage {
                             avatarUIImage
                                 .resizable()
@@ -132,10 +131,11 @@ struct ProfileView: View {
                                 .padding()
                         }
                     }
-                    .padding(.top, 20)
+                    .padding(.top, 10)
                     .padding(.horizontal)
                 }
             }
+            .padding(.horizontal)
 
             if showSettingsView {
                 SettingsView(closeAction: {
@@ -172,7 +172,6 @@ struct ProfileView: View {
     }
 
     func loadAvatarImage(named imageName: String) {
-      
         if let image = UIImage(named: imageName) {
             self.avatarUIImage = Image(uiImage: image)
         } else {

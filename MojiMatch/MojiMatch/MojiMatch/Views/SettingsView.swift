@@ -9,7 +9,7 @@ import SwiftUI
 import FirebaseAuth
 
 struct SettingsView: View {
-    @AppStorage("isDarkMode") private var isDarkMode = false
+    @EnvironmentObject var appSettings: AppSettings
     @AppStorage("soundOn") private var soundOn = true
     @AppStorage("isLoggedIn") private var isLoggedIn = true
 
@@ -17,24 +17,24 @@ struct SettingsView: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            Color(hex: "7CAC7D")
+            ThemeColors.background(appSettings.isSettingsMode)
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 30) {
                 Text("Settings")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(ThemeColors.text(appSettings.isSettingsMode))
                 
-                Toggle(isOn: $isDarkMode) {
+                Toggle(isOn: $appSettings.isSettingsMode) {
                     Text("Dark Mode")
-                        .foregroundColor(.black)
+                        .foregroundColor(ThemeColors.text(appSettings.isSettingsMode))
                 }
                 .toggleStyle(SwitchToggleStyle(tint: .black))
 
                 Toggle(isOn: $soundOn) {
                     Text("Sound")
-                        .foregroundColor(.black)
+                        .foregroundColor(ThemeColors.text(appSettings.isSettingsMode))
                 }
                 .toggleStyle(SwitchToggleStyle(tint: .black))
 
@@ -63,11 +63,11 @@ struct SettingsView: View {
             Button(action: closeAction) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.title)
-                    .foregroundColor(.black)
+                    .foregroundColor(ThemeColors.text(appSettings.isSettingsMode))
                     .padding()
             }
         }
         .transition(.move(edge: .trailing))
-        .animation(.easeInOut, value: isDarkMode)
+        .animation(.easeInOut, value: appSettings.isSettingsMode)
     }
 }

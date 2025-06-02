@@ -7,24 +7,31 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseAuth
 import UIKit
 
-
 class AppDelegate: NSObject, UIApplicationDelegate {
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
-
-    return true
-  }
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        FirebaseApp.configure()
+        return true
+    }
 }
 
 @main
-struct MojiMatchApp: App {
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+struct YourAppNameApp: App {
+
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    @StateObject private var authModel = AuthModel()
+    @StateObject private var appSettings = AppSettings()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(authModel)
+                .environmentObject(appSettings) 
         }
     }
 }
+

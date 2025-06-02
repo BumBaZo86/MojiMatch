@@ -6,48 +6,148 @@
 //
 
 import SwiftUI
-//commit
+
 struct HomeView: View {
-    
-    @State var showGameView = false
-    @State var category = "Animals"
-    @State var time = 10
-    @State var noOfQuestions = 5
- 
-    
+    @EnvironmentObject var appSettings: AppSettings
+
+    @State private var showInfo = false
+    @State private var showRules = false
+    @State private var navigateToGameSettings = false
+    @StateObject private var emojiVM = EmojiViewModel()
+
     var body: some View {
-        
-        ZStack{
-            
-            Color(red: 113/256, green: 162/256, blue: 114/256)
-                .ignoresSafeArea()
-            
-            VStack{
-                Text("HomeView")
-                
-                Spacer()
-                
-                Button(action: {
-                    showGameView = true }) {
+        NavigationStack {
+            ZStack {
+                Color(appSettings.isSettingsMode
+                      ? Color(hex: "778472")
+                      : Color(red: 113/256, green: 162/256, blue: 114/256))
+                    .ignoresSafeArea()
+
+                VStack(spacing: 30) {
+                    Image("MojiMatchLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 300, height: 300)
+                        .foregroundColor(.white)
+
+                    Button(action: {
+                        navigateToGameSettings = true
+                    }) {
                         Text("Play")
+                            .font(.title2)
                             .padding()
-                            .frame(width: 250, height: 60)
-                            .foregroundStyle(Color.black)
-                            .background(Color.white)
-                            .foregroundStyle(.white)
-                            .clipShape(.rect(cornerRadius: 15))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke( Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
-                            )
-                            .shadow(radius: 10.0, x: 20, y: 10)
-                            .fontDesign(.monospaced)
-                        
+                            .frame(width: 200)
+                            .background(Color(red: 186/256, green: 221/256, blue: 186/256))
+                            .foregroundColor(.black)
+                            .cornerRadius(12)
+                            .shadow(radius: 5)
                     }
-                Spacer()
+
+                    Button(action: {
+                        showRules = true
+                    }) {
+                        Text("Rules")
+                            .font(.title2)
+                            .padding()
+                            .frame(width: 200)
+                            .background(Color.white)
+                            .foregroundColor(.black)
+                            .cornerRadius(12)
+                            .shadow(radius: 5)
+                    }
+
+                    Button(action: {
+                        showInfo = true
+                    }) {
+                        Text("Info")
+                            .font(.title2)
+                            .padding()
+                            .frame(width: 200)
+                            .background(Color.white)
+                            .foregroundColor(.black)
+                            .cornerRadius(12)
+                            .shadow(radius: 5)
+                    }
+
+                    Spacer()
+
+                    VStack {
+                        Text("Emoji of the Day")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+
+                        Text(emojiVM.emoji)
+                            .font(.system(size: 50))
+                    }
+                    .padding(.bottom, 20)
+
+                    NavigationLink(destination: GameSettingsView(), isActive: $navigateToGameSettings) {
+                        EmptyView()
+                    }
+                }
+                .padding()
             }
-            .fullScreenCover(isPresented: $showGameView){
-                GameView(firebaseViewModel: FirebaseViewModel(), category: $category, time: $time, noOfQuestions: $noOfQuestions)
+            .onAppear {
+                emojiVM.fetchEmoji()
+            }
+
+            // Rules sheet
+            .sheet(isPresented: $showRules) {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("🧠 Rules")
+                        .font(.largeTitle)
+                        .bold()
+                    Text("""
+1. Choose a category and the number of questions.
+2. Each question has four answer options – pick the correct one before time runs out.
+3. You earn 10 points for every correct answer.
+4. The game ends when all questions are answered or the timer reaches zero.
+
+Think fast and aim for a high score!
+""")
+                    Spacer()
+                    Button("Close") {
+                        showRules = false
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(appSettings.isSettingsMode
+                                      ? Color(hex: "778472")
+                                      : Color(red: 113/256, green: 162/256, blue: 114/256)))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .padding()
+            }
+
+            // Info sheet
+            .sheet(isPresented: $showInfo) {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("ℹ️ Info")
+                        .font(.largeTitle)
+                        .bold()
+                    Text("""
+MojiMatch is a fast-paced quiz game designed to challenge your memory and reaction time.
+
+Choose your category, race against the clock, and see how high you can score!
+
+The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
+
+👾 Created with passion by [Your Name].
+""")
+                    Spacer()
+                    Button("Close") {
+                        showInfo = false
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(appSettings.isSettingsMode
+                                      ? Color(hex: "778472")
+                                      : Color(red: 113/256, green: 162/256, blue: 114/256)))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .padding()
             }
         }
     }
@@ -55,4 +155,8 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
+        .environmentObject(AppSettings())
 }
+
+
+/*test again*/

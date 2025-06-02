@@ -12,79 +12,85 @@ import FirebaseAuth
 struct LoginView: View {
     @Binding var isLoggedIn: Bool
     @Binding var showSignup: Bool
-
-    @State private var email: String = ""
-    @State private var password: String = ""
-    @State private var errorMessage: String = ""
-    @State private var isLoading: Bool = false
+    
+    @EnvironmentObject var authModel: AuthModel
 
     var body: some View {
-        VStack {
-            Text("Log In")
-                .font(.largeTitle)
-                .padding()
+        ZStack {
+            Color(red: 113/256, green: 162/256, blue: 114/256)
+                .ignoresSafeArea()
 
-            TextField("Email", text: $email)
-                .padding()
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .autocapitalization(.none)
+            VStack(spacing: 20) {
+                Image("MojiMatchLogo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 300, height: 300)
+                    .foregroundColor(.white)
 
-            SecureField("Password", text: $password)
-                .padding()
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-
-            if !errorMessage.isEmpty {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-            }
-
-            Button(action: {
-                logIn()
-            }) {
-                if isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle())
-                } else {
+                VStack(spacing: 16) {
                     Text("Log In")
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.blue)
+                        .font(.title)
                         .foregroundColor(.white)
-                        .cornerRadius(8)
+
+                    TextField("Email", text: $authModel.email)
+                        .padding()
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .autocapitalization(.none)
+
+                    SecureField("Password", text: $authModel.password)
+                        .padding()
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+
+                    Toggle("Remember email", isOn: $authModel.rememberEmail)
+                        .toggleStyle(SwitchToggleStyle(tint: .white))
+                        .foregroundColor(.white)
+
+                    if !authModel.errorMessage.isEmpty {
+                        Text(authModel.errorMessage)
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+
+                    Button(action: {
+                        authModel.logIn { success in
+                            if success {
+                                isLoggedIn = true
+                            }
+                        }
+                    }) {
+                        if authModel.isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        } else {
+                            Text("Log In")
+                                .font(.headline)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color(red: 186/256, green: 221/256, blue: 186/256))
+                                .foregroundColor(.black)
+                                .cornerRadius(10)
+                                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                        }
+                    }
+                    .disabled(authModel.isLoading)
+                    .padding(.top)
+
+                    Button(action: {
+                        showSignup = true
+                    }) {
+                        Text("Don't have an account? Sign up")
+                            .foregroundColor(.white)
+                            .underline()
+                    }
+                    .padding(.top, 8)
                 }
-            }
-            .disabled(isLoading)
-            .padding()
+                .padding(.horizontal, 30)
 
-            Button(action: {
-            
-                showSignup = true
-            }) {
-                Text("Don't have an account? Sign up")
-                    .foregroundColor(.blue)
+                Spacer()
             }
-            .padding(.top)
         }
-        .padding()
-    }
-
-    func logIn() {
-        guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = "Please fill in both fields."
-            return
-        }
-
-        isLoading = true
-        errorMessage = ""
-
-        Auth.auth().signIn(withEmail: email, password: password) { result, error in
-            isLoading = false
-            if let error = error {
-                errorMessage = error.localizedDescription
-            } else {
-                isLoggedIn = true
-                print("Logged in successfully!")
-            }
+        .onAppear {
+            authModel.onAppear()
         }
     }
 }

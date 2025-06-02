@@ -157,3 +157,6 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
     HomeView()
         .environmentObject(AppSettings())
 }
+
+
+/*test again*/

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct HomeView: View {
     @EnvironmentObject var appSettings: AppSettings
@@ -14,6 +15,23 @@ struct HomeView: View {
     @State private var showRules = false
     @State private var navigateToGameSettings = false
     @StateObject private var emojiVM = EmojiViewModel()
+    
+    @State private var audioPlayer: AVAudioPlayer?
+
+   
+    func playButtonSound() {
+        guard let url = Bundle.main.url(forResource: "buttonsound", withExtension: "mp3") else {
+            print("Ljudfilen hittades inte.")
+            return
+        }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.play()
+        } catch {
+            print("Fel vid uppspelning av ljud: \(error.localizedDescription)")
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -31,6 +49,7 @@ struct HomeView: View {
                         .foregroundColor(.white)
 
                     Button(action: {
+                        playButtonSound()
                         navigateToGameSettings = true
                     }) {
                         Text("Play")
@@ -44,6 +63,7 @@ struct HomeView: View {
                     }
 
                     Button(action: {
+                        playButtonSound()
                         showRules = true
                     }) {
                         Text("Rules")
@@ -57,6 +77,7 @@ struct HomeView: View {
                     }
 
                     Button(action: {
+                        playButtonSound()
                         showInfo = true
                     }) {
                         Text("Info")
@@ -71,14 +92,23 @@ struct HomeView: View {
 
                     Spacer()
 
-                    VStack {
+                    VStack(spacing: 10) {
                         Text("Emoji of the Day")
                             .font(.subheadline)
-                            .foregroundColor(.white)
+                            .foregroundColor(.black)
 
                         Text(emojiVM.emoji)
                             .font(.system(size: 50))
                     }
+                    .padding()
+                    .frame(width: 250, height: 110)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                    )
+                    .fontDesign(.monospaced)
                     .padding(.bottom, 20)
 
                     NavigationLink(destination: GameSettingsView(), isActive: $navigateToGameSettings) {
@@ -91,7 +121,7 @@ struct HomeView: View {
                 emojiVM.fetchEmoji()
             }
 
-            // Rules sheet
+           
             .sheet(isPresented: $showRules) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("🧠 Rules")
@@ -120,7 +150,7 @@ Think fast and aim for a high score!
                 .padding()
             }
 
-            // Info sheet
+            
             .sheet(isPresented: $showInfo) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("ℹ️ Info")
@@ -157,6 +187,3 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
     HomeView()
         .environmentObject(AppSettings())
 }
-
-
-/*test again*/

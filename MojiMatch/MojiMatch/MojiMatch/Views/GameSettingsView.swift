@@ -3,11 +3,12 @@
 //  MojiMatch
 //
 //  Created by Camilla Falk on 2025-05-20.
-//
+
 import SwiftUI
 import Firebase
 import FirebaseAuth
 import FirebaseFirestore
+import AVFoundation  // import AVFoundation for sound.
 
 struct GameSettingsView: View {
     @EnvironmentObject var appSettings: AppSettings
@@ -25,7 +26,10 @@ struct GameSettingsView: View {
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
     
-    // Arrange the categories into 4 items in each row. Fixed space from each item to the next.
+    // adds sound player
+    @State private var audioPlayer: AVAudioPlayer?  // Ljudspelare
+    
+    // shows categories
     let columns = Array(repeating: GridItem(.fixed(80), spacing: 10), count: 4)
     
     var body: some View {
@@ -42,7 +46,7 @@ struct GameSettingsView: View {
                 .padding(.horizontal)
                 .padding(.top)
                 
-                // Arrange the categories in rows.
+                
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
                     ForEach(unlockedCategories, id: \.self) { cat in
                         VStack {
@@ -53,8 +57,8 @@ struct GameSettingsView: View {
                         }
                         .customGameSettings(isSelected: category == cat)
                         .onTapGesture {
-                            category = cat   //selected category gets different background color and is updated to be ready to be sent to game.
-
+                            playButtonSound()  // calls button sound when its pressed.
+                            category = cat
                         }
                     }
                 }
@@ -78,9 +82,9 @@ struct GameSettingsView: View {
                         }
                         .customGameSettings(isSelected: difficulty == level)
                         .onTapGesture {
+                            playButtonSound()
                             difficulty = level
-                            //maxPoint means how many points each correct answer will be worth.
-
+                            // maxPoints how many points correct answer gives.
                             switch level {
                             case "Hard":
                                 time = 5.0
@@ -111,6 +115,7 @@ struct GameSettingsView: View {
                             .font(.system(size: 19))
                             .customGameSettings(isSelected: numberOfQuestions == String(q))
                             .onTapGesture {
+                                playButtonSound()
                                 numberOfQuestions = String(q)
                                 noOfQuestions = q
                             }
@@ -128,7 +133,7 @@ struct GameSettingsView: View {
                 }
                 
                 Spacer()
-                //Sheet that does not contain the tabview. Send all the info to gameview.
+              
 
             }
             .fullScreenCover(isPresented: $showGameView) {
@@ -146,10 +151,10 @@ struct GameSettingsView: View {
             fetchUserCategories()
         }
     }
-    /**
-      * Fetches the users unlocked categories/difficulty/noOfQs from firebase.
-      */
     
+    /**
+         * Fetches the users unlocked categories/difficulty/noOfQs from firebase.
+         */
     func fetchUserCategories() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
         
@@ -191,10 +196,10 @@ struct GameSettingsView: View {
             }
         }
     }
-    /**
-        * Makes the squares with categories/difficulty/noOfQs to emojis instead of letters.
-        */
     
+    /**
+     * Makes the squares with categories/difficulty/noOfQs to emojis instead of letters.
+     */
     func textToEmoji(for category: String) -> String {
         switch category {
         case "Animals": return "🦁"
@@ -210,6 +215,23 @@ struct GameSettingsView: View {
         case "10": return "🔟"
         case "15": return "1️⃣5️⃣"
         default: return "❔"
+        }
+    }
+    
+    /**
+     * Plays buttonsound.
+     */
+    func playButtonSound() {
+        guard let url = Bundle.main.url(forResource: "buttonsound", withExtension: "mp3") else {
+            print("Ljudfilen hittades inte.")
+            return
+        }
+
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.play()  // Spela ljudet
+        } catch {
+            print("Fel vid uppspelning av ljud: \(error.localizedDescription)")
         }
     }
 }

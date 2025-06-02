@@ -36,17 +36,28 @@ struct SettingsView: View {
                     .fontDesign(.monospaced)
                     .frame(maxWidth: .infinity, alignment: .center)
 
+          
                 Toggle(isOn: $appSettings.isSettingsMode) {
                     Text("Dark Mode")
                         .foregroundColor(ThemeColors.text(appSettings.isSettingsMode))
                 }
                 .toggleStyle(SwitchToggleStyle(tint: .black))
 
+             
                 Toggle(isOn: $soundOn) {
                     Text("Sound")
                         .foregroundColor(ThemeColors.text(appSettings.isSettingsMode))
                 }
                 .toggleStyle(SwitchToggleStyle(tint: .black))
+                .onChange(of: soundOn) { value in
+                    if value {
+                      
+                        AudioManager.shared.playBackgroundMusic()
+                    } else {
+                      
+                        AudioManager.shared.stopBackgroundMusic()
+                    }
+                }
 
                 Button(action: {
                     do {
@@ -70,6 +81,7 @@ struct SettingsView: View {
             .padding()
             .frame(maxWidth: .infinity, alignment: .center)
 
+      
             Button(action: closeAction) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.title)

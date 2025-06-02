@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @EnvironmentObject var appSettings: AppSettings
 
+    @State var showWheel = false
     @State private var showInfo = false
     @State private var showRules = false
     @State private var navigateToGameSettings = false
@@ -72,6 +73,9 @@ struct HomeView: View {
                     Spacer()
 
                     VStack {
+                        Button("Wheel") {
+                            showWheel = true
+                        }
                         Text("Emoji of the Day")
                             .font(.subheadline)
                             .foregroundColor(.white)
@@ -89,8 +93,11 @@ struct HomeView: View {
             }
             .onAppear {
                 emojiVM.fetchEmoji()
+                    
             }
-
+            .sheet(isPresented: $showWheel) {
+                WheelView()
+            }
             // Rules sheet
             .sheet(isPresented: $showRules) {
                 VStack(alignment: .leading, spacing: 20) {

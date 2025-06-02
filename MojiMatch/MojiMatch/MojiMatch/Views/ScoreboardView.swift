@@ -46,7 +46,7 @@ struct ScoreboardView: View {
                     let user = firebaseViewModel.usersAndScores[index]
                     
                     HStack {
-                        Text("#\(index + 1)")
+                        Text("\(emojiRank(rank: index))")
                             .padding()
                         
                         Text(user.username)
@@ -65,8 +65,39 @@ struct ScoreboardView: View {
         .onAppear {
             firebaseViewModel.fetchUsers(filter: selectedFilter)
         }
-        .onChange(of: selectedFilter) { newFilter in
+        .onChange(of: selectedFilter) { oldValue, newFilter in
             firebaseViewModel.fetchUsers(filter: newFilter)
         }
     }
+    
+    
+    func emojiRank(rank : Int) -> String {
+            
+            switch rank {
+            case 0:
+                return "🥇"
+            case 1:
+                return "🥈"
+            case 2:
+                return "🥉"
+            case 3:
+                return "4️⃣"
+            case 4:
+                return "5️⃣"
+            case 5:
+                return "6️⃣"
+            case 6:
+                return "7️⃣"
+            case 7:
+                return "8️⃣"
+            case 8:
+                return "9️⃣"
+            case 9:
+                return "🔟"
+            default:
+                return "🔹"
+            }
+            
+        }
+
 }

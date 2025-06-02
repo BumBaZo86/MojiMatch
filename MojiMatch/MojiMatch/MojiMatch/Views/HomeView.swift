@@ -11,6 +11,7 @@ import AVFoundation
 struct HomeView: View {
     @EnvironmentObject var appSettings: AppSettings
 
+    @State var showWheel = false
     @State private var showInfo = false
     @State private var showRules = false
     @State private var navigateToGameSettings = false
@@ -41,7 +42,7 @@ struct HomeView: View {
                       : Color(red: 113/256, green: 162/256, blue: 114/256))
                     .ignoresSafeArea()
 
-                VStack(spacing: 30) {
+                VStack(spacing: 20) {
                     Image("MojiMatchLogo")
                         .resizable()
                         .scaledToFit()
@@ -90,9 +91,22 @@ struct HomeView: View {
                             .shadow(radius: 5)
                     }
 
-                    Spacer()
-
+                 
+                    VStack {
+                        Button(action:  {
+                            withAnimation {
+                                showWheel = true
+                            }
+                        }) {
+                            SpinningWheelButton()
+                            
+                        }
+                        .padding()
+                        
+                        Spacer()
+                        
                     VStack(spacing: 10) {
+
                         Text("Emoji of the Day")
                             .font(.subheadline)
                             .foregroundColor(.black)
@@ -116,12 +130,26 @@ struct HomeView: View {
                     }
                 }
                 .padding()
+                
+                if showWheel {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation {
+                                showWheel = false
+                            }
+                        }
+                    
+                    WheelView()
+                        .transition(.scale)
+                        .zIndex(1)
+                }
             }
             .onAppear {
                 emojiVM.fetchEmoji()
+                    
             }
-
-           
+                      
             .sheet(isPresented: $showRules) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("🧠 Rules")
@@ -182,6 +210,31 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
         }
     }
 }
+
+struct SpinningWheelButton : View {
+    
+    @State var rotation : Double = 0
+    
+    let timer = Timer.publish(every: 0.02, on: .main, in: .common).autoconnect()
+    
+    
+    var body : some View {
+        
+        ZStack{
+            ForEach(0..<10, id: \.self) { i in
+            
+                SegmentView(label: "", index: i, totalSegments: 10)
+            }
+        }
+        
+        .frame(width: 60, height: 60)
+        .clipShape(Circle())
+        .rotationEffect(.degrees(rotation))
+        .onReceive(timer) { _ in
+            rotation += 0.5}
+    }
+}
+
 
 #Preview {
     HomeView()

@@ -9,10 +9,11 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var appSettings: AppSettings
-    
+
     @State private var showInfo = false
     @State private var showRules = false
     @State private var navigateToGameSettings = false
+    @StateObject private var emojiVM = EmojiViewModel()
 
     var body: some View {
         NavigationStack {
@@ -20,7 +21,7 @@ struct HomeView: View {
                 Color(appSettings.isSettingsMode
                       ? Color(hex: "778472")
                       : Color(red: 113/256, green: 162/256, blue: 114/256))
-                .ignoresSafeArea()
+                    .ignoresSafeArea()
 
                 VStack(spacing: 30) {
                     Image("MojiMatchLogo")
@@ -68,12 +69,28 @@ struct HomeView: View {
                             .shadow(radius: 5)
                     }
 
+                    Spacer()
+
+                    VStack {
+                        Text("Emoji of the Day")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+
+                        Text(emojiVM.emoji)
+                            .font(.system(size: 50))
+                    }
+                    .padding(.bottom, 20)
+
                     NavigationLink(destination: GameSettingsView(), isActive: $navigateToGameSettings) {
                         EmptyView()
                     }
                 }
                 .padding()
             }
+            .onAppear {
+                emojiVM.fetchEmoji()
+            }
+
             // Rules sheet
             .sheet(isPresented: $showRules) {
                 VStack(alignment: .leading, spacing: 20) {
@@ -103,7 +120,7 @@ Think fast and aim for a high score!
                 .padding()
             }
 
-            
+            // Info sheet
             .sheet(isPresented: $showInfo) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("ℹ️ Info")

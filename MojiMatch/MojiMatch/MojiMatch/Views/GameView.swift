@@ -8,7 +8,7 @@
 import SwiftUI
 import Firebase
 import FirebaseFirestore
-
+import AVFoundation
 struct GameView: View {
     
     @EnvironmentObject var appSettings: AppSettings
@@ -31,9 +31,25 @@ struct GameView: View {
     @State var starTwo : Bool = false
     @State var starThree : Bool = false
     
+    @State private var audioPlayer: AVAudioPlayer?
+    
+   
+    func playButtonSound() { // play buttonsound
+        guard let url = Bundle.main.url(forResource: "buttonsound", withExtension: "mp3") else {
+            print("Ljudfilen hittades inte.")
+            return
+        }
+
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.play()
+        } catch {
+            print("Fel vid uppspelning av ljud: \(error.localizedDescription)")
+        }
+    }
+
     var body: some View {
         NavigationStack {
-            
             ZStack {
                 // backgroundcolor depending of settings
                 (appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 124/255, green: 172/255, blue: 125/255))
@@ -149,12 +165,14 @@ struct GameView: View {
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
                 startTimer()
+                playButtonSound()
             }
         }
     }
-    
+
     func optionButton(text: String) -> some View {
         Button(action: {
+            playButtonSound()
             checkAnswer(text)
         }) {
             Text(text)

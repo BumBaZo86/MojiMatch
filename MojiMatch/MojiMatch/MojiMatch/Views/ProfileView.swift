@@ -55,6 +55,21 @@ struct ProfileView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
 
+                // PROFILE TITEL LIGGER HÄR, UTANFÖR SCROLLVIEW
+                Text("Profile")
+                    .font(.largeTitle)
+                    .foregroundColor(.black)
+                    .padding()
+                    .frame(width: 250, height: 60)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                    )
+                    .fontDesign(.monospaced)
+                    .frame(maxWidth: .infinity, alignment: .center)
+
                 ScrollView {
                     VStack(spacing: 20) {
                         if let avatarUIImage = avatarUIImage {

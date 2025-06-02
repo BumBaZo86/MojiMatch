@@ -71,14 +71,24 @@ struct HomeView: View {
 
                     Spacer()
 
-                    VStack {
+                   
+                    VStack(spacing: 10) {
                         Text("Emoji of the Day")
                             .font(.subheadline)
-                            .foregroundColor(.white)
+                            .foregroundColor(.black)
 
                         Text(emojiVM.emoji)
                             .font(.system(size: 50))
                     }
+                    .padding()
+                    .frame(width: 250, height: 110)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                    )
+                    .fontDesign(.monospaced)
                     .padding(.bottom, 20)
 
                     NavigationLink(destination: GameSettingsView(), isActive: $navigateToGameSettings) {
@@ -157,6 +167,3 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
     HomeView()
         .environmentObject(AppSettings())
 }
-
-
-/*test again*/

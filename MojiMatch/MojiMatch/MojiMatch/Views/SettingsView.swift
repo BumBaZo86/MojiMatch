@@ -20,12 +20,22 @@ struct SettingsView: View {
             ThemeColors.background(appSettings.isSettingsMode)
                 .ignoresSafeArea()
 
-            VStack(alignment: .leading, spacing: 30) {
+            VStack(alignment: .center, spacing: 30) {
                 Text("Settings")
                     .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(ThemeColors.text(appSettings.isSettingsMode))
-                
+                    .foregroundColor(.black)
+                    .padding()
+                    .frame(width: 250, height: 60)
+                    .background(Color.white)
+                    .foregroundColor(.black)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                    )
+                    .fontDesign(.monospaced)
+                    .frame(maxWidth: .infinity, alignment: .center)
+
                 Toggle(isOn: $appSettings.isSettingsMode) {
                     Text("Dark Mode")
                         .foregroundColor(ThemeColors.text(appSettings.isSettingsMode))
@@ -58,7 +68,7 @@ struct SettingsView: View {
                 Spacer()
             }
             .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .center)
 
             Button(action: closeAction) {
                 Image(systemName: "xmark.circle.fill")

@@ -14,6 +14,7 @@ struct ProfileView: View {
     @EnvironmentObject var appSettings: AppSettings
 
     @State private var user: User? = Auth.auth().currentUser
+    @State private var username: String = "Unknown"
     @State private var points: Int = 0
     @State private var avatarImage: UIImage?
     @State private var avatarUIImage: Image?
@@ -49,64 +50,33 @@ struct ProfileView: View {
                             .clipShape(Circle())
                             .shadow(radius: 2)
                     }
-
                     Spacer()
-
-                    Button(action: {
-                        do {
-                            try Auth.auth().signOut()
-                            isLoggedIn = false
-                        } catch {
-                            errorMessage = "Failed logging out: \(error.localizedDescription)"
-                        }
-                    }) {
-                        Text("Log out")
-                            .foregroundColor(.black)
-                            .font(.system(.body, design: .monospaced))
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 16)
-                            .background(Color.white)
-                            .cornerRadius(6)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(Color.black.opacity(0.2), lineWidth: 1)
-                            )
-                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
 
                 ScrollView {
                     VStack(spacing: 20) {
-                        Text("Username: \(user?.email ?? "No Email")")
-                            .font(.system(.body, design: .monospaced))
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-
                         if let avatarUIImage = avatarUIImage {
                             avatarUIImage
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 100, height: 100)
+                                .frame(width: 130, height: 130)
                                 .clipShape(Circle())
                         } else {
                             Image(systemName: "person.circle.fill")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 100, height: 100)
+                                .frame(width: 130, height: 130)
                                 .clipShape(Circle())
                                 .foregroundColor(.white)
                         }
 
-                        Button("Change Avatar") {
-                            isImagePickerPresented.toggle()
-                        }
-                        .padding()
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundColor(.white)
-                        .sheet(isPresented: $isImagePickerPresented) {
-                            ImagePicker(selectedImage: $avatarImage, isImagePickerPresented: $isImagePickerPresented)
-                        }
+                        // Här visas nu användarnamnet
+                        Text("Username: \(username)")
+                            .font(.system(.body, design: .monospaced))
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
 
                         Group {
                             VStack(spacing: 8) {
@@ -179,6 +149,7 @@ struct ProfileView: View {
                 self.unlockedCategories = document["unlockedCategories"] as? [String] ?? ["Animals"]
                 self.unlockedLevels = document["unlockedLevels"] as? [String] ?? ["Easy"]
                 self.unlockedQuestionCounts = document["unlockedQuestionCounts"] as? [Int] ?? [5]
+                self.username = document["username"] as? String ?? "Unknown"
             }
         }
     }

@@ -146,7 +146,10 @@ struct SignUpView: View {
     }
     
     func createUserProfile(user: FirebaseAuth.User) {
-
+        
+        let randomAvatarNumber = Int.random(in: 1...5)
+        let avatarImageName = "avatar\(randomAvatarNumber)"
+        
         let userData: [String: Any] = [
             "email": authModel.email,
             "username": username,
@@ -154,10 +157,10 @@ struct SignUpView: View {
             "level": "Easy",
             "unlockedCategories": ["Animals"],
             "unlockedLevels": ["Easy"],
-            "unlockedQuestionCounts": [5]
+            "unlockedQuestionCounts": [5],
+            "avatar": avatarImageName
         ]
         
-     
         Firestore.firestore().collection("users").document(authModel.email).setData(userData) { error in
             DispatchQueue.main.async {
                 if let error = error {

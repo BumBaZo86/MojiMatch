@@ -55,7 +55,7 @@ struct ProfileView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
 
-                // PROFILE TITEL LIGGER HÄR, UTANFÖR SCROLLVIEW
+         
                 Text("Profile")
                     .font(.largeTitle)
                     .foregroundColor(.black)
@@ -72,6 +72,7 @@ struct ProfileView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
+                        // Avataren visas här
                         if let avatarUIImage = avatarUIImage {
                             avatarUIImage
                                 .resizable()
@@ -164,7 +165,18 @@ struct ProfileView: View {
                 self.unlockedLevels = document["unlockedLevels"] as? [String] ?? ["Easy"]
                 self.unlockedQuestionCounts = document["unlockedQuestionCounts"] as? [Int] ?? [5]
                 self.username = document["username"] as? String ?? "Unknown"
+                let avatarImageName = document["avatar"] as? String ?? "avatar1"
+                loadAvatarImage(named: avatarImageName)
             }
+        }
+    }
+
+    func loadAvatarImage(named imageName: String) {
+      
+        if let image = UIImage(named: imageName) {
+            self.avatarUIImage = Image(uiImage: image)
+        } else {
+            self.avatarUIImage = Image(systemName: "person.circle.fill")
         }
     }
 

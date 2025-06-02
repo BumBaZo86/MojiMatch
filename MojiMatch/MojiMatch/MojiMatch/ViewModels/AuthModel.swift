@@ -17,15 +17,18 @@ class AuthModel: ObservableObject {
     @Published var errorMessage: String = ""
     @Published var isLoading: Bool = false
     @Published var rememberEmail: Bool = false
-    
+    @Published var isSoundEnabled: Bool = true
+
     @AppStorage("isLoggedIn") private var storedLoggedIn: Bool = false
     @AppStorage("rememberedEmail") private var rememberedEmail: String = ""
     
+    private let db = Firestore.firestore()
+
     func onAppear() {
         email = rememberedEmail
         rememberEmail = !rememberedEmail.isEmpty
     }
-    
+
     func logIn(completion: @escaping (Bool) -> Void) {
         guard !email.isEmpty, !password.isEmpty else {
             errorMessage = "Please fill in both fields."
@@ -48,12 +51,13 @@ class AuthModel: ObservableObject {
                         self.rememberedEmail = ""
                     }
                     self.storedLoggedIn = true
+                    self.fetchUserSoundSetting()
                     completion(true)
                 }
             }
         }
     }
-    
+
     func signUp(completion: @escaping (Bool) -> Void) {
         guard !email.isEmpty, !password.isEmpty, !username.isEmpty else {
             errorMessage = "All fields are required."
@@ -81,6 +85,7 @@ class AuthModel: ObservableObject {
                 self.createUserProfile(user: firebaseUser) { success in
                     if success {
                         self.storedLoggedIn = true
+                        self.fetchUserSoundSetting()
                         completion(true)
                     } else {
                         completion(false)
@@ -89,7 +94,7 @@ class AuthModel: ObservableObject {
             }
         }
     }
-    
+
     private func createUserProfile(user: FirebaseAuth.User, completion: @escaping (Bool) -> Void) {
         let userData: [String: Any] = [
             "email": email,
@@ -98,10 +103,10 @@ class AuthModel: ObservableObject {
             "level": 1,
             "unlockedCategories": [],
             "unlockedLevels": [],
-            "unlockedQuestionCounts": []
+            "unlockedQuestionCounts": [],
+            "soundEnabled": true
         ]
         
-        let db = Firestore.firestore()
         db.collection("users").document(user.uid).setData(userData) { error in
             DispatchQueue.main.async {
                 if let error = error {
@@ -110,6 +115,33 @@ class AuthModel: ObservableObject {
                 } else {
                     completion(true)
                 }
+            }
+        }
+    }
+
+    
+    private func fetchUserSoundSetting() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        db.collection("users").document(userId).getDocument { document, error in
+            if let error = error {
+                print("Error fetching sound setting: \(error.localizedDescription)")
+            } else if let document = document, document.exists {
+                let data = document.data()
+                self.isSoundEnabled = data?["soundEnabled"] as? Bool ?? true
+            }
+        }
+    }
+
+   
+    func updateSoundSetting(isEnabled: Bool) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        db.collection("users").document(userId).updateData(["soundEnabled": isEnabled]) { error in
+            if let error = error {
+                print("Error updating sound setting: \(error.localizedDescription)")
+            } else {
+                self.isSoundEnabled = isEnabled
             }
         }
     }

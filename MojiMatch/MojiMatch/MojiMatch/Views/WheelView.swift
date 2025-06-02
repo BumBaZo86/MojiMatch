@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WheelView: View {
     
-    let segments = ["hej", "hej", "hej igen", "hallå"]
+    let segments = ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"]
     
     @State var rotation : Double = 0.0
     @State var isSpinning = false
@@ -22,27 +22,28 @@ struct WheelView: View {
                 ForEach(0..<segments.count, id: \.self) { i in
                     SegmentView(label: segments[i], index: i, totalSegments: segments.count)
                 }
+                Button("Spin"){
+                    if !isSpinning {
+                        isSpinning = true
+                        let randomRotation = Double.random(in: 1720...11440)
+                        rotation += randomRotation
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            isSpinning = false
+                        }
+                    }
+                }
+                .padding()
+                .background(Color.blue)
+                .clipShape(Circle())
+                .disabled(isSpinning)
+                
             }
-            .frame(width: 300, height: 300)
+            .frame(width: 350, height: 350)
             .rotationEffect(.degrees(rotation))
-            .animation(.easeOut(duration: 3), value: rotation)
+            .animation(.interpolatingSpring(stiffness: 10, damping: 10), value: rotation)
             .clipShape(Circle())
             
             
-            Button("Spin"){
-                if !isSpinning {
-                    isSpinning = true
-                    let randomRotation = Double.random(in: 720...1440)
-                    rotation += randomRotation
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        isSpinning = false
-                    }
-                }
-            }
-            .padding()
-            .background(Color.blue)
-            .clipShape(Capsule())
-            .disabled(isSpinning)
         }
     }
 }
@@ -56,22 +57,23 @@ struct SegmentView : View {
     
     var body : some View {
         
-        GeometryReader { geo in
-            
-            let segmentAngle =  360.0 / Double(totalSegments)
-            let rotation = Angle(degrees: Double(index) * segmentAngle)
-            
-            ZStack{
-                SegmentShape(startAngle: .degrees(-segmentAngle/2), endAngle: .degrees(segmentAngle/2))
-                    .fill(Color(hue: Double(index) / Double(totalSegments), saturation: 0.4, brightness: 1.0))
                 
-                Text(label)
-                    .rotationEffect(.degrees(-rotation.degrees))
-                    .offset(y: -geo.size.height * 0.25)
-            }
-            .rotationEffect(rotation)
-        }
-        .frame(width: 300, height: 300)
+                let segmentAngle =  360.0 / Double(totalSegments)
+                let rotation = Angle(degrees: Double(index) * segmentAngle)
+                
+                ZStack{
+                    SegmentShape(startAngle: .degrees(-segmentAngle / 2), endAngle: .degrees(segmentAngle / 2))
+                        .fill(Color(hue: Double(index) / Double(totalSegments), saturation: 0.5, brightness: 1.0))
+                    
+                    Text(label)
+                        .foregroundStyle(.black)
+                        .font(.system(size: 16, weight: .bold))
+                        .rotationEffect(.degrees(-90))
+                        .offset(y: -100)
+                }
+                .rotationEffect(rotation)
+        .frame(width: 350, height: 350)
+        .compositingGroup()
     }
 }
 
@@ -84,7 +86,11 @@ struct SegmentShape : Shape {
         var path = Path()
         let center = CGPoint(x: rect.midX, y: rect.midY)
         path.move(to: center)
-        path.addArc(center: center, radius: rect.width / 2, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+        path.addArc(center: center,
+                    radius: rect.width / 2,
+                    startAngle: .degrees(-90) + startAngle,
+                               endAngle: .degrees(-90) + endAngle,
+                    clockwise: false)
         path.closeSubpath()
         return path
     }

@@ -12,8 +12,9 @@ import FirebaseStorage
 
 struct ProfileView: View {
     @EnvironmentObject var appSettings: AppSettings
-    
+
     @State private var user: User? = Auth.auth().currentUser
+    @State private var username: String = "Unknown"
     @State private var points: Int = 0
     @State private var avatarImage: UIImage?
     @State private var avatarUIImage: Image?
@@ -24,21 +25,24 @@ struct ProfileView: View {
     @State private var unlockedLevels: [String] = ["Easy"]
     @State private var unlockedQuestionCounts: [Int] = [5]
     @State private var isImagePickerPresented = false
-    
+    @State private var showSettingsView = false
+
     @AppStorage("isLoggedIn") private var isLoggedIn: Bool = true
-    
+
     private var db = Firestore.firestore()
-    
+
     var body: some View {
         ZStack {
             Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
-            
+
             VStack {
                 HStack {
+                    Spacer()
                     Button(action: {
-                        appSettings.isSettingsMode.toggle()
-                        print("Settings tapped, isSettingsMode = \(appSettings.isSettingsMode)")
+                        withAnimation {
+                            showSettingsView.toggle()
+                        }
                     }) {
                         Image("Settings")
                             .resizable()
@@ -47,67 +51,48 @@ struct ProfileView: View {
                             .clipShape(Circle())
                             .shadow(radius: 2)
                     }
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        do {
-                            try Auth.auth().signOut()
-                            isLoggedIn = false
-                            print("User logged out successfully.")
-                        } catch {
-                            errorMessage = "Failed logging out: \(error.localizedDescription)"
-                        }
-                    }) {
-                        Text("Log out")
-                            .foregroundColor(.black)
-                            .font(.system(.body, design: .monospaced))
-                    
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 16)
-                            .background(Color.white)
-                            .cornerRadius(6)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .stroke(Color.black.opacity(0.2), lineWidth: 1)
-                            )
-                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
-                
+
+         
+                Text("Profile")
+                    .font(.largeTitle)
+                    .foregroundColor(.black)
+                    .padding()
+                    .frame(width: 250, height: 60)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                    )
+                    .fontDesign(.monospaced)
+                    .frame(maxWidth: .infinity, alignment: .center)
+
                 ScrollView {
                     VStack(spacing: 20) {
-                        Text("Username: \(user?.email ?? "No Email")")
-                            .font(.system(.body, design: .monospaced))
-                            .fontWeight(.semibold)
-                            .foregroundColor(.white)
-                        
+                    
                         if let avatarUIImage = avatarUIImage {
                             avatarUIImage
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 100, height: 100)
+                                .frame(width: 130, height: 130)
                                 .clipShape(Circle())
                         } else {
                             Image(systemName: "person.circle.fill")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 100, height: 100)
+                                .frame(width: 130, height: 130)
                                 .clipShape(Circle())
                                 .foregroundColor(.white)
                         }
-                        
-                        Button("Change Avatar") {
-                            isImagePickerPresented.toggle()
-                        }
-                        .padding()
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundColor(.white)
-                        .sheet(isPresented: $isImagePickerPresented) {
-                            ImagePicker(selectedImage: $avatarImage, isImagePickerPresented: $isImagePickerPresented)
-                        }
-                        
+
+                        Text("Username: \(username)")
+                            .font(.system(.body, design: .monospaced))
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+
                         Group {
                             VStack(spacing: 8) {
                                 Text("Points: \(points)")
@@ -120,12 +105,12 @@ struct ProfileView: View {
                             .multilineTextAlignment(.center)
                         }
                         .customGroupStyle()
-                        
+
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Recent Games Top 5")
                                 .font(.system(.body, design: .monospaced))
                                 .foregroundColor(.white)
-                            
+
                             ForEach(Array(recentGames.enumerated()), id: \.offset) { index, game in
                                 Text(game)
                                     .padding(8)
@@ -140,7 +125,7 @@ struct ProfileView: View {
                             }
                         }
                         .padding(.top)
-                        
+
                         if !errorMessage.isEmpty {
                             Text(errorMessage)
                                 .foregroundColor(.red)
@@ -151,16 +136,25 @@ struct ProfileView: View {
                     .padding(.horizontal)
                 }
             }
+
+            if showSettingsView {
+                SettingsView(closeAction: {
+                    withAnimation {
+                        showSettingsView = false
+                    }
+                })
+                .zIndex(1)
+            }
         }
         .onAppear {
             loadUserData()
             loadRecentGames()
         }
     }
-    
+
     func loadUserData() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
-        
+
         db.collection("users").document(userEmail).getDocument { document, error in
             if let error = error {
                 self.errorMessage = "Failed to load user data: \(error.localizedDescription)"
@@ -170,13 +164,25 @@ struct ProfileView: View {
                 self.unlockedCategories = document["unlockedCategories"] as? [String] ?? ["Animals"]
                 self.unlockedLevels = document["unlockedLevels"] as? [String] ?? ["Easy"]
                 self.unlockedQuestionCounts = document["unlockedQuestionCounts"] as? [Int] ?? [5]
+                self.username = document["username"] as? String ?? "Unknown"
+                let avatarImageName = document["avatar"] as? String ?? "avatar1"
+                loadAvatarImage(named: avatarImageName)
             }
         }
     }
-    
+
+    func loadAvatarImage(named imageName: String) {
+      
+        if let image = UIImage(named: imageName) {
+            self.avatarUIImage = Image(uiImage: image)
+        } else {
+            self.avatarUIImage = Image(systemName: "person.circle.fill")
+        }
+    }
+
     func loadRecentGames() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
-        
+
         db.collection("users").document(userEmail).collection("recentGames")
             .order(by: "timestamp", descending: true)
             .limit(to: 5)

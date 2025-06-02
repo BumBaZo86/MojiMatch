@@ -4,7 +4,6 @@
 //
 //  Created by Natalie S on 2025-05-20.
 //
-
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -90,6 +89,10 @@ struct LoginView: View {
             }
         }
         .onAppear {
+            
+            AudioManager.shared.playBackgroundMusic()
+            
+       
             authModel.onAppear()
         }
     }

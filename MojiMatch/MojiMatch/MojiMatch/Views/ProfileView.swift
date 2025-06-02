@@ -38,6 +38,7 @@ struct ProfileView: View {
 
             VStack {
                 HStack {
+                    Spacer()
                     Button(action: {
                         withAnimation {
                             showSettingsView.toggle()
@@ -50,7 +51,6 @@ struct ProfileView: View {
                             .clipShape(Circle())
                             .shadow(radius: 2)
                     }
-                    Spacer()
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
@@ -72,7 +72,6 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
                         }
 
-                        // Här visas nu användarnamnet
                         Text("Username: \(username)")
                             .font(.system(.body, design: .monospaced))
                             .fontWeight(.semibold)

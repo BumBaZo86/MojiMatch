@@ -74,7 +74,9 @@ struct HomeView: View {
 
                     VStack {
                         Button("Wheel") {
-                            showWheel = true
+                            withAnimation {
+                                showWheel = true
+                            }
                         }
                         Text("Emoji of the Day")
                             .font(.subheadline)
@@ -90,14 +92,26 @@ struct HomeView: View {
                     }
                 }
                 .padding()
+                
+                if showWheel {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation {
+                                showWheel = false
+                            }
+                        }
+                    
+                    WheelView()
+                        .transition(.scale)
+                        .zIndex(1)
+                }
             }
             .onAppear {
                 emojiVM.fetchEmoji()
                     
             }
-            .sheet(isPresented: $showWheel) {
-                WheelView()
-            }
+            
             // Rules sheet
             .sheet(isPresented: $showRules) {
                 VStack(alignment: .leading, spacing: 20) {
@@ -165,5 +179,3 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
         .environmentObject(AppSettings())
 }
 
-
-/*test again*/

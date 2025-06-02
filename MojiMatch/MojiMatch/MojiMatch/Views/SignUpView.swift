@@ -147,7 +147,7 @@ struct SignUpView: View {
     
     func createUserProfile(user: FirebaseAuth.User) {
         
-        let randomAvatarNumber = Int.random(in: 1...5)
+        let randomAvatarNumber = Int.random(in: 1...6)
         let avatarImageName = "avatar\(randomAvatarNumber)"
         
         let userData: [String: Any] = [

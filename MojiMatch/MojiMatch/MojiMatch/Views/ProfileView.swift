@@ -72,7 +72,7 @@ struct ProfileView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Avataren visas här
+                    
                         if let avatarUIImage = avatarUIImage {
                             avatarUIImage
                                 .resizable()

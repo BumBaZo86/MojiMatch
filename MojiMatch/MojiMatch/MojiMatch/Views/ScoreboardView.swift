@@ -65,7 +65,7 @@ struct ScoreboardView: View {
         .onAppear {
             firebaseViewModel.fetchUsers(filter: selectedFilter)
         }
-        .onChange(of: selectedFilter) { newFilter in
+        .onChange(of: selectedFilter) { oldValue, newFilter in
             firebaseViewModel.fetchUsers(filter: newFilter)
         }
     }

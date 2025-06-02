@@ -24,7 +24,7 @@ struct HomeView: View {
                       : Color(red: 113/256, green: 162/256, blue: 114/256))
                     .ignoresSafeArea()
 
-                VStack(spacing: 30) {
+                VStack(spacing: 20) {
                     Image("MojiMatchLogo")
                         .resizable()
                         .scaledToFit()
@@ -70,14 +70,21 @@ struct HomeView: View {
                             .shadow(radius: 5)
                     }
 
-                    Spacer()
+                   
 
                     VStack {
-                        Button("Wheel") {
+                        Button(action:  {
                             withAnimation {
                                 showWheel = true
                             }
+                        }) {
+                            SpinningWheelButton()
+                            
                         }
+                        .padding()
+                        
+                        Spacer()
+                        
                         Text("Emoji of the Day")
                             .font(.subheadline)
                             .foregroundColor(.white)
@@ -173,6 +180,31 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
         }
     }
 }
+
+struct SpinningWheelButton : View {
+    
+    @State var rotation : Double = 0
+    
+    let timer = Timer.publish(every: 0.02, on: .main, in: .common).autoconnect()
+    
+    
+    var body : some View {
+        
+        ZStack{
+            ForEach(0..<10, id: \.self) { i in
+            
+                SegmentView(label: "", index: i, totalSegments: 10)
+            }
+        }
+        
+        .frame(width: 60, height: 60)
+        .clipShape(Circle())
+        .rotationEffect(.degrees(rotation))
+        .onReceive(timer) { _ in
+            rotation += 0.5}
+    }
+}
+
 
 #Preview {
     HomeView()

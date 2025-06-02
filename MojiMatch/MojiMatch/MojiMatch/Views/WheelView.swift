@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import Firebase
+import FirebaseFirestore
+import FirebaseAuth
 
 struct WheelView: View {
     
@@ -18,9 +21,9 @@ struct WheelView: View {
     var body: some View {
         
         VStack(spacing: 30){
-           
-            ZStack{
             
+            ZStack{
+                
                 Triangle()
                     .fill(Color.red)
                     .frame(width: 30, height: 50)
@@ -30,7 +33,7 @@ struct WheelView: View {
                 
                 ZStack{
                     ForEach(0..<segments.count, id: \.self) { i in
-                        SegmentView(label: segments[i], index: i, totalSegments: segments.count, winner: $winner)
+                        SegmentView(label: segments[i], index: i, totalSegments: segments.count)
                     }
                     Button("Spin"){
                         if !isSpinning {
@@ -49,6 +52,10 @@ struct WheelView: View {
                                 
                                 print("Winner \(segments[index])")
                                 
+                                winner = Int(segments[index])
+                                
+                                saveWheelWin()
+                                
                                 isSpinning = false
                             }
                         }
@@ -65,21 +72,48 @@ struct WheelView: View {
                 .clipShape(Circle())
                 
             }
-            
-            if let winner {
-                Text("Winner: \(segments[winner])")
+        }
+    }
+
+    
+    func saveWheelWin() {
+        guard let userEmail = Auth.auth().currentUser?.email else {
+            print("No logged in user.")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(userEmail)
+        
+        userRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching user data: \(error.localizedDescription)")
+                return
+            }
+            if let document = document, document.exists {
+                let previousPoints = document["points"] as? Int ?? 0
+                userRef.updateData(["points": previousPoints + (winner ?? 0)]) { err in
+                    if let err = err {
+                        print("Error updating points: \(err.localizedDescription)")
+                    }
+                }
+            } else {
+                userRef.setData(["points": winner ?? 0], merge: true) { err in
+                    if let err = err {
+                        print("Error setting points: \(err.localizedDescription)")
+                    }
+                }
             }
         }
     }
 }
-
 
 struct SegmentView : View {
     
     let label : String
     let index : Int
     let totalSegments : Int
-    @Binding var winner : Int?
+    var winner : Int? = nil
     
     @State var isVisible = true
     
@@ -102,7 +136,7 @@ struct SegmentView : View {
         .rotationEffect(rotation)
         .frame(width: 350, height: 350)
         .compositingGroup()
-        .onChange(of: winner) { _ in
+        .onChange(of: winner) {
             if shouldBlink {
                 blink()
             }

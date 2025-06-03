@@ -28,8 +28,10 @@ struct GameOverView: View {
     @State private var showStarTwo = false
     @State private var showStarThree = false
     @State private var confettiTrigger = false
-    
-    @State private var audioPlayer: AVAudioPlayer?
+
+   
+    @State private var gameEndPlayer: AVAudioPlayer?
+    @State private var starPlayer: AVAudioPlayer?
 
     var body: some View {
         ZStack {
@@ -106,11 +108,26 @@ struct GameOverView: View {
             .navigationBarBackButtonHidden(true)
         }
         .onAppear {
+            playGameEndSound()      
             starAnimation()
             saveGameData()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 confettiTrigger = true
             }
+        }
+    }
+
+    func playGameEndSound() {
+        guard let url = Bundle.main.url(forResource: "gameend", withExtension: "wav") else {
+            print("Ljudfilen gameend.wav hittades inte.")
+            return
+        }
+
+        do {
+            gameEndPlayer = try AVAudioPlayer(contentsOf: url)
+            gameEndPlayer?.play()
+        } catch {
+            print("Kunde inte spela upp gameend-ljudet: \(error.localizedDescription)")
         }
     }
 
@@ -121,10 +138,10 @@ struct GameOverView: View {
         }
 
         do {
-            audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer?.play()
+            starPlayer = try AVAudioPlayer(contentsOf: url)
+            starPlayer?.play()
         } catch {
-            print("Kunde inte spela upp ljudet: \(error.localizedDescription)")
+            print("Kunde inte spela upp starbell-ljudet: \(error.localizedDescription)")
         }
     }
 

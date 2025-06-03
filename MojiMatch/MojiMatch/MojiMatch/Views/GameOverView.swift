@@ -33,8 +33,10 @@ struct GameOverView: View {
     @State private var gameEndPlayer: AVAudioPlayer?
     @State private var starPlayer: AVAudioPlayer?
 
- 
     @State private var wellDoneScale: CGFloat = 0.5
+    @State private var visibleCharacters = 0
+
+    let wellDoneText = "Well done!"
 
     var body: some View {
         ZStack {
@@ -47,11 +49,31 @@ struct GameOverView: View {
             VStack(spacing: 30) {
                 Spacer()
 
-                Text("Well done!")
-                    .font(.largeTitle)
-                    .foregroundColor(.white)
-                    .scaleEffect(wellDoneScale)
-                    .animation(.easeOut(duration: 1.2), value: wellDoneScale)
+                
+                HStack(spacing: 0) {
+                    ForEach(0..<wellDoneText.count, id: \.self) { index in
+                        let char = Array(wellDoneText)[index]
+                        Text(String(char))
+                            .font(.largeTitle)
+                            .foregroundColor(.black)
+                            .opacity(index < visibleCharacters ? 1 : 0)
+                            .animation(.easeIn(duration: 0.3).delay(Double(index) * 0.1), value: visibleCharacters)
+                    }
+                }
+                .padding()
+             //   .frame(width: 250, height: 60)
+           //     .background(Color.white)
+           //     .clipShape(RoundedRectangle(cornerRadius: 15))
+           //     .overlay(
+           //         RoundedRectangle(cornerRadius: 15)
+                   //     .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+             //   )
+                .scaleEffect(wellDoneScale)
+                .animation(.easeOut(duration: 1.2), value: wellDoneScale)
+                .onAppear {
+                    wellDoneScale = 1.2
+                    animateText()
+                }
 
                 HStack {
                     Spacer()
@@ -89,7 +111,7 @@ struct GameOverView: View {
 
                 Text("Your score: \(score) !!")
                     .font(.title2)
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
 
                 NavigationLink(destination: GameView(
                     category: $category,
@@ -109,19 +131,31 @@ struct GameOverView: View {
 
                 Spacer()
             }
+            .padding(-10)
+            .background(Color.white.opacity(0.9))
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+            )
             .padding()
             .navigationBarBackButtonHidden(true)
         }
         .onAppear {
-          
-            wellDoneScale = 1.5
-
             playGameEndSound()
             starAnimation()
             saveGameData()
-
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 confettiTrigger = true
+            }
+        }
+    }
+
+    func animateText() {
+        visibleCharacters = 0
+        for i in 1...wellDoneText.count {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.15) {
+                visibleCharacters = i
             }
         }
     }

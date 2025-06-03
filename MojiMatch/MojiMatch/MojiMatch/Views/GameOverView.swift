@@ -4,6 +4,7 @@
 //
 //  Created by Natalie S on 2025-05-21.
 //
+
 import SwiftUI
 import Firebase
 import FirebaseFirestore
@@ -29,9 +30,11 @@ struct GameOverView: View {
     @State private var showStarThree = false
     @State private var confettiTrigger = false
 
-   
     @State private var gameEndPlayer: AVAudioPlayer?
     @State private var starPlayer: AVAudioPlayer?
+
+ 
+    @State private var wellDoneScale: CGFloat = 0.5
 
     var body: some View {
         ZStack {
@@ -47,6 +50,8 @@ struct GameOverView: View {
                 Text("Well done!")
                     .font(.largeTitle)
                     .foregroundColor(.white)
+                    .scaleEffect(wellDoneScale)
+                    .animation(.easeOut(duration: 1.2), value: wellDoneScale)
 
                 HStack {
                     Spacer()
@@ -108,9 +113,13 @@ struct GameOverView: View {
             .navigationBarBackButtonHidden(true)
         }
         .onAppear {
-            playGameEndSound()      
+          
+            wellDoneScale = 1.5
+
+            playGameEndSound()
             starAnimation()
             saveGameData()
+
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 confettiTrigger = true
             }

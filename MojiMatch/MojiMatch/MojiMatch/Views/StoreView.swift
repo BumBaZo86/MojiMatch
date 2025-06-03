@@ -31,7 +31,7 @@ struct StoreView: View {
     @State private var pointChangeAmount = 0
 
     @State private var audioPlayer: AVAudioPlayer?
-    
+
     var body: some View {
         NavigationView {
             ScrollView {
@@ -39,7 +39,7 @@ struct StoreView: View {
                     Text("Store")
                         .font(.title2)
                         .fontDesign(.monospaced)
-                        .foregroundStyle(.black)
+                        .foregroundColor(.black)
                         .padding(8)
                         .frame(width: 200)
                         .background(Color.white)
@@ -66,7 +66,7 @@ struct StoreView: View {
                         if showPointChange {
                             Text("\(pointChangeAmount)")
                                 .font(.caption)
-                                .foregroundColor(.red)
+                                .foregroundColor(pointChangeAmount < 0 ? .red : .green)
                                 .padding(.trailing, 8)
                                 .padding(.top, -4)
                                 .transition(.move(edge: .top).combined(with: .opacity))
@@ -137,6 +137,8 @@ struct StoreView: View {
                                     } else {
                                         unlockItem(item: item, field: field, cost: price)
                                     }
+                                } else {
+                                    playDeniedSound()
                                 }
                             }
                             .frame(width: 120, height: 120)
@@ -204,6 +206,17 @@ struct StoreView: View {
 
     func playCashSound() {
         if let soundURL = Bundle.main.url(forResource: "cashier", withExtension: "wav") {
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
+                audioPlayer?.play()
+            } catch {
+                print("Kunde inte spela upp ljudet: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func playDeniedSound() {
+        if let soundURL = Bundle.main.url(forResource: "insufficientfunds", withExtension: "mp3") {
             do {
                 audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
                 audioPlayer?.play()

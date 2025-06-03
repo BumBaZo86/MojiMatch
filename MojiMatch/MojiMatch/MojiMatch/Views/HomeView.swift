@@ -155,15 +155,68 @@ struct HomeView: View {
             .onDisappear {
                 AudioManager.shared.stopBackgroundMusic()
             }
-            // Dina sheets för info och regler
+            
+            // Rules sheet
             .sheet(isPresented: $showRules) {
-           
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("🧠 Rules")
+                        .font(.largeTitle)
+                        .bold()
+                    Text("""
+1. Choose a category and the number of questions.
+2. Each question has four answer options – pick the correct one before time runs out.
+3. You earn 10 points for every correct answer.
+4. The game ends when all questions are answered or the timer reaches zero.
+
+Think fast and aim for a high score!
+""")
+                    Spacer()
+                    Button("Close") {
+                        showRules = false
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(appSettings.isSettingsMode
+                                      ? Color(hex: "778472")
+                                      : Color(red: 113/256, green: 162/256, blue: 114/256)))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .padding()
             }
+
+            // Info sheet
             .sheet(isPresented: $showInfo) {
-                
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("ℹ️ Info")
+                        .font(.largeTitle)
+                        .bold()
+                    Text("""
+MojiMatch is a fast-paced quiz game designed to challenge your memory and reaction time.
+
+Choose your category, race against the clock, and see how high you can score!
+
+The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
+
+👾 Created with passion by [Your Name].
+""")
+                    Spacer()
+                    Button("Close") {
+                        showInfo = false
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(appSettings.isSettingsMode
+                                      ? Color(hex: "778472")
+                                      : Color(red: 113/256, green: 162/256, blue: 114/256)))
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+                }
+                .padding()
             }
         }
     }
+
     
     struct SpinningWheelButton : View {
         

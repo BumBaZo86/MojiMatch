@@ -23,22 +23,48 @@ struct WheelView: View {
     @State var hasSpunToday = false
     @State var isLoading = true
     
+    @State var points : Int?
+    @State var stars : Int?
+    
     var body: some View {
         
         VStack(spacing: 30){
-            
+            Spacer()
             ZStack{
+                HStack{
+                    Spacer()
+                    
+                    VStack{
+                        VStack(alignment: .leading, spacing: 8){
+                            Text("⭐: \(stars ?? 0)")
+                            Text("💰: \(points ?? 0)")
+                        }
+                        .frame(width: 130, height: 50)
+                        .font(.subheadline)
+                        .fontDesign(.monospaced)
+                        .foregroundStyle(.black)
+                        .padding(8)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
+                        )
+                        .offset(y: -80)
+                    }
+                    .padding()
+                }
+                
                 VStack{
                     
                     if showWinning {
                         Text("You won \(winner ?? 0)!")
-                            
+                        
                     } else if !hasSpunToday {
-                        Text("Have a free spin!")
-                            
+                        Text("Have a spin!")
+                        
                     }
                 }
-                .offset(y: -80)
                 .foregroundStyle(.white)
                 .font(.title2)
                 .fontDesign(.monospaced)
@@ -59,29 +85,7 @@ struct WheelView: View {
                     }
                     Button("Spin"){
                         if !isSpinning && !hasSpunToday {
-                            isSpinning = true
-                            let randomRotation = Double.random(in: 1720...2440)
-                            rotation += randomRotation
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 3.7) {
-                                
-                                let normalizedRotation = rotation.truncatingRemainder(dividingBy: 360)
-                                let anglePerSegment = 360 / Double(segments.count)
-                                
-                                let adjustRotation = (360 - normalizedRotation + anglePerSegment / 2).truncatingRemainder(dividingBy: 360)
-                                
-                                let index = Int(adjustRotation / anglePerSegment) % segments.count
-                                winnerIndex = index
-                                
-                                print("Winner \(segments[index])")
-                                
-                                winner = Int(segments[index])
-                                
-                                saveWheelWin()
-                                showWinning = true
-                                hasSpunToday = true
-                                isSpinning = false
-                                checkSpinStatus()
-                            }
+                            spinWheel(isFreeSpin: true)
                         }
                     }
                     .padding()
@@ -89,31 +93,33 @@ struct WheelView: View {
                     .clipShape(Circle())
                     .disabled(isSpinning || hasSpunToday)
                     .opacity(hasSpunToday ? 0.5 : 1.0)
-                    
+                        
                 }
                 .frame(width: 350, height: 350)
                 .rotationEffect(.degrees(rotation))
                 .animation(.easeOut(duration: 4), value: rotation)
                 .clipShape(Circle())
-                
+                    
             }
             .onAppear {
                 checkSpinStatus()
             }
-            
-            VStack {
                 
-                if hasSpunToday {
+            VStack {
+                    
+                Group {
                     Text("Buy another spin?")
                         .foregroundStyle(.white)
                         .font(.title2)
                         .fontDesign(.monospaced)
-                    
-                    
-                    Button("20 ⭐") {
                         
+                        
+                    Button("20 ⭐") {
+                        if let currentStars = stars, currentStars >= 20 {
+                            buyASpin()
+                        }
                     }
-                    .frame(width: 100, height: 40)
+                    .frame(width: 100, height: 30)
                     .font(.title2)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.black)
@@ -124,9 +130,71 @@ struct WheelView: View {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
                     )
-                    
+                        
+                }
+                .opacity(hasSpunToday ? 1 : 0)
+            }
+            .padding()
+        }
+    }
+        
+    func buyASpin() {
+            
+            guard let userEmail = Auth.auth().currentUser?.email else {
+                print("No logged in user.")
+                return
+            }
+            
+            let db = Firestore.firestore()
+            let userRef = db.collection("users").document(userEmail)
+            
+            userRef.getDocument { document, error in
+                if let error = error {
+                    print("Error fetching user data: \(error.localizedDescription)")
+                    return
+                }
+                
+                if let document = document, document.exists {
+                    if let currentStars = stars, currentStars >= 20 {
+                        let newStars = currentStars - 20
+                        userRef.updateData(["stars": newStars]) { error in
+                            if let error = error {
+                                print("Error updating stars: \(error.localizedDescription)")
+                            } else {
+                                stars = newStars
+                                hasSpunToday = false
+                                showWinning = false
+                                spinWheel(isFreeSpin: false)
+                            }
+                        }
+                    }
                 }
             }
+        }
+        
+    func spinWheel(isFreeSpin : Bool) {
+            isSpinning = true
+            let randomRotation = Double.random(in: 1720...2440)
+            rotation += randomRotation
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.7) {
+                
+                let normalizedRotation = rotation.truncatingRemainder(dividingBy: 360)
+                let anglePerSegment = 360 / Double(segments.count)
+                
+                let adjustRotation = (360 - normalizedRotation + anglePerSegment / 2).truncatingRemainder(dividingBy: 360)
+                
+                let index = Int(adjustRotation / anglePerSegment) % segments.count
+                winnerIndex = index
+                
+                print("Winner \(segments[index])")
+                
+                winner = Int(segments[index])
+                
+                saveWheelWin(isFreeSpin: isFreeSpin)
+                showWinning = true
+                hasSpunToday = isFreeSpin
+                isSpinning = false
+                checkSpinStatus()
         }
     }
     
@@ -151,12 +219,21 @@ struct WheelView: View {
                     let calendar = Calendar.current
                     hasSpunToday = calendar.isDateInToday(lastSpin)
                 }
+                
+                if let fetchPoints = document["points"] as? Int {
+                    points = fetchPoints
+                }
+                
+                if let fetchStars = document["stars"] as? Int {
+                    stars = fetchStars
+                }
+                
             }
             isLoading = false
         }
     }
     
-    func saveWheelWin() {
+    func saveWheelWin(isFreeSpin: Bool) {
         guard let userEmail = Auth.auth().currentUser?.email else {
             print("No logged in user.")
             return
@@ -172,13 +249,27 @@ struct WheelView: View {
             }
             if let document = document, document.exists {
                 let previousPoints = document["points"] as? Int ?? 0
-                userRef.updateData(["points": previousPoints + (winner ?? 0), "lastFreeSpin": Timestamp(date: Date())]) { err in
+                let newPoints = previousPoints + (winner ?? 0)
+                
+                var data: [String: Any] = ["points": newPoints]
+                            if isFreeSpin {
+                                data["lastFreeSpin"] = Timestamp(date: Date())
+                            }
+                
+                userRef.updateData(data) { err in
                     if let err = err {
                         print("Error updating points: \(err.localizedDescription)")
+                    } else {
+                        points = newPoints
                     }
                 }
             } else {
-                userRef.setData(["points": winner ?? 0, "lastFreeSpin": Timestamp(date: Date())], merge: true) { err in
+                
+                var data: [String: Any] = ["points": winner ?? 0]
+                            if isFreeSpin {
+                                data["lastFreeSpin"] = Timestamp(date: Date())
+                            }
+                userRef.setData(data, merge: true) { err in
                     if let err = err {
                         print("Error setting points: \(err.localizedDescription)")
                     }

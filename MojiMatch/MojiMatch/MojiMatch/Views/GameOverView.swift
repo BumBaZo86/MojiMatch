@@ -24,6 +24,7 @@ struct GameOverView: View {
     @Binding var starOne: Bool
     @Binding var starTwo: Bool
     @Binding var starThree: Bool
+    @State var starCount = 0
 
     @State private var showStarOne = false
     @State private var showStarTwo = false
@@ -189,6 +190,21 @@ struct GameOverView: View {
     }
 
     func saveGameData() {
+       
+        if starOne {
+            starCount += 1
+        }
+        
+        if starTwo {
+            starCount += 1
+        }
+        
+        if starThree {
+            starCount += 1
+        }
+        
+        print("\(starCount)")
+        
         guard let userEmail = Auth.auth().currentUser?.email else {
             print("No logged in user.")
             return
@@ -204,13 +220,14 @@ struct GameOverView: View {
             }
             if let document = document, document.exists {
                 let previousPoints = document["points"] as? Int ?? 0
-                userRef.updateData(["points": previousPoints + score]) { err in
+                let stars = document["stars"] as? Int ?? 0
+                userRef.updateData(["points": previousPoints + score, "stars": stars + starCount]) { err in
                     if let err = err {
                         print("Error updating points: \(err.localizedDescription)")
                     }
                 }
             } else {
-                userRef.setData(["points": score], merge: true) { err in
+                userRef.setData(["points": score, "stars": starCount], merge: true) { err in
                     if let err = err {
                         print("Error setting points: \(err.localizedDescription)")
                     }

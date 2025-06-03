@@ -9,6 +9,7 @@ import SwiftUI
 import Firebase
 import FirebaseAuth
 import FirebaseFirestore
+import AVFoundation
 
 struct StoreView: View {
     @EnvironmentObject var appSettings: AppSettings
@@ -29,6 +30,8 @@ struct StoreView: View {
     @State private var showPointChange = false
     @State private var pointChangeAmount = 0
 
+    @State private var audioPlayer: AVAudioPlayer?
+    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -186,6 +189,7 @@ struct StoreView: View {
                 pointChangeAmount = -cost
                 withAnimation(.easeOut(duration: 0.4)) {
                     showPointChange = true
+                    playCashSound()
                 }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
                     withAnimation {
@@ -194,6 +198,17 @@ struct StoreView: View {
                 }
 
                 loadUserData()
+            }
+        }
+    }
+
+    func playCashSound() {
+        if let soundURL = Bundle.main.url(forResource: "cashier", withExtension: "wav") {
+            do {
+                audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
+                audioPlayer?.play()
+            } catch {
+                print("Kunde inte spela upp ljudet: \(error.localizedDescription)")
             }
         }
     }

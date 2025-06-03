@@ -9,6 +9,7 @@ import Firebase
 import FirebaseFirestore
 import FirebaseAuth
 import ConfettiSwiftUI
+import AVFoundation
 
 struct GameOverView: View {
     @EnvironmentObject var appSettings: AppSettings
@@ -27,6 +28,8 @@ struct GameOverView: View {
     @State private var showStarTwo = false
     @State private var showStarThree = false
     @State private var confettiTrigger = false
+    
+    @State private var audioPlayer: AVAudioPlayer?
 
     var body: some View {
         ZStack {
@@ -111,6 +114,20 @@ struct GameOverView: View {
         }
     }
 
+    func playStarSound() {
+        guard let url = Bundle.main.url(forResource: "starbell", withExtension: "mp3") else {
+            print("Ljudfilen starbell.mp3 hittades inte.")
+            return
+        }
+
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            audioPlayer?.play()
+        } catch {
+            print("Kunde inte spela upp ljudet: \(error.localizedDescription)")
+        }
+    }
+
     func saveGameData() {
         guard let userEmail = Auth.auth().currentUser?.email else {
             print("No logged in user.")
@@ -163,6 +180,7 @@ struct GameOverView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 withAnimation {
                     showStarOne = true
+                    playStarSound()
                 }
             }
         }
@@ -171,6 +189,7 @@ struct GameOverView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation {
                     showStarTwo = true
+                    playStarSound()
                 }
             }
         }
@@ -179,6 +198,7 @@ struct GameOverView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 withAnimation {
                     showStarThree = true
+                    playStarSound()
                 }
             }
         }

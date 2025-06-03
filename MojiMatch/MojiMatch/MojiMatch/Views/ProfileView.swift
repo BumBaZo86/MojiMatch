@@ -3,7 +3,6 @@
 //  MojiMatch
 //
 //  Created by Camilla Falk on 2025-05-20.
-
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -36,7 +35,7 @@ struct ProfileView: View {
             Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
 
-            VStack(spacing: 10) {
+            VStack {
                 HStack {
                     Spacer()
                     Button(action: {
@@ -52,13 +51,13 @@ struct ProfileView: View {
                             .shadow(radius: 2)
                     }
                 }
-                .padding(.trailing, 7)
+                .padding(.horizontal, 16)
                 .padding(.top, 16)
 
                 Text("Profile")
                     .font(.largeTitle)
                     .foregroundColor(.black)
-                    .padding(.vertical, 8)
+                    .padding()
                     .frame(width: 250, height: 60)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 15))
@@ -68,23 +67,34 @@ struct ProfileView: View {
                     )
                     .fontDesign(.monospaced)
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .offset(y: -50) 
 
                 ScrollView {
                     VStack(spacing: 20) {
-                        if let avatarUIImage = avatarUIImage {
-                            avatarUIImage
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 130, height: 130)
-                                .clipShape(Circle())
-                        } else {
-                            Image(systemName: "person.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 130, height: 130)
-                                .clipShape(Circle())
-                                .foregroundColor(.white)
+                        
+                        ZStack {
+                            Circle()
+                                .fill(Color.clear)
+                                .frame(width: 190, height: 190)
+                                .background(
+                                    Circle()
+                                        .stroke(Color(red: 210/255, green: 245/255, blue: 210/255), lineWidth: 7)
+                                        .shadow(color: Color(red: 210/255, green: 245/255, blue: 210/255).opacity(0.9), radius: 12, x: 0, y: 0)
+                                )
+
+                            if let avatarUIImage = avatarUIImage {
+                                avatarUIImage
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 180, height: 180)
+                                    .clipShape(Circle())
+                            } else {
+                                Image(systemName: "person.circle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 180, height: 180)
+                                    .clipShape(Circle())
+                                    .foregroundColor(.white)
+                            }
                         }
 
                         Text("Username: \(username)")
@@ -131,11 +141,10 @@ struct ProfileView: View {
                                 .padding()
                         }
                     }
-                    .padding(.top, 10)
+                    .padding(.top, 20)
                     .padding(.horizontal)
                 }
             }
-            .padding(.horizontal)
 
             if showSettingsView {
                 SettingsView(closeAction: {

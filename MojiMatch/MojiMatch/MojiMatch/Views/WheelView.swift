@@ -20,6 +20,9 @@ struct WheelView: View {
     @State var winner : Int?
     @State var showWinning = false
     
+    @State var hasSpunToday = false
+    @State var isLoading = true
+    
     var body: some View {
         
         VStack(spacing: 30){
@@ -29,18 +32,16 @@ struct WheelView: View {
                     
                     if showWinning {
                         Text("You won \(winner ?? 0)!")
-                            .offset(y: -80)
-                            .foregroundStyle(.white)
-                            .font(.title2)
-                            .fontDesign(.monospaced)
-                    } else {
-                        Text("Have a spin!")
-                            .offset(y: -80)
-                            .foregroundStyle(.white)
-                            .font(.title2)
-                            .fontDesign(.monospaced)
+                            
+                    } else if !hasSpunToday {
+                        Text("Have a free spin!")
+                            
                     }
                 }
+                .offset(y: -80)
+                .foregroundStyle(.white)
+                .font(.title2)
+                .fontDesign(.monospaced)
             }
             
             ZStack{
@@ -57,7 +58,7 @@ struct WheelView: View {
                         SegmentView(label: segments[i], index: i, totalSegments: segments.count, winnerIndex: $winnerIndex)
                     }
                     Button("Spin"){
-                        if !isSpinning {
+                        if !isSpinning && !hasSpunToday {
                             isSpinning = true
                             let randomRotation = Double.random(in: 1720...2440)
                             rotation += randomRotation
@@ -77,15 +78,17 @@ struct WheelView: View {
                                 
                                 saveWheelWin()
                                 showWinning = true
-                                
+                                hasSpunToday = true
                                 isSpinning = false
+                                checkSpinStatus()
                             }
                         }
                     }
                     .padding()
                     .background(Color.blue)
                     .clipShape(Circle())
-                    .disabled(isSpinning)
+                    .disabled(isSpinning || hasSpunToday)
+                    .opacity(hasSpunToday ? 0.5 : 1.0)
                     
                 }
                 .frame(width: 350, height: 350)
@@ -94,9 +97,64 @@ struct WheelView: View {
                 .clipShape(Circle())
                 
             }
+            .onAppear {
+                checkSpinStatus()
+            }
+            
+            VStack {
+                
+                if hasSpunToday {
+                    Text("Buy another spin?")
+                        .foregroundStyle(.white)
+                        .font(.title2)
+                        .fontDesign(.monospaced)
+                    
+                    
+                    Button("20 ⭐") {
+                        
+                    }
+                    .frame(width: 100, height: 40)
+                    .font(.title2)
+                    .fontDesign(.monospaced)
+                    .foregroundStyle(.black)
+                    .padding(8)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
+                    )
+                    
+                }
+            }
         }
     }
-
+    
+    func checkSpinStatus() {
+        guard let userEmail = Auth.auth().currentUser?.email else {
+            print("No logged in user.")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(userEmail)
+        
+        userRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching user data: \(error.localizedDescription)")
+                return
+            }
+            
+            if let document = document, document.exists {
+                if let timestamp = document["lastFreeSpin"] as? Timestamp {
+                    let lastSpin = timestamp.dateValue()
+                    let calendar = Calendar.current
+                    hasSpunToday = calendar.isDateInToday(lastSpin)
+                }
+            }
+            isLoading = false
+        }
+    }
     
     func saveWheelWin() {
         guard let userEmail = Auth.auth().currentUser?.email else {
@@ -114,13 +172,13 @@ struct WheelView: View {
             }
             if let document = document, document.exists {
                 let previousPoints = document["points"] as? Int ?? 0
-                userRef.updateData(["points": previousPoints + (winner ?? 0)]) { err in
+                userRef.updateData(["points": previousPoints + (winner ?? 0), "lastFreeSpin": Timestamp(date: Date())]) { err in
                     if let err = err {
                         print("Error updating points: \(err.localizedDescription)")
                     }
                 }
             } else {
-                userRef.setData(["points": winner ?? 0], merge: true) { err in
+                userRef.setData(["points": winner ?? 0, "lastFreeSpin": Timestamp(date: Date())], merge: true) { err in
                     if let err = err {
                         print("Error setting points: \(err.localizedDescription)")
                     }

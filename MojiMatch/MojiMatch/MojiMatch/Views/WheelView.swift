@@ -16,11 +16,33 @@ struct WheelView: View {
     
     @State var rotation : Double = 0.0
     @State var isSpinning = false
-    @State var winner : Int? = nil
+    @State var winnerIndex : Int?
+    @State var winner : Int?
+    @State var showWinning = false
+    
+    @State var hasSpunToday = false
+    @State var isLoading = true
     
     var body: some View {
         
         VStack(spacing: 30){
+            
+            ZStack{
+                VStack{
+                    
+                    if showWinning {
+                        Text("You won \(winner ?? 0)!")
+                            
+                    } else if !hasSpunToday {
+                        Text("Have a free spin!")
+                            
+                    }
+                }
+                .offset(y: -80)
+                .foregroundStyle(.white)
+                .font(.title2)
+                .fontDesign(.monospaced)
+            }
             
             ZStack{
                 
@@ -33,10 +55,10 @@ struct WheelView: View {
                 
                 ZStack{
                     ForEach(0..<segments.count, id: \.self) { i in
-                        SegmentView(label: segments[i], index: i, totalSegments: segments.count)
+                        SegmentView(label: segments[i], index: i, totalSegments: segments.count, winnerIndex: $winnerIndex)
                     }
                     Button("Spin"){
-                        if !isSpinning {
+                        if !isSpinning && !hasSpunToday {
                             isSpinning = true
                             let randomRotation = Double.random(in: 1720...2440)
                             rotation += randomRotation
@@ -48,22 +70,25 @@ struct WheelView: View {
                                 let adjustRotation = (360 - normalizedRotation + anglePerSegment / 2).truncatingRemainder(dividingBy: 360)
                                 
                                 let index = Int(adjustRotation / anglePerSegment) % segments.count
-                                winner = index
+                                winnerIndex = index
                                 
                                 print("Winner \(segments[index])")
                                 
                                 winner = Int(segments[index])
                                 
                                 saveWheelWin()
-                                
+                                showWinning = true
+                                hasSpunToday = true
                                 isSpinning = false
+                                checkSpinStatus()
                             }
                         }
                     }
                     .padding()
                     .background(Color.blue)
                     .clipShape(Circle())
-                    .disabled(isSpinning)
+                    .disabled(isSpinning || hasSpunToday)
+                    .opacity(hasSpunToday ? 0.5 : 1.0)
                     
                 }
                 .frame(width: 350, height: 350)
@@ -72,9 +97,64 @@ struct WheelView: View {
                 .clipShape(Circle())
                 
             }
+            .onAppear {
+                checkSpinStatus()
+            }
+            
+            VStack {
+                
+                if hasSpunToday {
+                    Text("Buy another spin?")
+                        .foregroundStyle(.white)
+                        .font(.title2)
+                        .fontDesign(.monospaced)
+                    
+                    
+                    Button("20 ⭐") {
+                        
+                    }
+                    .frame(width: 100, height: 40)
+                    .font(.title2)
+                    .fontDesign(.monospaced)
+                    .foregroundStyle(.black)
+                    .padding(8)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
+                    )
+                    
+                }
+            }
         }
     }
-
+    
+    func checkSpinStatus() {
+        guard let userEmail = Auth.auth().currentUser?.email else {
+            print("No logged in user.")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(userEmail)
+        
+        userRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching user data: \(error.localizedDescription)")
+                return
+            }
+            
+            if let document = document, document.exists {
+                if let timestamp = document["lastFreeSpin"] as? Timestamp {
+                    let lastSpin = timestamp.dateValue()
+                    let calendar = Calendar.current
+                    hasSpunToday = calendar.isDateInToday(lastSpin)
+                }
+            }
+            isLoading = false
+        }
+    }
     
     func saveWheelWin() {
         guard let userEmail = Auth.auth().currentUser?.email else {
@@ -92,13 +172,13 @@ struct WheelView: View {
             }
             if let document = document, document.exists {
                 let previousPoints = document["points"] as? Int ?? 0
-                userRef.updateData(["points": previousPoints + (winner ?? 0)]) { err in
+                userRef.updateData(["points": previousPoints + (winner ?? 0), "lastFreeSpin": Timestamp(date: Date())]) { err in
                     if let err = err {
                         print("Error updating points: \(err.localizedDescription)")
                     }
                 }
             } else {
-                userRef.setData(["points": winner ?? 0], merge: true) { err in
+                userRef.setData(["points": winner ?? 0, "lastFreeSpin": Timestamp(date: Date())], merge: true) { err in
                     if let err = err {
                         print("Error setting points: \(err.localizedDescription)")
                     }
@@ -113,7 +193,7 @@ struct SegmentView : View {
     let label : String
     let index : Int
     let totalSegments : Int
-    var winner : Int? = nil
+    @Binding var winnerIndex: Int?
     
     @State var isVisible = true
     
@@ -136,7 +216,7 @@ struct SegmentView : View {
         .rotationEffect(rotation)
         .frame(width: 350, height: 350)
         .compositingGroup()
-        .onChange(of: winner) {
+        .onChange(of: winnerIndex) {
             if shouldBlink {
                 blink()
             }
@@ -144,7 +224,8 @@ struct SegmentView : View {
     }
     
     var shouldBlink: Bool {
-        winner == index
+        winnerIndex == index
+        
     }
     
     func blink() {
@@ -181,6 +262,36 @@ struct Triangle: Shape {
         path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY)) // Vänster hörn
         path.closeSubpath()
         return path
+    }
+}
+
+
+struct SegmentViewButton : View {
+    
+    let label : String
+    let index : Int
+    let totalSegments : Int
+    
+    @State var isVisible = true
+    
+    var body : some View {
+        let segmentAngle =  360.0 / Double(totalSegments)
+        let rotation = Angle(degrees: Double(index) * segmentAngle)
+        
+        ZStack{
+            SegmentShape(startAngle: .degrees(-segmentAngle / 2), endAngle: .degrees(segmentAngle / 2))
+                .fill(Color(hue: Double(index) / Double(totalSegments), saturation: 0.9, brightness: 1.0))
+            
+            Text(label)
+                .foregroundStyle(.black)
+                .font(.system(size: 16, weight: .bold))
+                .rotationEffect(.degrees(-90))
+                .offset(y: -100)
+            
+        }
+        .rotationEffect(rotation)
+        .frame(width: 350, height: 350)
+        .compositingGroup()
     }
 }
 

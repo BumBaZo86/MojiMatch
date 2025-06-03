@@ -133,7 +133,7 @@ struct HomeView: View {
                 }
                 
                 if showWheel {
-                    Color.black.opacity(0.4)
+                    Color.black.opacity(0.9)
                         .ignoresSafeArea()
                         .onTapGesture {
                             withAnimation {
@@ -174,7 +174,7 @@ struct HomeView: View {
         var body : some View {
             ZStack{
                 ForEach(0..<10, id: \.self) { i in
-                    SegmentView(label: "", index: i, totalSegments: 10)
+                    SegmentViewButton(label: "", index: i, totalSegments: 10)
                 }
             }
             .frame(width: 60, height: 60)

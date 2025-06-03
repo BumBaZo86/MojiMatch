@@ -23,22 +23,48 @@ struct WheelView: View {
     @State var hasSpunToday = false
     @State var isLoading = true
     
+    @State var points : Int?
+    @State var stars : Int?
+    
     var body: some View {
         
         VStack(spacing: 30){
-            
+            Spacer()
             ZStack{
+                HStack{
+                    Spacer()
+                    
+                    VStack{
+                        VStack(alignment: .leading, spacing: 8){
+                            Text("⭐: \(stars ?? 0)")
+                            Text("💰: \(points ?? 0)")
+                        }
+                        .frame(width: 130, height: 50)
+                        .font(.subheadline)
+                        .fontDesign(.monospaced)
+                        .foregroundStyle(.black)
+                        .padding(8)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
+                        )
+                        .offset(y: -80)
+                    }
+                    .padding()
+                }
+                
                 VStack{
                     
                     if showWinning {
                         Text("You won \(winner ?? 0)!")
                             
                     } else if !hasSpunToday {
-                        Text("Have a free spin!")
+                        Text("Have a spin!")
                             
                     }
                 }
-                .offset(y: -80)
                 .foregroundStyle(.white)
                 .font(.title2)
                 .fontDesign(.monospaced)
@@ -103,7 +129,7 @@ struct WheelView: View {
             
             VStack {
                 
-                if hasSpunToday {
+               Group {
                     Text("Buy another spin?")
                         .foregroundStyle(.white)
                         .font(.title2)
@@ -111,9 +137,11 @@ struct WheelView: View {
                     
                     
                     Button("20 ⭐") {
-                        
+                        if let currentStars = stars, currentStars >= 20 {
+                            buyASpin()
+                        }
                     }
-                    .frame(width: 100, height: 40)
+                    .frame(width: 100, height: 30)
                     .font(.title2)
                     .fontDesign(.monospaced)
                     .foregroundStyle(.black)
@@ -125,6 +153,41 @@ struct WheelView: View {
                             .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
                     )
                     
+                }
+               .opacity(hasSpunToday ? 1 : 0)
+            }
+            .padding()
+        }
+    }
+    
+    func buyASpin() {
+        
+        guard let userEmail = Auth.auth().currentUser?.email else {
+            print("No logged in user.")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(userEmail)
+        
+        userRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching user data: \(error.localizedDescription)")
+                return
+            }
+            
+            if let document = document, document.exists {
+                if let currentStars = stars, currentStars >= 20 {
+                    let newStars = currentStars - 20
+                    userRef.updateData(["stars": newStars]) { error in
+                        if let error = error {
+                            print("Error updating stars: \(error.localizedDescription)")
+                        } else {
+                            stars = newStars
+                            hasSpunToday = false
+                            showWinning = false
+                        }
+                    }
                 }
             }
         }
@@ -151,6 +214,15 @@ struct WheelView: View {
                     let calendar = Calendar.current
                     hasSpunToday = calendar.isDateInToday(lastSpin)
                 }
+                
+                if let fetchPoints = document["points"] as? Int {
+                    points = fetchPoints
+                }
+                
+                if let fetchStars = document["stars"] as? Int {
+                    stars = fetchStars
+                }
+                
             }
             isLoading = false
         }
@@ -172,9 +244,13 @@ struct WheelView: View {
             }
             if let document = document, document.exists {
                 let previousPoints = document["points"] as? Int ?? 0
-                userRef.updateData(["points": previousPoints + (winner ?? 0), "lastFreeSpin": Timestamp(date: Date())]) { err in
+                let newPoints = previousPoints + (winner ?? 0)
+                
+                userRef.updateData(["points": newPoints, "lastFreeSpin": Timestamp(date: Date())]) { err in
                     if let err = err {
                         print("Error updating points: \(err.localizedDescription)")
+                    } else {
+                        points = newPoints
                     }
                 }
             } else {

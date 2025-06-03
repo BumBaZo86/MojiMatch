@@ -14,7 +14,6 @@ class AudioManager {
 
     private init() {}
 
-   
     func playBackgroundMusic() {
         guard let url = Bundle.main.url(forResource: "background", withExtension: "mp3") else {
             print("Musikfilen background.mp3 kunde inte hittas.")
@@ -30,18 +29,7 @@ class AudioManager {
         }
     }
 
-
     func stopBackgroundMusic() {
         audioPlayer?.stop()
-    }
-    
-  
-    func pauseBackgroundMusic() {
-        audioPlayer?.pause()
-    }
-    
- 
-    func resumeBackgroundMusic() {
-        audioPlayer?.play()
     }
 }

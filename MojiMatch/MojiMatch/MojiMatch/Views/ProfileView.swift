@@ -3,7 +3,6 @@
 //  MojiMatch
 //
 //  Created by Camilla Falk on 2025-05-20.
-
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -55,7 +54,6 @@ struct ProfileView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
 
-         
                 Text("Profile")
                     .font(.largeTitle)
                     .foregroundColor(.black)
@@ -72,20 +70,31 @@ struct ProfileView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
-                    
-                        if let avatarUIImage = avatarUIImage {
-                            avatarUIImage
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 130, height: 130)
-                                .clipShape(Circle())
-                        } else {
-                            Image(systemName: "person.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 130, height: 130)
-                                .clipShape(Circle())
-                                .foregroundColor(.white)
+                        
+                        ZStack {
+                            Circle()
+                                .fill(Color.clear)
+                                .frame(width: 190, height: 190)
+                                .background(
+                                    Circle()
+                                        .stroke(Color(red: 210/255, green: 245/255, blue: 210/255), lineWidth: 7)
+                                        .shadow(color: Color(red: 210/255, green: 245/255, blue: 210/255).opacity(0.9), radius: 12, x: 0, y: 0)
+                                )
+
+                            if let avatarUIImage = avatarUIImage {
+                                avatarUIImage
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 180, height: 180)
+                                    .clipShape(Circle())
+                            } else {
+                                Image(systemName: "person.circle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 180, height: 180)
+                                    .clipShape(Circle())
+                                    .foregroundColor(.white)
+                            }
                         }
 
                         Text("Username: \(username)")
@@ -172,7 +181,6 @@ struct ProfileView: View {
     }
 
     func loadAvatarImage(named imageName: String) {
-      
         if let image = UIImage(named: imageName) {
             self.avatarUIImage = Image(uiImage: image)
         } else {

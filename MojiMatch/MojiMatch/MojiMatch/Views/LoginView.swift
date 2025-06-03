@@ -89,10 +89,6 @@ struct LoginView: View {
             }
         }
         .onAppear {
-            
-            AudioManager.shared.playBackgroundMusic()
-            
-       
             authModel.onAppear()
         }
     }

@@ -14,9 +14,9 @@ struct ContentView: View {
     @StateObject private var authModel = AuthModel()
     @AppStorage("isLoggedIn") private var isLoggedIn = false
     @State private var showSignup = false
-    @State private var audioPlayer: AVAudioPlayer?  // Ljudspelare
+    @State private var audioPlayer: AVAudioPlayer?
     
-    // Funktion för att spela ljud
+ 
     func playButtonSound() {
         guard let url = Bundle.main.url(forResource: "buttonsound", withExtension: "mp3") else {
             print("Ljudfilen hittades inte.")
@@ -25,7 +25,7 @@ struct ContentView: View {
         
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer?.play()  // Spela upp ljudet
+            audioPlayer?.play()
         } catch {
             print("Fel vid uppspelning av ljud: \(error.localizedDescription)")
         }
@@ -55,13 +55,13 @@ struct ContentView: View {
                     SignUpView(isLoggedIn: $isLoggedIn, showSignup: $showSignup)
                         .environmentObject(authModel)
                         .onAppear {
-                            playButtonSound()  // Spela ljud när signup-vyn visas
+                            playButtonSound()
                         }
                 } else {
                     LoginView(isLoggedIn: $isLoggedIn, showSignup: $showSignup)
                         .environmentObject(authModel)
                         .onAppear {
-                            playButtonSound()  // Spela ljud när login-vyn visas
+                            playButtonSound()
                         }
                 }
             }

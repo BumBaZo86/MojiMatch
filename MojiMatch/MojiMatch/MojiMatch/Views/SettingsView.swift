@@ -11,6 +11,10 @@ struct SettingsView: View {
     @EnvironmentObject var appSettings: AppSettings
     @AppStorage("soundOn") private var soundOn = true
     @AppStorage("isLoggedIn") private var isLoggedIn = true
+    @AppStorage("notificationsOn") private var notificationsOn = false
+    
+    @State var selectedDate = Date()
+    @State var notificationText = ""
 
     var closeAction: () -> Void
 
@@ -34,14 +38,11 @@ struct SettingsView: View {
                     .fontDesign(.monospaced)
                     .frame(maxWidth: .infinity, alignment: .center)
 
-             
+            
                 HStack {
-                    Image("Darkmode")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 28, height: 28)
-                        .foregroundColor(.black)
-
+                    Text("🌗")
+                        .font(.title)
+                
                     Spacer()
 
                     Toggle("", isOn: $appSettings.isSettingsMode)
@@ -57,21 +58,17 @@ struct SettingsView: View {
                         .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                 )
 
-              
                 HStack {
-                    Image("Sound")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 28, height: 28)
-                        .foregroundColor(.black)
+                    Text("🎵")
+                        .font(.title)
 
                     Spacer()
 
                     Toggle("", isOn: $soundOn)
                         .labelsHidden()
                         .toggleStyle(SwitchToggleStyle(tint: .black))
-                        .onChange(of: soundOn) { value in
-                            if value {
+                        .onChange(of: soundOn) { oldValue, newValue in
+                            if newValue {
                                 AudioManager.shared.playBackgroundMusic()
                             } else {
                                 AudioManager.shared.stopBackgroundMusic()
@@ -86,8 +83,53 @@ struct SettingsView: View {
                     RoundedRectangle(cornerRadius: 15)
                         .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                 )
+                
+                HStack{
+                    Text("🔔")
+                        .font(.title)
+                    
+                    Spacer()
+                    
+                    DatePicker("", selection: $selectedDate, displayedComponents: .hourAndMinute)
+                        .disabled(notificationsOn)
+                    
+                    Spacer()
+                    
+                    Toggle("", isOn: $notificationsOn)
+                        .labelsHidden()
+                        .toggleStyle(SwitchToggleStyle(tint: .black))
+                        .onChange(of: notificationsOn) { oldValue, newValue in
+                            if newValue {
+                                
+                                UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+                                    if success {
+                                        
+                                        scheduleNotifications(at: selectedDate)
+                                        
+                                    } else if let error {
+                                        print(error.localizedDescription)
+                                    }
+                                }
+                            } else {
+                                UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+                                print("Removed notification")
+                                notificationText = ""
+                            }
+                        }
+                    
+                }
+                .padding()
+                .frame(width: 250, height: 60)
+                .background(Color.white)
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 15)
+                        .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                )
 
-             
+                Text(notificationText)
+                
+                Spacer()
                 Button(action: {
                     do {
                         try Auth.auth().signOut()
@@ -112,8 +154,6 @@ struct SettingsView: View {
                             .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                     )
                 }
-
-                Spacer()
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .center)
@@ -129,4 +169,32 @@ struct SettingsView: View {
         .transition(.move(edge: .trailing))
         .animation(.easeInOut, value: appSettings.isSettingsMode)
     }
+    
+    func scheduleNotifications(at date : Date) {
+        
+        let content = UNMutableNotificationContent()
+        content.title = "Time to play some MojiMatch!!"
+        content.body = "😄🎯⭐🦁💰🔥🎡"
+        content.sound = .default // Vill vi ändra till något annat ljud?
+        
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.hour, .minute], from: date)
+        
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: true)
+        
+        let request = UNNotificationRequest(identifier: "MojiMatchDailyReminder", content: content, trigger: trigger)
+        
+        UNUserNotificationCenter.current().add(request) { error in
+            
+            if let error = error {
+                print("Failed to schedule notifications: \(error.localizedDescription)")
+            } else {
+                print("Success! Notification scheduled at \(components.hour ?? 0):\(components.minute ?? 0)")
+            
+                notificationText = "Notification scheduled at \(components.hour ?? 0):\(components.minute ?? 0)"
+            }
+        }
+        
+    }
+
 }

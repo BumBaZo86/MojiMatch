@@ -12,4 +12,5 @@ struct ScoreboardModel : Identifiable {
     var id = UUID()
     var username : String
     var points : Int
+    var avatar : String
 }

@@ -12,19 +12,7 @@ import FirebaseAuth
 
 struct WheelView: View {
     
-    let segments = ["100", "300", "600", "400", "900", "500", "200", "700", "1000","800"]
-    
-    @State var rotation : Double = 0.0
-    @State var isSpinning = false
-    @State var winnerIndex : Int?
-    @State var winner : Int?
-    @State var showWinning = false
-    
-    @State var hasSpunToday = false
-    @State var isLoading = true
-    
-    @State var points : Int?
-    @State var stars : Int?
+    @StateObject var wheelViewModel = WheelViewModel()
     
     var body: some View {
         
@@ -36,8 +24,8 @@ struct WheelView: View {
                     
                     VStack{
                         VStack(alignment: .leading, spacing: 8){
-                            Text("⭐: \(stars ?? 0)")
-                            Text("💰: \(points ?? 0)")
+                            Text("⭐: \(wheelViewModel.stars ?? 0)")
+                            Text("💰: \(wheelViewModel.points ?? 0)")
                         }
                         .frame(width: 130, height: 50)
                         .font(.subheadline)
@@ -57,10 +45,10 @@ struct WheelView: View {
                 
                 VStack{
                     
-                    if showWinning {
-                        Text("You won \(winner ?? 0)!")
+                    if wheelViewModel.showWinning {
+                        Text("You won \(wheelViewModel.winner ?? 0)!")
                         
-                    } else if !hasSpunToday {
+                    } else if !wheelViewModel.hasSpunToday {
                         Text("Have a spin!")
                         
                     }
@@ -80,29 +68,29 @@ struct WheelView: View {
                 
                 
                 ZStack{
-                    ForEach(0..<segments.count, id: \.self) { i in
-                        SegmentView(label: segments[i], index: i, totalSegments: segments.count, winnerIndex: $winnerIndex)
+                    ForEach(0..<wheelViewModel.segments.count, id: \.self) { i in
+                        SegmentView(label: wheelViewModel.segments[i], index: i, totalSegments: wheelViewModel.segments.count, winnerIndex: $wheelViewModel.winnerIndex)
                     }
                     Button("Spin"){
-                        if !isSpinning && !hasSpunToday {
-                            spinWheel(isFreeSpin: true)
+                        if !wheelViewModel.isSpinning && !wheelViewModel.hasSpunToday {
+                            wheelViewModel.spinWheel(isFreeSpin: true)
                         }
                     }
                     .padding()
                     .background(Color.blue)
                     .clipShape(Circle())
-                    .disabled(isSpinning || hasSpunToday)
-                    .opacity(hasSpunToday ? 0.5 : 1.0)
+                    .disabled(wheelViewModel.isSpinning || wheelViewModel.hasSpunToday)
+                    .opacity(wheelViewModel.hasSpunToday ? 0.5 : 1.0)
                         
                 }
                 .frame(width: 350, height: 350)
-                .rotationEffect(.degrees(rotation))
-                .animation(.easeOut(duration: 4), value: rotation)
+                .rotationEffect(.degrees(wheelViewModel.rotation))
+                .animation(.easeOut(duration: 4), value: wheelViewModel.rotation)
                 .clipShape(Circle())
                     
             }
             .onAppear {
-                checkSpinStatus()
+                wheelViewModel.checkSpinStatus()
             }
                 
             VStack {
@@ -115,8 +103,8 @@ struct WheelView: View {
                         
                         
                     Button("20 ⭐") {
-                        if let currentStars = stars, currentStars >= 20 {
-                            buyASpin()
+                        if let currentStars = wheelViewModel.stars, currentStars >= 20 {
+                            wheelViewModel.buyASpin()
                         }
                     }
                     .frame(width: 100, height: 30)
@@ -132,149 +120,9 @@ struct WheelView: View {
                     )
                         
                 }
-                .opacity(hasSpunToday ? 1 : 0)
+                .opacity(wheelViewModel.hasSpunToday ? 1 : 0)
             }
             .padding()
-        }
-    }
-        
-    func buyASpin() {
-            
-            guard let userEmail = Auth.auth().currentUser?.email else {
-                print("No logged in user.")
-                return
-            }
-            
-            let db = Firestore.firestore()
-            let userRef = db.collection("users").document(userEmail)
-            
-            userRef.getDocument { document, error in
-                if let error = error {
-                    print("Error fetching user data: \(error.localizedDescription)")
-                    return
-                }
-                
-                if let document = document, document.exists {
-                    if let currentStars = stars, currentStars >= 20 {
-                        let newStars = currentStars - 20
-                        userRef.updateData(["stars": newStars]) { error in
-                            if let error = error {
-                                print("Error updating stars: \(error.localizedDescription)")
-                            } else {
-                                stars = newStars
-                                hasSpunToday = false
-                                showWinning = false
-                                spinWheel(isFreeSpin: false)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-    func spinWheel(isFreeSpin : Bool) {
-            isSpinning = true
-            let randomRotation = Double.random(in: 1720...2440)
-            rotation += randomRotation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.7) {
-                
-                let normalizedRotation = rotation.truncatingRemainder(dividingBy: 360)
-                let anglePerSegment = 360 / Double(segments.count)
-                
-                let adjustRotation = (360 - normalizedRotation + anglePerSegment / 2).truncatingRemainder(dividingBy: 360)
-                
-                let index = Int(adjustRotation / anglePerSegment) % segments.count
-                winnerIndex = index
-                
-                print("Winner \(segments[index])")
-                
-                winner = Int(segments[index])
-                
-                saveWheelWin(isFreeSpin: isFreeSpin)
-                showWinning = true
-                hasSpunToday = isFreeSpin
-                isSpinning = false
-                checkSpinStatus()
-        }
-    }
-    
-    func checkSpinStatus() {
-        guard let userEmail = Auth.auth().currentUser?.email else {
-            print("No logged in user.")
-            return
-        }
-        
-        let db = Firestore.firestore()
-        let userRef = db.collection("users").document(userEmail)
-        
-        userRef.getDocument { document, error in
-            if let error = error {
-                print("Error fetching user data: \(error.localizedDescription)")
-                return
-            }
-            
-            if let document = document, document.exists {
-                if let timestamp = document["lastFreeSpin"] as? Timestamp {
-                    let lastSpin = timestamp.dateValue()
-                    let calendar = Calendar.current
-                    hasSpunToday = calendar.isDateInToday(lastSpin)
-                }
-                
-                if let fetchPoints = document["points"] as? Int {
-                    points = fetchPoints
-                }
-                
-                if let fetchStars = document["stars"] as? Int {
-                    stars = fetchStars
-                }
-                
-            }
-            isLoading = false
-        }
-    }
-    
-    func saveWheelWin(isFreeSpin: Bool) {
-        guard let userEmail = Auth.auth().currentUser?.email else {
-            print("No logged in user.")
-            return
-        }
-        
-        let db = Firestore.firestore()
-        let userRef = db.collection("users").document(userEmail)
-        
-        userRef.getDocument { document, error in
-            if let error = error {
-                print("Error fetching user data: \(error.localizedDescription)")
-                return
-            }
-            if let document = document, document.exists {
-                let previousPoints = document["points"] as? Int ?? 0
-                let newPoints = previousPoints + (winner ?? 0)
-                
-                var data: [String: Any] = ["points": newPoints]
-                            if isFreeSpin {
-                                data["lastFreeSpin"] = Timestamp(date: Date())
-                            }
-                
-                userRef.updateData(data) { err in
-                    if let err = err {
-                        print("Error updating points: \(err.localizedDescription)")
-                    } else {
-                        points = newPoints
-                    }
-                }
-            } else {
-                
-                var data: [String: Any] = ["points": winner ?? 0]
-                            if isFreeSpin {
-                                data["lastFreeSpin"] = Timestamp(date: Date())
-                            }
-                userRef.setData(data, merge: true) { err in
-                    if let err = err {
-                        print("Error setting points: \(err.localizedDescription)")
-                    }
-                }
-            }
         }
     }
 }
@@ -355,7 +203,6 @@ struct Triangle: Shape {
         return path
     }
 }
-
 
 struct SegmentViewButton : View {
     

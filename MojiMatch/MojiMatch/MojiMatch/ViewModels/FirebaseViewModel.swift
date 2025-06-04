@@ -109,11 +109,12 @@ class FirebaseViewModel : ObservableObject {
                 let data = document.data()
                 let username = data["username"] as? String ?? "No username"
                 let email = document.documentID
+                let avatar = document["avatar"] as? String ?? "avatar1"
                 
                 
                 group.enter() //start collecting scores.
                 self.fetchTotalScores(for: email, filter: filter) { total in
-                    let userWithScores = ScoreboardModel(username: username, points : total)
+                    let userWithScores = ScoreboardModel(username: username, points : total, avatar: avatar)
                     userScore.append(userWithScores)
                     group.leave() //Done collecting scores.
                 }

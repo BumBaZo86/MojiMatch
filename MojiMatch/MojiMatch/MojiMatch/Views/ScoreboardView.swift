@@ -48,6 +48,14 @@ struct ScoreboardView: View {
                     HStack {
                         Text("\(emojiRank(rank: index))")
                             .padding()
+                            .font(.system(size: 40))
+                        
+                        Image(user.avatar)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                            .shadow(radius: 2)
                         
                         Text(user.username)
                         

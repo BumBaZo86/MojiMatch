@@ -27,7 +27,7 @@ struct GameSettingsView: View {
     @State private var unlockedQuestionCounts: [Int] = [5]
     
     // adds sound player
-    @State private var audioPlayer: AVAudioPlayer?  // Ljudspelare
+    @State private var audioPlayer: AVAudioPlayer?
     
     // shows categories
     let columns = Array(repeating: GridItem(.fixed(80), spacing: 10), count: 4)

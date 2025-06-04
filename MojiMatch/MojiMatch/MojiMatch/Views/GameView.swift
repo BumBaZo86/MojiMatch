@@ -9,16 +9,16 @@ import SwiftUI
 import Firebase
 import FirebaseFirestore
 import AVFoundation
+
 struct GameView: View {
     
     @EnvironmentObject var appSettings: AppSettings
-    
     @ObservedObject var firebaseViewModel = FirebaseViewModel()
     
     @Binding var category: String
-    @Binding var time: Double // (Difficulty)
+    @Binding var time: Double
     @Binding var noOfQuestions: Int
-    @Binding var maxPoints : Int
+    @Binding var maxPoints: Int
     @Binding var showGameView: Bool
     
     @State var questionCount = 0
@@ -27,36 +27,18 @@ struct GameView: View {
     @State var timeRemaining = 10.0
     @State var timer: Timer?
     
-    @State var starOne : Bool = false
-    @State var starTwo : Bool = false
-    @State var starThree : Bool = false
-    
-    
-    @State private var audioPlayer: AVAudioPlayer?
-    
-   
-    func playButtonSound() { // play buttonsound
-        guard let url = Bundle.main.url(forResource: "buttonsound", withExtension: "mp3") else {
-            print("Ljudfilen hittades inte.")
-            return
-        }
-
-        do {
-            audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer?.play()
-        } catch {
-            print("Fel vid uppspelning av ljud: \(error.localizedDescription)")
-        }
-    }
+    @State var starOne: Bool = false
+    @State var starTwo: Bool = false
+    @State var starThree: Bool = false
 
     var body: some View {
         NavigationStack {
             ZStack {
-                // backgroundcolor depending of settings
                 (appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 124/255, green: 172/255, blue: 125/255))
                     .ignoresSafeArea()
                 
                 VStack {
+                   
                     VStack {
                         Text("Score: \(score)")
                             .foregroundColor(.black)
@@ -100,7 +82,6 @@ struct GameView: View {
                     }
                     .padding()
                     .frame(width: 350, height: 100)
-                    .foregroundColor(.black)
                     .background(Color.white)
                     .clipShape(RoundedRectangle(cornerRadius: 15))
                     .overlay(
@@ -111,6 +92,7 @@ struct GameView: View {
                     .fontDesign(.monospaced)
                     .padding(.top)
                     
+             
                     if let question = firebaseViewModel.currentQuestion {
                         Text(question.question)
                             .customQuestionText()
@@ -158,7 +140,20 @@ struct GameView: View {
                             .padding(.bottom, 50)
                     }
                     
-                    NavigationLink(destination: GameOverView(score: $score, showGameView: $showGameView, category: $category, time: $time, noOfQuestions: $noOfQuestions, maxPoints: $maxPoints, starOne: $starOne, starTwo: $starTwo, starThree: $starThree), isActive: $isGameOver) {
+                    NavigationLink(
+                        destination: GameOverView(
+                            score: $score,
+                            showGameView: $showGameView,
+                            category: $category,
+                            time: $time,
+                            noOfQuestions: $noOfQuestions,
+                            maxPoints: $maxPoints,
+                            starOne: $starOne,
+                            starTwo: $starTwo,
+                            starThree: $starThree
+                        ),
+                        isActive: $isGameOver
+                    ) {
                         EmptyView()
                     }
                 }
@@ -166,14 +161,19 @@ struct GameView: View {
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
                 startTimer()
-                playButtonSound()
+                SoundManager.shared.playButtonSound()
+                SoundManager.shared.playGameMusic()
+            }
+            .onDisappear {
+                timer?.invalidate()
+                // Musik stoppas INTE här
             }
         }
     }
-
+    
     func optionButton(text: String) -> some View {
         Button(action: {
-            playButtonSound()
+            SoundManager.shared.playButtonSound()
             checkAnswer(text)
         }) {
             Text(text)
@@ -240,12 +240,13 @@ struct GameView: View {
     }
     
     func checkStars() {
-        if score == (maxPoints * noOfQuestions) / 5 {
-            starOne = true
-        } else if score == ((maxPoints * noOfQuestions) / 5) * 3 {
-            starTwo = true
-        } else if score == (maxPoints * noOfQuestions) {
+        let total = maxPoints * noOfQuestions
+        if score >= total {
             starThree = true
+        } else if score >= total * 3 / 5 {
+            starTwo = true
+        } else if score >= total / 5 {
+            starOne = true
         }
     }
 }

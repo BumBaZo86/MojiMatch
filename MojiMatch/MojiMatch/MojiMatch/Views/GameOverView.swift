@@ -4,7 +4,7 @@
 //
 //  Created by Natalie S on 2025-05-21.
 //
-
+//
 import SwiftUI
 import Firebase
 import FirebaseFirestore
@@ -33,8 +33,7 @@ struct GameOverView: View {
 
     @State private var gameEndPlayer: AVAudioPlayer?
     @State private var starPlayer: AVAudioPlayer?
-    @State private var coinPlayer: AVAudioPlayer?   // Ny coin-spelare
-    @State private var wellDonePlayer: AVAudioPlayer?  // Ny welldone-spelare
+    @State private var wellDonePlayer: AVAudioPlayer?
 
     @State private var wellDoneScale: CGFloat = 0.5
     @State private var visibleCharacters = 0
@@ -108,7 +107,6 @@ struct GameOverView: View {
                     .font(.title2)
                     .foregroundColor(.black)
                     .onAppear {
-                       
                         showCoin = false
                         coinOffset = 0
                         coinOpacity = 1
@@ -163,7 +161,6 @@ struct GameOverView: View {
             SoundManager.shared.stopGameMusic()
 
             playGameEndSound()
-            playCoinSound()
             playWellDoneSound()
             starAnimation()
             saveGameData()
@@ -208,22 +205,9 @@ struct GameOverView: View {
         }
     }
 
-    func playCoinSound() {
-        guard let url = Bundle.main.url(forResource: "coinswelldone", withExtension: "mp3") else {
-            print("Ljudfilen coinswelldone.mp3 hittades inte.")
-            return
-        }
-        do {
-            coinPlayer = try AVAudioPlayer(contentsOf: url)
-            coinPlayer?.play()
-        } catch {
-            print("Kunde inte spela upp coinswelldone-ljudet: \(error.localizedDescription)")
-        }
-    }
-
     func playWellDoneSound() {
         guard let url = Bundle.main.url(forResource: "gameoversound", withExtension: "wav") else {
-            print("Ljudfilen welldone.mp3 hittades inte.")
+            print("Ljudfilen gameoversound.wav hittades inte.")
             return
         }
         do {
@@ -292,7 +276,6 @@ struct GameOverView: View {
                 withAnimation {
                     showStarOne = true
                     playStarSound()
-                    playCoinSound() 
                 }
             }
         }
@@ -301,7 +284,6 @@ struct GameOverView: View {
                 withAnimation {
                     showStarTwo = true
                     playStarSound()
-                    playCoinSound()
                 }
             }
         }
@@ -310,7 +292,6 @@ struct GameOverView: View {
                 withAnimation {
                     showStarThree = true
                     playStarSound()
-                    playCoinSound()
                 }
             }
         }

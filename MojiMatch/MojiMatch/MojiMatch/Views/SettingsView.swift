@@ -165,6 +165,9 @@ struct SettingsView: View {
                     .foregroundColor(ThemeColors.text(appSettings.isSettingsMode))
                     .padding()
             }
+            .onAppear {
+                loadNotification()
+            }
         }
         .transition(.move(edge: .trailing))
         .animation(.easeInOut, value: appSettings.isSettingsMode)
@@ -194,7 +197,22 @@ struct SettingsView: View {
                 notificationText = "Notification scheduled at \(components.hour ?? 0):\(components.minute ?? 0)"
             }
         }
-        
     }
-
+    
+    func loadNotification() {
+        
+        UNUserNotificationCenter.current().getPendingNotificationRequests { request in
+            
+            if let request = request.first(where: { $0.identifier == "MojiMatchDailyReminder" }),
+               let trigger = request.trigger as? UNCalendarNotificationTrigger,
+               let hour = trigger.dateComponents.hour,
+               let minute = trigger.dateComponents.minute {
+                
+                DispatchQueue.main.async {
+                    selectedDate = Calendar.current.date(from: trigger.dateComponents) ?? Date()
+                    notificationText = "Notification scheduled at \(hour):\(String(format: "%02d", minute))"
+                }
+            }
+        }
+    }
 }

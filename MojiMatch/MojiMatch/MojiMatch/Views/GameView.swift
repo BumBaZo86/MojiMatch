@@ -21,6 +21,8 @@ struct GameView: View {
     @Binding var maxPoints: Int
     @Binding var showGameView: Bool
     
+    @AppStorage("soundOn") private var soundOn = true
+    
     @State var questionCount = 0
     @State var score = 0
     @State private var isGameOver = false
@@ -38,7 +40,6 @@ struct GameView: View {
                     .ignoresSafeArea()
                 
                 VStack {
-                   
                     VStack {
                         Text("Score: \(score)")
                             .foregroundColor(.black)
@@ -92,7 +93,6 @@ struct GameView: View {
                     .fontDesign(.monospaced)
                     .padding(.top)
                     
-             
                     if let question = firebaseViewModel.currentQuestion {
                         Text(question.question)
                             .customQuestionText()
@@ -161,19 +161,31 @@ struct GameView: View {
             .onAppear {
                 firebaseViewModel.fetchQuestionAndAnswer(category: category)
                 startTimer()
-                SoundManager.shared.playButtonSound()
-                SoundManager.shared.playGameMusic()
+                
+                if soundOn {
+                    SoundManager.shared.playButtonSound()
+                    SoundManager.shared.playGameMusic()
+                }
+            }
+            .onChange(of: soundOn) { newValue in
+                if newValue {
+                    SoundManager.shared.playGameMusic()
+                } else {
+                    SoundManager.shared.stopGameMusic()
+                }
             }
             .onDisappear {
                 timer?.invalidate()
-                // Musik stoppas INTE här
+                // Musik stoppas INTE här – låt soundOn styra ljudet globalt
             }
         }
     }
     
     func optionButton(text: String) -> some View {
         Button(action: {
-            SoundManager.shared.playButtonSound()
+            if soundOn {
+                SoundManager.shared.playButtonSound()
+            }
             checkAnswer(text)
         }) {
             Text(text)

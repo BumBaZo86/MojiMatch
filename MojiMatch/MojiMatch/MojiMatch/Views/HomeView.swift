@@ -185,7 +185,7 @@ Think fast and aim for a high score!
                 .padding()
             }
 
-            // Info sheet
+          
             .sheet(isPresented: $showInfo) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("ℹ️ Info")
@@ -235,6 +235,7 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
             .rotationEffect(.degrees(rotation))
             .onReceive(timer) { _ in
                 rotation += 0.5
+                
             }
         }
     }

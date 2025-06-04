@@ -33,9 +33,15 @@ struct GameOverView: View {
 
     @State private var gameEndPlayer: AVAudioPlayer?
     @State private var starPlayer: AVAudioPlayer?
+    @State private var coinPlayer: AVAudioPlayer?   // Ny coin-spelare
+    @State private var wellDonePlayer: AVAudioPlayer?  // Ny welldone-spelare
 
     @State private var wellDoneScale: CGFloat = 0.5
     @State private var visibleCharacters = 0
+
+    @State private var showCoin = false
+    @State private var coinOffset: CGFloat = 0
+    @State private var coinOpacity: Double = 1.0
 
     let wellDoneText = "Well done!"
 
@@ -50,7 +56,6 @@ struct GameOverView: View {
             VStack(spacing: 30) {
                 Spacer()
 
-                
                 HStack(spacing: 0) {
                     ForEach(0..<wellDoneText.count, id: \.self) { index in
                         let char = Array(wellDoneText)[index]
@@ -62,13 +67,6 @@ struct GameOverView: View {
                     }
                 }
                 .padding()
-             //   .frame(width: 250, height: 60)
-           //     .background(Color.white)
-           //     .clipShape(RoundedRectangle(cornerRadius: 15))
-           //     .overlay(
-           //         RoundedRectangle(cornerRadius: 15)
-                   //     .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
-             //   )
                 .scaleEffect(wellDoneScale)
                 .animation(.easeOut(duration: 1.2), value: wellDoneScale)
                 .onAppear {
@@ -78,7 +76,6 @@ struct GameOverView: View {
 
                 HStack {
                     Spacer()
-
                     if showStarOne {
                         Image(systemName: "star.fill")
                             .resizable()
@@ -87,7 +84,6 @@ struct GameOverView: View {
                             .foregroundStyle(Color.yellow)
                             .transition(.scale)
                     }
-
                     if showStarTwo {
                         Image(systemName: "star.fill")
                             .resizable()
@@ -96,7 +92,6 @@ struct GameOverView: View {
                             .foregroundStyle(Color.yellow)
                             .transition(.scale)
                     }
-
                     if showStarThree {
                         Image(systemName: "star.fill")
                             .resizable()
@@ -105,7 +100,6 @@ struct GameOverView: View {
                             .foregroundStyle(Color.yellow)
                             .transition(.scale)
                     }
-
                     Spacer()
                 }
                 .padding()
@@ -113,6 +107,29 @@ struct GameOverView: View {
                 Text("Your score: \(score) !!")
                     .font(.title2)
                     .foregroundColor(.black)
+                    .onAppear {
+                       
+                        showCoin = false
+                        coinOffset = 0
+                        coinOpacity = 1
+
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            showCoin = true
+                            withAnimation(.easeOut(duration: 1.5)) {
+                                coinOffset = -100
+                                coinOpacity = 0
+                            }
+                        }
+                    }
+
+                if showCoin {
+                    Image("coin")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .offset(y: coinOffset)
+                        .opacity(coinOpacity)
+                        .transition(.opacity)
+                }
 
                 NavigationLink(destination: GameView(
                     category: $category,
@@ -143,7 +160,11 @@ struct GameOverView: View {
             .navigationBarBackButtonHidden(true)
         }
         .onAppear {
+            SoundManager.shared.stopGameMusic()
+
             playGameEndSound()
+            playCoinSound()
+            playWellDoneSound()
             starAnimation()
             saveGameData()
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -166,7 +187,6 @@ struct GameOverView: View {
             print("Ljudfilen gameend.wav hittades inte.")
             return
         }
-
         do {
             gameEndPlayer = try AVAudioPlayer(contentsOf: url)
             gameEndPlayer?.play()
@@ -180,7 +200,6 @@ struct GameOverView: View {
             print("Ljudfilen starbell.mp3 hittades inte.")
             return
         }
-
         do {
             starPlayer = try AVAudioPlayer(contentsOf: url)
             starPlayer?.play()
@@ -189,22 +208,37 @@ struct GameOverView: View {
         }
     }
 
+    func playCoinSound() {
+        guard let url = Bundle.main.url(forResource: "coinswelldone", withExtension: "mp3") else {
+            print("Ljudfilen coinswelldone.mp3 hittades inte.")
+            return
+        }
+        do {
+            coinPlayer = try AVAudioPlayer(contentsOf: url)
+            coinPlayer?.play()
+        } catch {
+            print("Kunde inte spela upp coinswelldone-ljudet: \(error.localizedDescription)")
+        }
+    }
+
+    func playWellDoneSound() {
+        guard let url = Bundle.main.url(forResource: "gameoversound", withExtension: "wav") else {
+            print("Ljudfilen welldone.mp3 hittades inte.")
+            return
+        }
+        do {
+            wellDonePlayer = try AVAudioPlayer(contentsOf: url)
+            wellDonePlayer?.play()
+        } catch {
+            print("Kunde inte spela upp gameoversound-ljudet: \(error.localizedDescription)")
+        }
+    }
+
     func saveGameData() {
-       
-        if starOne {
-            starCount += 1
-        }
-        
-        if starTwo {
-            starCount += 1
-        }
-        
-        if starThree {
-            starCount += 1
-        }
-        
-        print("\(starCount)")
-        
+        if starOne { starCount += 1 }
+        if starTwo { starCount += 1 }
+        if starThree { starCount += 1 }
+
         guard let userEmail = Auth.auth().currentUser?.email else {
             print("No logged in user.")
             return
@@ -258,24 +292,25 @@ struct GameOverView: View {
                 withAnimation {
                     showStarOne = true
                     playStarSound()
+                    playCoinSound() 
                 }
             }
         }
-
         if starTwo {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation {
                     showStarTwo = true
                     playStarSound()
+                    playCoinSound()
                 }
             }
         }
-
         if starThree {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
                 withAnimation {
                     showStarThree = true
                     playStarSound()
+                    playCoinSound()
                 }
             }
         }

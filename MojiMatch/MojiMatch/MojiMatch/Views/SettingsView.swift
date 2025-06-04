@@ -34,7 +34,7 @@ struct SettingsView: View {
                     .fontDesign(.monospaced)
                     .frame(maxWidth: .infinity, alignment: .center)
 
-           
+             
                 HStack {
                     Image("Darkmode")
                         .resizable()
@@ -57,7 +57,7 @@ struct SettingsView: View {
                         .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                 )
 
-        
+              
                 HStack {
                     Image("Sound")
                         .resizable()
@@ -87,6 +87,7 @@ struct SettingsView: View {
                         .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                 )
 
+             
                 Button(action: {
                     do {
                         try Auth.auth().signOut()
@@ -95,13 +96,21 @@ struct SettingsView: View {
                         print("Logout failed: \(error.localizedDescription)")
                     }
                 }) {
-                    Text("Log Out")
-                        .foregroundColor(.red)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(10)
-                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.red, lineWidth: 1))
+                    HStack {
+                        Spacer()
+                        Text("Log out")
+                            .foregroundColor(.black)
+                            .font(.title)
+                            .fontDesign(.monospaced)
+                        Spacer()
+                    }
+                    .frame(width: 250, height: 60)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                    )
                 }
 
                 Spacer()
@@ -109,6 +118,7 @@ struct SettingsView: View {
             .padding()
             .frame(maxWidth: .infinity, alignment: .center)
 
+        
             Button(action: closeAction) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.title)

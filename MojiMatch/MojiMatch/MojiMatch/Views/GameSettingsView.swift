@@ -229,7 +229,7 @@ struct GameSettingsView: View {
 
         do {
             audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer?.play()  // Spela ljudet
+            audioPlayer?.play()
         } catch {
             print("Fel vid uppspelning av ljud: \(error.localizedDescription)")
         }

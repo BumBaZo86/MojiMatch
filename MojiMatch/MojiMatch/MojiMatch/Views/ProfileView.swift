@@ -15,6 +15,7 @@ struct ProfileView: View {
     @State private var user: User? = Auth.auth().currentUser
     @State private var username: String = "Unknown"
     @State private var points: Int = 0
+    @State private var stars: Int = 0
     @State private var avatarImage: UIImage?
     @State private var avatarUIImage: Image?
     @State private var errorMessage: String = ""
@@ -107,12 +108,12 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
 
                             Group {
-                                VStack(spacing: 8) {
-                                    Text("Points: \(points)")
-                                    Text("Level: \(level)")
-                                    Text("Unlocked Categories: \(unlockedCategories.joined(separator: ", "))")
-                                    Text("Unlocked Levels: \(unlockedLevels.joined(separator: ", "))")
-                                    Text("Unlocked Question Counts: \(unlockedQuestionCounts.map { String($0) }.joined(separator: ", "))")
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("💰: \(points)")
+                                    Text("⭐: \(stars)")
+                                    Text("Categories: \(unlockedCategories.map { textToEmoji(for: $0) }.joined(separator: " "))")
+                                    Text("Difficulties: \(unlockedLevels.map { textToEmoji(for: $0) }.joined(separator: " "))")
+                                    Text("Question Counts: \(unlockedQuestionCounts.map { textToEmoji(for: String($0)) }.joined(separator: " "))")
                                 }
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(.center)
@@ -192,6 +193,7 @@ struct ProfileView: View {
                 self.errorMessage = "Failed to load user data: \(error.localizedDescription)"
             } else if let document = document, document.exists {
                 self.points = document["points"] as? Int ?? 0
+                self.stars = document["stars"] as? Int ?? 0
                 self.level = document["level"] as? String ?? "Easy"
                 self.unlockedCategories = document["unlockedCategories"] as? [String] ?? ["Animals"]
                 self.unlockedLevels = document["unlockedLevels"] as? [String] ?? ["Easy"]
@@ -210,6 +212,25 @@ struct ProfileView: View {
             self.avatarUIImage = Image(systemName: "person.circle.fill")
         }
     }
+    
+    func textToEmoji(for category: String) -> String {
+        switch category {
+        case "Animals": return "🦁"
+        case "Flags": return "🇬🇶"
+        case "Countries": return "🌍"
+        case "Food": return "🍝"
+        case "Riddles": return "❓"
+        case "Movies": return "🎥"
+        case "Easy": return "🍼"
+        case "Medium": return "😐"
+        case "Hard": return "🔥"
+        case "5": return "5️⃣"
+        case "10": return "🔟"
+        case "15": return "1️⃣5️⃣"
+        default: return "❔"
+        }
+    }
+    
 
     func loadRecentGames() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }

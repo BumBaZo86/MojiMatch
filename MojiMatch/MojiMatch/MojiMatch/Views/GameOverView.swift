@@ -14,7 +14,7 @@ import AVFoundation
 
 struct GameOverView: View {
     @EnvironmentObject var appSettings: AppSettings
-
+    
     @Binding var score: Int
     @Binding var showGameView: Bool
     @Binding var category: String
@@ -25,36 +25,39 @@ struct GameOverView: View {
     @Binding var starTwo: Bool
     @Binding var starThree: Bool
     @State var starCount = 0
-
+    
     @State private var showStarOne = false
     @State private var showStarTwo = false
     @State private var showStarThree = false
     @State private var confettiTrigger = false
-
+    
     @State private var gameEndPlayer: AVAudioPlayer?
     @State private var starPlayer: AVAudioPlayer?
     @State private var wellDonePlayer: AVAudioPlayer?
-
+    @State private var buttonPlayer: AVAudioPlayer?  // <-- Knappljudspelare
+    
     @State private var wellDoneScale: CGFloat = 0.5
     @State private var visibleCharacters = 0
-
+    
     @State private var showCoin = false
     @State private var coinOffset: CGFloat = 0
     @State private var coinOpacity: Double = 1.0
-
+    
+    @AppStorage("soundOn") private var soundOn = true  // Ljudinställning från SettingsView
+    
     let wellDoneText = "Well done!"
-
+    
     var body: some View {
         ZStack {
             Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
-
+            
             ConfettiCannon(trigger: $confettiTrigger, num: 50, radius: 300)
                 .position(x: UIScreen.main.bounds.width / 2, y: 50)
-
+            
             VStack(spacing: 30) {
                 Spacer()
-
+                
                 HStack(spacing: 0) {
                     ForEach(0..<wellDoneText.count, id: \.self) { index in
                         let char = Array(wellDoneText)[index]
@@ -72,7 +75,7 @@ struct GameOverView: View {
                     wellDoneScale = 1.2
                     animateText()
                 }
-
+                
                 HStack {
                     Spacer()
                     if showStarOne {
@@ -102,7 +105,7 @@ struct GameOverView: View {
                     Spacer()
                 }
                 .padding()
-
+                
                 Text("Your score: \(score) !!")
                     .font(.title2)
                     .foregroundColor(.black)
@@ -110,7 +113,7 @@ struct GameOverView: View {
                         showCoin = false
                         coinOffset = 0
                         coinOpacity = 1
-
+                        
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                             showCoin = true
                             withAnimation(.easeOut(duration: 1.5)) {
@@ -119,7 +122,7 @@ struct GameOverView: View {
                             }
                         }
                     }
-
+                
                 if showCoin {
                     Image("coin")
                         .resizable()
@@ -128,7 +131,7 @@ struct GameOverView: View {
                         .opacity(coinOpacity)
                         .transition(.opacity)
                 }
-
+                
                 NavigationLink(destination: GameView(
                     category: $category,
                     time: $time,
@@ -139,12 +142,16 @@ struct GameOverView: View {
                     Text("Play Again")
                         .buttonStyleCustom()
                 }
-
+                .onTapGesture {
+                    playButtonSound()
+                }
+                
                 Button("Close game") {
+                    playButtonSound()
                     showGameView = false
                 }
                 .buttonStyleCustom()
-
+                
                 Spacer()
             }
             .padding(-10)
@@ -159,7 +166,7 @@ struct GameOverView: View {
         }
         .onAppear {
             SoundManager.shared.stopGameMusic()
-
+            
             playGameEndSound()
             playWellDoneSound()
             starAnimation()
@@ -169,7 +176,7 @@ struct GameOverView: View {
             }
         }
     }
-
+    
     func animateText() {
         visibleCharacters = 0
         for i in 1...wellDoneText.count {
@@ -178,8 +185,9 @@ struct GameOverView: View {
             }
         }
     }
-
+    
     func playGameEndSound() {
+        guard soundOn else { return }
         guard let url = Bundle.main.url(forResource: "gameend", withExtension: "wav") else {
             print("Ljudfilen gameend.wav hittades inte.")
             return
@@ -191,8 +199,9 @@ struct GameOverView: View {
             print("Kunde inte spela upp gameend-ljudet: \(error.localizedDescription)")
         }
     }
-
+    
     func playStarSound() {
+        guard soundOn else { return }
         guard let url = Bundle.main.url(forResource: "starbell", withExtension: "mp3") else {
             print("Ljudfilen starbell.mp3 hittades inte.")
             return
@@ -204,8 +213,9 @@ struct GameOverView: View {
             print("Kunde inte spela upp starbell-ljudet: \(error.localizedDescription)")
         }
     }
-
+    
     func playWellDoneSound() {
+        guard soundOn else { return }
         guard let url = Bundle.main.url(forResource: "gameoversound", withExtension: "wav") else {
             print("Ljudfilen gameoversound.wav hittades inte.")
             return
@@ -217,20 +227,34 @@ struct GameOverView: View {
             print("Kunde inte spela upp gameoversound-ljudet: \(error.localizedDescription)")
         }
     }
-
+    
+    func playButtonSound() {
+        guard soundOn else { return }
+        guard let url = Bundle.main.url(forResource: "buttonsound", withExtension: "mp3") else {
+            print("Ljudfilen buttonsound.mp3 hittades inte.")
+            return
+        }
+        do {
+            buttonPlayer = try AVAudioPlayer(contentsOf: url)
+            buttonPlayer?.play()
+        } catch {
+            print("Kunde inte spela upp knappljudet: \(error.localizedDescription)")
+        }
+    }
+    
     func saveGameData() {
         if starOne { starCount += 1 }
         if starTwo { starCount += 1 }
         if starThree { starCount += 1 }
-
+        
         guard let userEmail = Auth.auth().currentUser?.email else {
             print("No logged in user.")
             return
         }
-
+        
         let db = Firestore.firestore()
         let userRef = db.collection("users").document(userEmail)
-
+        
         userRef.getDocument { document, error in
             if let error = error {
                 print("Error fetching user data: \(error.localizedDescription)")
@@ -252,24 +276,24 @@ struct GameOverView: View {
                 }
             }
         }
-
+        
         let gameDetails = "Category: \(category), Time: \(Int(time)) sec, Questions: \(noOfQuestions), Points: \(score)"
         let gameScoreList = ["gameScore": score, "timestamp": Timestamp()] as [String: Any]
         let recentGame = ["gameDetails": gameDetails, "timestamp": Timestamp()] as [String: Any]
-
+        
         userRef.collection("gameScore").addDocument(data: gameScoreList) { err in
             if let err = err {
                 print("Error saving recent game score: \(err.localizedDescription)")
             }
         }
-
+        
         userRef.collection("recentGames").addDocument(data: recentGame) { err in
             if let err = err {
                 print("Error saving recent game: \(err.localizedDescription)")
             }
         }
     }
-
+    
     func starAnimation() {
         if starOne {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -283,14 +307,6 @@ struct GameOverView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation {
                     showStarTwo = true
-                    playStarSound()
-                }
-            }
-        }
-        if starThree {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                withAnimation {
-                    showStarThree = true
                     playStarSound()
                 }
             }

@@ -34,7 +34,7 @@ struct GameOverView: View {
     @State private var gameEndPlayer: AVAudioPlayer?
     @State private var starPlayer: AVAudioPlayer?
     @State private var wellDonePlayer: AVAudioPlayer?
-    @State private var buttonPlayer: AVAudioPlayer?  // <-- Knappljudspelare
+    @State private var buttonPlayer: AVAudioPlayer?
     
     @State private var wellDoneScale: CGFloat = 0.5
     @State private var visibleCharacters = 0
@@ -43,7 +43,7 @@ struct GameOverView: View {
     @State private var coinOffset: CGFloat = 0
     @State private var coinOpacity: Double = 1.0
     
-    @AppStorage("soundOn") private var soundOn = true  // Ljudinställning från SettingsView
+    @AppStorage("soundOn") private var soundOn = true
     
     let wellDoneText = "Well done!"
     
@@ -55,113 +55,119 @@ struct GameOverView: View {
             ConfettiCannon(trigger: $confettiTrigger, num: 50, radius: 300)
                 .position(x: UIScreen.main.bounds.width / 2, y: 50)
             
-            VStack(spacing: 30) {
-                Spacer()
+            VStack {
+                Spacer().frame(height: 80) 
                 
-                HStack(spacing: 0) {
-                    ForEach(0..<wellDoneText.count, id: \.self) { index in
-                        let char = Array(wellDoneText)[index]
-                        Text(String(char))
-                            .font(.largeTitle)
-                            .foregroundColor(.black)
-                            .opacity(index < visibleCharacters ? 1 : 0)
-                            .animation(.easeIn(duration: 0.3).delay(Double(index) * 0.1), value: visibleCharacters)
-                    }
-                }
-                .padding()
-                .scaleEffect(wellDoneScale)
-                .animation(.easeOut(duration: 1.2), value: wellDoneScale)
-                .onAppear {
-                    wellDoneScale = 1.2
-                    animateText()
-                }
-                
-                HStack {
+                VStack(spacing: 30) {
                     Spacer()
-                    if showStarOne {
-                        Image(systemName: "star.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 65, height: 65)
-                            .foregroundStyle(Color.yellow)
-                            .transition(.scale)
-                    }
-                    if showStarTwo {
-                        Image(systemName: "star.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 65, height: 65)
-                            .foregroundStyle(Color.yellow)
-                            .transition(.scale)
-                    }
-                    if showStarThree {
-                        Image(systemName: "star.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 65, height: 65)
-                            .foregroundStyle(Color.yellow)
-                            .transition(.scale)
-                    }
-                    Spacer()
-                }
-                .padding()
-                
-                Text("Your score: \(score) !!")
-                    .font(.title2)
-                    .foregroundColor(.black)
-                    .onAppear {
-                        showCoin = false
-                        coinOffset = 0
-                        coinOpacity = 1
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            showCoin = true
-                            withAnimation(.easeOut(duration: 1.5)) {
-                                coinOffset = -100
-                                coinOpacity = 0
-                            }
+                    
+                    HStack(spacing: 0) {
+                        ForEach(0..<wellDoneText.count, id: \.self) { index in
+                            let char = Array(wellDoneText)[index]
+                            Text(String(char))
+                                .font(.largeTitle)
+                                .foregroundColor(.black)
+                                .opacity(index < visibleCharacters ? 1 : 0)
+                                .animation(.easeIn(duration: 0.3).delay(Double(index) * 0.1), value: visibleCharacters)
                         }
                     }
-                
-                if showCoin {
-                    Image("coin")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .offset(y: coinOffset)
-                        .opacity(coinOpacity)
-                        .transition(.opacity)
+                    .padding()
+                    .scaleEffect(wellDoneScale)
+                    .animation(.easeOut(duration: 1.2), value: wellDoneScale)
+                    .onAppear {
+                        wellDoneScale = 1.2
+                        animateText()
+                    }
+                    
+                    HStack {
+                        Spacer()
+                        if showStarOne {
+                            Image(systemName: "star.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 65, height: 65)
+                                .foregroundStyle(Color.yellow)
+                                .transition(.scale)
+                        }
+                        if showStarTwo {
+                            Image(systemName: "star.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 65, height: 65)
+                                .foregroundStyle(Color.yellow)
+                                .transition(.scale)
+                        }
+                        if showStarThree {
+                            Image(systemName: "star.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 65, height: 65)
+                                .foregroundStyle(Color.yellow)
+                                .transition(.scale)
+                        }
+                        Spacer()
+                    }
+                    .padding()
+                    
+                    Text("Your score: \(score) !!")
+                        .font(.title2)
+                        .foregroundColor(.black)
+                        .onAppear {
+                            showCoin = false
+                            coinOffset = 0
+                            coinOpacity = 1
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                showCoin = true
+                                withAnimation(.easeOut(duration: 1.5)) {
+                                    coinOffset = -100
+                                    coinOpacity = 0
+                                }
+                            }
+                        }
+                    
+                    if showCoin {
+                        Image("coin")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .offset(y: coinOffset)
+                            .opacity(coinOpacity)
+                            .transition(.opacity)
+                    }
+                    
+                    NavigationLink(destination: GameView(
+                        category: $category,
+                        time: $time,
+                        noOfQuestions: $noOfQuestions,
+                        maxPoints: $maxPoints,
+                        showGameView: $showGameView
+                    )) {
+                        Text("Play Again")
+                            .buttonStyleCustom()
+                    }
+                    .onTapGesture {
+                        playButtonSound()
+                    }
+                    
+                    Button("Close game") {
+                        playButtonSound()
+                        showGameView = false
+                    }
+                    .buttonStyleCustom()
+                    
+                    Spacer()
                 }
+                .padding(30)
+                .background(Color.white.opacity(0.9))
+                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 20)
+                        .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
+                )
+                .padding(.horizontal, 20)
                 
-                NavigationLink(destination: GameView(
-                    category: $category,
-                    time: $time,
-                    noOfQuestions: $noOfQuestions,
-                    maxPoints: $maxPoints,
-                    showGameView: $showGameView
-                )) {
-                    Text("Play Again")
-                        .buttonStyleCustom()
-                }
-                .onTapGesture {
-                    playButtonSound()
-                }
-                
-                Button("Close game") {
-                    playButtonSound()
-                    showGameView = false
-                }
-                .buttonStyleCustom()
-                
-                Spacer()
+                Spacer() // Trycker innehållet uppåt om det finns utrymme
             }
-            .padding(-10)
-            .background(Color.white.opacity(0.9))
-            .clipShape(RoundedRectangle(cornerRadius: 20))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
-            )
-            .padding()
             .navigationBarBackButtonHidden(true)
         }
         .onAppear {
@@ -307,6 +313,14 @@ struct GameOverView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 withAnimation {
                     showStarTwo = true
+                    playStarSound()
+                }
+            }
+        }
+        if starThree {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                withAnimation {
+                    showStarThree = true
                     playStarSound()
                 }
             }

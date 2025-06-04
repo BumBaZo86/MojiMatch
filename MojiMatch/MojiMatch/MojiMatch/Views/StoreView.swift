@@ -14,6 +14,8 @@ import AVFoundation
 struct StoreView: View {
     @EnvironmentObject var appSettings: AppSettings
 
+    @AppStorage("soundOn") private var soundOn: Bool = true
+
     @State private var lockedCategories = ["Flags", "Countries", "Food", "Riddles", "Movies"]
     @State private var lockedLevels = ["Medium", "Hard"]
     @State private var lockedQuestionCounts = [10, 15]
@@ -205,6 +207,7 @@ struct StoreView: View {
     }
 
     func playCashSound() {
+        guard soundOn else { return }
         if let soundURL = Bundle.main.url(forResource: "cashier", withExtension: "wav") {
             do {
                 audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
@@ -216,6 +219,7 @@ struct StoreView: View {
     }
 
     func playDeniedSound() {
+        guard soundOn else { return }
         if let soundURL = Bundle.main.url(forResource: "insufficientfunds", withExtension: "mp3") {
             do {
                 audioPlayer = try AVAudioPlayer(contentsOf: soundURL)

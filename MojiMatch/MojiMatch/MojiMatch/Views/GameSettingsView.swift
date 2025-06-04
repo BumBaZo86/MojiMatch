@@ -13,6 +13,8 @@ import AVFoundation  // import AVFoundation for sound.
 struct GameSettingsView: View {
     @EnvironmentObject var appSettings: AppSettings
     
+    @AppStorage("soundOn") private var soundOn = true  // controls sound on/off
+    
     @State var showGameView = false
     
     @State var category = "Animals"
@@ -57,7 +59,7 @@ struct GameSettingsView: View {
                         }
                         .customGameSettings(isSelected: category == cat)
                         .onTapGesture {
-                            playButtonSound()  // calls button sound when its pressed.
+                            playButtonSound()
                             category = cat
                         }
                     }
@@ -219,9 +221,11 @@ struct GameSettingsView: View {
     }
     
     /**
-     * Plays buttonsound.
+     * Plays buttonsound only if soundOn is true.
      */
     func playButtonSound() {
+        guard soundOn else { return }  // Ljudet spelas bara om soundOn är true
+        
         guard let url = Bundle.main.url(forResource: "buttonsound", withExtension: "mp3") else {
             print("Ljudfilen hittades inte.")
             return

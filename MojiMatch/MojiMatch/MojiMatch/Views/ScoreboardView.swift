@@ -58,6 +58,7 @@ struct ScoreboardView: View {
                             .shadow(radius: 2)
                         
                         Text(user.username)
+                            .font(.system(size: 17))
                         
                         Spacer()
                         

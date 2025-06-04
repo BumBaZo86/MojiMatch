@@ -253,7 +253,7 @@ struct GameOverView: View {
             }
         }
 
-        let gameDetails = "Category: \(category), Time: \(Int(time)) sek, Questions: \(noOfQuestions), Points: \(score)"
+        let gameDetails = "Category: \(category), Time: \(Int(time)) sec, Questions: \(noOfQuestions), Points: \(score)"
         let gameScoreList = ["gameScore": score, "timestamp": Timestamp()] as [String: Any]
         let recentGame = ["gameDetails": gameDetails, "timestamp": Timestamp()] as [String: Any]
 

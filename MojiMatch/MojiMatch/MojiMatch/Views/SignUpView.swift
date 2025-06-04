@@ -44,9 +44,14 @@ struct SignUpView: View {
                                 .background(Color.white)
                                 .cornerRadius(8)
                                 .keyboardType(.emailAddress)
+                                .textInputAutocapitalization(.never)
                                 .foregroundColor(.black)
                                 .padding(.horizontal)
                                 .frame(height: 50)
+                                .onChange(of: authModel.email) { oldValue, newValue in
+                                    authModel.email = newValue.lowercased()
+                                    
+                                }
                             
                             SecureField("Password", text: $authModel.password)
                                 .padding()

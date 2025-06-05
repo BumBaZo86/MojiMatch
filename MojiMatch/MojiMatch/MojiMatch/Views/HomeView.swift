@@ -4,7 +4,6 @@
 //
 //  Created by Camilla Falk on 2025-05-20.
 //
-
 import SwiftUI
 import AVFoundation
 
@@ -21,7 +20,7 @@ struct HomeView: View {
     @State private var audioPlayer: AVAudioPlayer?
     
     func playButtonSound() {
-        guard soundOn else { return } 
+        guard soundOn else { return }
         
         guard let url = Bundle.main.url(forResource: "buttonsound", withExtension: "mp3") else {
             print("Ljudfilen hittades inte.")

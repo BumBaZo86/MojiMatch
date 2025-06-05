@@ -52,11 +52,8 @@ struct GameOverView: View {
             Color(appSettings.isSettingsMode ? Color(hex: "778472") : Color(red: 113/256, green: 162/256, blue: 114/256))
                 .ignoresSafeArea()
             
-            ConfettiCannon(trigger: $confettiTrigger, num: 50, radius: 300)
-                .position(x: UIScreen.main.bounds.width / 2, y: 50)
-            
             VStack {
-                Spacer().frame(height: 80) 
+                Spacer().frame(height: 80)
                 
                 VStack(spacing: 30) {
                     Spacer()
@@ -166,9 +163,13 @@ struct GameOverView: View {
                 )
                 .padding(.horizontal, 20)
                 
-                Spacer() // Trycker innehållet uppåt om det finns utrymme
+                Spacer()
             }
             .navigationBarBackButtonHidden(true)
+            
+         
+            ConfettiCannon(trigger: $confettiTrigger, num: 50, radius: 300)
+                .position(x: UIScreen.main.bounds.width / 2, y: 50)
         }
         .onAppear {
             SoundManager.shared.stopGameMusic()

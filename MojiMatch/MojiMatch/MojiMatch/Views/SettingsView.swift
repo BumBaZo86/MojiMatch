@@ -48,7 +48,7 @@ struct SettingsView: View {
 
                     Toggle("", isOn: $appSettings.isSettingsMode)
                         .labelsHidden()
-                        .toggleStyle(SwitchToggleStyle(tint: .black))
+                        .toggleStyle(SwitchToggleStyle(tint: Color(red: 194/255, green: 225/255, blue: 194/255)))
                 }
                 .padding()
                 .frame(width: 250, height: 60)
@@ -67,7 +67,7 @@ struct SettingsView: View {
 
                     Toggle("", isOn: $soundOn)
                         .labelsHidden()
-                        .toggleStyle(SwitchToggleStyle(tint: .black))
+                        .toggleStyle(SwitchToggleStyle(tint: Color(red: 194/255, green: 225/255, blue: 194/255)))
                         .onChange(of: soundOn) { oldValue, newValue in
                             if newValue {
                                 AudioManager.shared.playBackgroundMusic()
@@ -98,7 +98,7 @@ struct SettingsView: View {
                     
                     Toggle("", isOn: $notificationsOn)
                         .labelsHidden()
-                        .toggleStyle(SwitchToggleStyle(tint: .black))
+                        .toggleStyle(SwitchToggleStyle(tint: Color(red: 194/255, green: 225/255, blue: 194/255)))
                         .onChange(of: notificationsOn) { oldValue, newValue in
                             if newValue {
                                 
@@ -179,7 +179,7 @@ struct SettingsView: View {
         let content = UNMutableNotificationContent()
         content.title = "Time to play some MojiMatch!!"
         content.body = "😄🎯⭐🦁💰🔥🎡"
-        content.sound = .default // Vill vi ändra till något annat ljud?
+        content.sound = .default 
         
         let calendar = Calendar.current
         let components = calendar.dateComponents([.hour, .minute], from: date)

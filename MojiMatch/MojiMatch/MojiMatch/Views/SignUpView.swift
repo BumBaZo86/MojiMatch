@@ -26,11 +26,7 @@ struct SignUpView: View {
                     .ignoresSafeArea()
                 
                 VStack {
-                    Image("MojiMatchLogo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 300, height: 300)
-                        .foregroundColor(.white)
+                    mojiMatchLogo()
                     
                     ScrollView {
                         VStack(spacing: 15) {
@@ -38,31 +34,22 @@ struct SignUpView: View {
                                 .font(.largeTitle)
                                 .foregroundColor(.white)
                                 .padding(.top)
+                                .fontDesign(.monospaced)
                             
                             TextField("Email", text: $authModel.email)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
+                                .logInSignUpTextField()
                                 .keyboardType(.emailAddress)
-                                .foregroundColor(.black)
-                                .padding(.horizontal)
-                                .frame(height: 50)
+                                .textInputAutocapitalization(.never)
+                                .onChange(of: authModel.email) { oldValue, newValue in
+                                    authModel.email = newValue.lowercased()
+                                    
+                                }
                             
                             SecureField("Password", text: $authModel.password)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .foregroundColor(.black)
-                                .padding(.horizontal)
-                                .frame(height: 50)
+                                .logInSignUpTextField()
                             
                             TextField("Username", text: $username)
-                                .padding()
-                                .background(Color.white)
-                                .cornerRadius(8)
-                                .foregroundColor(.black)
-                                .padding(.horizontal)
-                                .frame(height: 50)
+                                .logInSignUpTextField()
                             
                             if !errorMessage.isEmpty {
                                 Text(errorMessage)
@@ -82,17 +69,7 @@ struct SignUpView: View {
                                         .foregroundColor(.black)
                                 } else {
                                     Text("Sign Up")
-                                        .padding()
-                                        .frame(width: 250, height: 60)
-                                        .background(Color.white)
-                                        .foregroundColor(.black)
-                                        .clipShape(RoundedRectangle(cornerRadius: 15))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 15)
-                                                .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
-                                        )
-                                        .shadow(radius: 10.0, x: 20, y: 10)
-                                        .fontDesign(.monospaced)
+                                        .buttonStyleCustom()
                                 }
                             }
                             .disabled(isLoading)
@@ -101,18 +78,12 @@ struct SignUpView: View {
                             Button(action: {
                                 showSignup = false
                             }) {
-                                Text("Login")
-                                    .padding()
-                                    .frame(width: 250, height: 60)
-                                    .background(Color.white)
-                                    .foregroundColor(.black)
-                                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 15)
-                                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
-                                    )
-                                    .shadow(radius: 10.0, x: 20, y: 10)
+                                Text("Already have an account? Log in!")
+                                    .foregroundColor(.white)
+                                    .underline()
                                     .fontDesign(.monospaced)
+                                    .font(.system(size: 13))
+                                    
                             }
                             .padding(.top)
                         }

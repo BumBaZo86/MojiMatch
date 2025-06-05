@@ -12,19 +12,9 @@ import FirebaseAuth
 
 struct WheelView: View {
     
-    let segments = ["100", "300", "600", "400", "900", "500", "200", "700", "1000","800"]
-    
-    @State var rotation : Double = 0.0
-    @State var isSpinning = false
-    @State var winnerIndex : Int?
-    @State var winner : Int?
-    @State var showWinning = false
-    
-    @State var hasSpunToday = false
-    @State var isLoading = true
-    
-    @State var points : Int?
-    @State var stars : Int?
+    @StateObject var wheelViewModel = WheelViewModel()
+    @State private var showPlusAnimation = false
+    @State private var showMinusAnimation = false  
     
     var body: some View {
         
@@ -36,8 +26,8 @@ struct WheelView: View {
                     
                     VStack{
                         VStack(alignment: .leading, spacing: 8){
-                            Text("⭐: \(stars ?? 0)")
-                            Text("💰: \(points ?? 0)")
+                            Text("⭐: \(wheelViewModel.stars ?? 0)")
+                            Text("💰: \(wheelViewModel.points ?? 0)")
                         }
                         .frame(width: 130, height: 50)
                         .font(.subheadline)
@@ -47,22 +37,50 @@ struct WheelView: View {
                         .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
+
+                                if showMinusAnimation {
+                                    Text("-20 ⭐")
+                                        .font(.system(size: 40, weight: .bold))
+                                        .foregroundColor(.yellow)
+                                        .shadow(radius: 3)
+                                        .offset(y: -40)
+                                        .opacity(showMinusAnimation ? 1 : 0)
+                                        .scaleEffect(showMinusAnimation ? 1.3 : 1.0)
+                                        .animation(.easeOut(duration: 1.5), value: showMinusAnimation)
+                                }
+                            }
                         )
                         .offset(y: -80)
                     }
                     .padding()
                 }
                 
-                VStack{
-                    
-                    if showWinning {
-                        Text("You won \(winner ?? 0)!")
-                        
-                    } else if !hasSpunToday {
+                VStack {
+                    if wheelViewModel.showWinning {
+                        VStack(spacing: 10) {
+                            if let winner = wheelViewModel.winner {
+                                Text("+\(winner)")
+                                    .font(.system(size: 40, weight: .bold))
+                                    .foregroundStyle(.green)
+                                    .offset(y: showPlusAnimation ? -60 : 0)
+                                    .opacity(showPlusAnimation ? 0 : 1)
+                                    .scaleEffect(showPlusAnimation ? 1.3 : 1.0)
+                                    .onAppear {
+                                        withAnimation(.easeOut(duration: 1.5)) {
+                                            showPlusAnimation = true
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                                            showPlusAnimation = false
+                                        }
+                                    }
+                            }
+                            Text("You won \(wheelViewModel.winner ?? 0)!")
+                        }
+                    } else if !wheelViewModel.hasSpunToday {
                         Text("Have a spin!")
-                        
                     }
                 }
                 .foregroundStyle(.white)
@@ -70,53 +88,53 @@ struct WheelView: View {
                 .fontDesign(.monospaced)
             }
             
-            ZStack{
-                
+            ZStack {
                 Triangle()
                     .fill(Color.red)
                     .frame(width: 30, height: 50)
                     .rotationEffect(.degrees(180))
                     .offset(y: -200)
                 
-                
-                ZStack{
-                    ForEach(0..<segments.count, id: \.self) { i in
-                        SegmentView(label: segments[i], index: i, totalSegments: segments.count, winnerIndex: $winnerIndex)
+                ZStack {
+                    ForEach(0..<wheelViewModel.segments.count, id: \.self) { i in
+                        SegmentView(label: wheelViewModel.segments[i], index: i, totalSegments: wheelViewModel.segments.count, winnerIndex: $wheelViewModel.winnerIndex)
                     }
-                    Button("Spin"){
-                        if !isSpinning && !hasSpunToday {
-                            spinWheel(isFreeSpin: true)
+                    Button("Spin") {
+                        if !wheelViewModel.isSpinning && !wheelViewModel.hasSpunToday {
+                            wheelViewModel.spinWheel(isFreeSpin: true)
                         }
                     }
                     .padding()
                     .background(Color.blue)
                     .clipShape(Circle())
-                    .disabled(isSpinning || hasSpunToday)
-                    .opacity(hasSpunToday ? 0.5 : 1.0)
-                        
+                    .disabled(wheelViewModel.isSpinning || wheelViewModel.hasSpunToday)
+                    .opacity(wheelViewModel.hasSpunToday ? 0.5 : 1.0)
                 }
                 .frame(width: 350, height: 350)
-                .rotationEffect(.degrees(rotation))
-                .animation(.easeOut(duration: 4), value: rotation)
+                .rotationEffect(.degrees(wheelViewModel.rotation))
+                .animation(.easeOut(duration: 4), value: wheelViewModel.rotation)
                 .clipShape(Circle())
-                    
             }
             .onAppear {
-                checkSpinStatus()
+                wheelViewModel.checkSpinStatus()
             }
-                
+            
             VStack {
-                    
                 Group {
                     Text("Buy another spin?")
                         .foregroundStyle(.white)
                         .font(.title2)
                         .fontDesign(.monospaced)
-                        
-                        
+                    
                     Button("20 ⭐") {
-                        if let currentStars = stars, currentStars >= 20 {
-                            buyASpin()
+                        if let currentStars = wheelViewModel.stars, currentStars >= 20 {
+                            wheelViewModel.buyASpin()
+                            withAnimation(.easeOut(duration: 1.5)) {
+                                showMinusAnimation = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                showMinusAnimation = false
+                            }
                         }
                     }
                     .frame(width: 100, height: 30)
@@ -130,151 +148,10 @@ struct WheelView: View {
                         RoundedRectangle(cornerRadius: 12)
                             .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
                     )
-                        
                 }
-                .opacity(hasSpunToday ? 1 : 0)
+                .opacity(wheelViewModel.hasSpunToday ? 1 : 0)
             }
             .padding()
-        }
-    }
-        
-    func buyASpin() {
-            
-            guard let userEmail = Auth.auth().currentUser?.email else {
-                print("No logged in user.")
-                return
-            }
-            
-            let db = Firestore.firestore()
-            let userRef = db.collection("users").document(userEmail)
-            
-            userRef.getDocument { document, error in
-                if let error = error {
-                    print("Error fetching user data: \(error.localizedDescription)")
-                    return
-                }
-                
-                if let document = document, document.exists {
-                    if let currentStars = stars, currentStars >= 20 {
-                        let newStars = currentStars - 20
-                        userRef.updateData(["stars": newStars]) { error in
-                            if let error = error {
-                                print("Error updating stars: \(error.localizedDescription)")
-                            } else {
-                                stars = newStars
-                                hasSpunToday = false
-                                showWinning = false
-                                spinWheel(isFreeSpin: false)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-    func spinWheel(isFreeSpin : Bool) {
-            isSpinning = true
-            let randomRotation = Double.random(in: 1720...2440)
-            rotation += randomRotation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.7) {
-                
-                let normalizedRotation = rotation.truncatingRemainder(dividingBy: 360)
-                let anglePerSegment = 360 / Double(segments.count)
-                
-                let adjustRotation = (360 - normalizedRotation + anglePerSegment / 2).truncatingRemainder(dividingBy: 360)
-                
-                let index = Int(adjustRotation / anglePerSegment) % segments.count
-                winnerIndex = index
-                
-                print("Winner \(segments[index])")
-                
-                winner = Int(segments[index])
-                
-                saveWheelWin(isFreeSpin: isFreeSpin)
-                showWinning = true
-                hasSpunToday = isFreeSpin
-                isSpinning = false
-                checkSpinStatus()
-        }
-    }
-    
-    func checkSpinStatus() {
-        guard let userEmail = Auth.auth().currentUser?.email else {
-            print("No logged in user.")
-            return
-        }
-        
-        let db = Firestore.firestore()
-        let userRef = db.collection("users").document(userEmail)
-        
-        userRef.getDocument { document, error in
-            if let error = error {
-                print("Error fetching user data: \(error.localizedDescription)")
-                return
-            }
-            
-            if let document = document, document.exists {
-                if let timestamp = document["lastFreeSpin"] as? Timestamp {
-                    let lastSpin = timestamp.dateValue()
-                    let calendar = Calendar.current
-                    hasSpunToday = calendar.isDateInToday(lastSpin)
-                }
-                
-                if let fetchPoints = document["points"] as? Int {
-                    points = fetchPoints
-                }
-                
-                if let fetchStars = document["stars"] as? Int {
-                    stars = fetchStars
-                }
-                
-            }
-            isLoading = false
-        }
-    }
-    
-    func saveWheelWin(isFreeSpin: Bool) {
-        guard let userEmail = Auth.auth().currentUser?.email else {
-            print("No logged in user.")
-            return
-        }
-        
-        let db = Firestore.firestore()
-        let userRef = db.collection("users").document(userEmail)
-        
-        userRef.getDocument { document, error in
-            if let error = error {
-                print("Error fetching user data: \(error.localizedDescription)")
-                return
-            }
-            if let document = document, document.exists {
-                let previousPoints = document["points"] as? Int ?? 0
-                let newPoints = previousPoints + (winner ?? 0)
-                
-                var data: [String: Any] = ["points": newPoints]
-                            if isFreeSpin {
-                                data["lastFreeSpin"] = Timestamp(date: Date())
-                            }
-                
-                userRef.updateData(data) { err in
-                    if let err = err {
-                        print("Error updating points: \(err.localizedDescription)")
-                    } else {
-                        points = newPoints
-                    }
-                }
-            } else {
-                
-                var data: [String: Any] = ["points": winner ?? 0]
-                            if isFreeSpin {
-                                data["lastFreeSpin"] = Timestamp(date: Date())
-                            }
-                userRef.setData(data, merge: true) { err in
-                    if let err = err {
-                        print("Error setting points: \(err.localizedDescription)")
-                    }
-                }
-            }
         }
     }
 }
@@ -292,7 +169,7 @@ struct SegmentView : View {
         let segmentAngle =  360.0 / Double(totalSegments)
         let rotation = Angle(degrees: Double(index) * segmentAngle)
         
-        ZStack{
+        ZStack {
             SegmentShape(startAngle: .degrees(-segmentAngle / 2), endAngle: .degrees(segmentAngle / 2))
                 .fill(Color(hue: Double(index) / Double(totalSegments), saturation: 0.9, brightness: 1.0))
                 .opacity(shouldBlink ? (isVisible ? 1.0 : 0.2) : 1.0)
@@ -302,7 +179,6 @@ struct SegmentView : View {
                 .font(.system(size: 16, weight: .bold))
                 .rotationEffect(.degrees(-90))
                 .offset(y: -100)
-            
         }
         .rotationEffect(rotation)
         .frame(width: 350, height: 350)
@@ -316,7 +192,6 @@ struct SegmentView : View {
     
     var shouldBlink: Bool {
         winnerIndex == index
-        
     }
     
     func blink() {
@@ -338,7 +213,7 @@ struct SegmentShape : Shape {
         path.addArc(center: center,
                     radius: rect.width / 2,
                     startAngle: .degrees(-90) + startAngle,
-                               endAngle: .degrees(-90) + endAngle,
+                    endAngle: .degrees(-90) + endAngle,
                     clockwise: false)
         path.closeSubpath()
         return path
@@ -348,14 +223,13 @@ struct SegmentShape : Shape {
 struct Triangle: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY)) // Topp
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY)) // Höger hörn
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY)) // Vänster hörn
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
         path.closeSubpath()
         return path
     }
 }
-
 
 struct SegmentViewButton : View {
     
@@ -369,7 +243,7 @@ struct SegmentViewButton : View {
         let segmentAngle =  360.0 / Double(totalSegments)
         let rotation = Angle(degrees: Double(index) * segmentAngle)
         
-        ZStack{
+        ZStack {
             SegmentShape(startAngle: .degrees(-segmentAngle / 2), endAngle: .degrees(segmentAngle / 2))
                 .fill(Color(hue: Double(index) / Double(totalSegments), saturation: 0.9, brightness: 1.0))
             
@@ -378,7 +252,6 @@ struct SegmentViewButton : View {
                 .font(.system(size: 16, weight: .bold))
                 .rotationEffect(.degrees(-90))
                 .offset(y: -100)
-            
         }
         .rotationEffect(rotation)
         .frame(width: 350, height: 350)
@@ -389,4 +262,3 @@ struct SegmentViewButton : View {
 #Preview {
     WheelView()
 }
-

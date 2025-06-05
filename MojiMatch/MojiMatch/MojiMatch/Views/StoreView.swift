@@ -14,6 +14,10 @@ import AVFoundation
 struct StoreView: View {
     @EnvironmentObject var appSettings: AppSettings
 
+    @AppStorage("soundOn") private var soundOn: Bool = true
+
+    @ObservedObject var emojiConverterViewModel : EmojiConverterViewModel
+    
     @State private var lockedCategories = ["Flags", "Countries", "Food", "Riddles", "Movies"]
     @State private var lockedLevels = ["Medium", "Hard"]
     @State private var lockedQuestionCounts = [10, 15]
@@ -89,7 +93,7 @@ struct StoreView: View {
                     )
 
                     storeSection(
-                        title: "No of questions",
+                        title: "Number of questions",
                         items: lockedQuestionCounts
                             .sorted { (questionCountPrices[$0] ?? 0) < (questionCountPrices[$1] ?? 0) }
                             .map { "\($0)" },
@@ -128,7 +132,7 @@ struct StoreView: View {
                                 }
                             }()
 
-                            StoreItemView(name: item, emoji: textToEmoji(for: item), price: price) {
+                            StoreItemView(name: item, emoji: emojiConverterViewModel.textToEmoji(for: item), price: price) {
                                 if points >= price {
                                     if field == "unlockedQuestionCounts" {
                                         if let intItem = Int(item) {
@@ -205,6 +209,7 @@ struct StoreView: View {
     }
 
     func playCashSound() {
+        guard soundOn else { return }
         if let soundURL = Bundle.main.url(forResource: "cashier", withExtension: "wav") {
             do {
                 audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
@@ -216,6 +221,7 @@ struct StoreView: View {
     }
 
     func playDeniedSound() {
+        guard soundOn else { return }
         if let soundURL = Bundle.main.url(forResource: "insufficientfunds", withExtension: "mp3") {
             do {
                 audioPlayer = try AVAudioPlayer(contentsOf: soundURL)
@@ -223,24 +229,6 @@ struct StoreView: View {
             } catch {
                 print("Kunde inte spela upp ljudet: \(error.localizedDescription)")
             }
-        }
-    }
-
-    func textToEmoji(for category: String) -> String {
-        switch category {
-        case "Animals": return "🦁"
-        case "Flags": return "🇬🇶"
-        case "Countries": return "🌍"
-        case "Food": return "🍝"
-        case "Riddles": return "❓"
-        case "Movies": return "🎥"
-        case "Easy": return "🍼"
-        case "Medium": return "😐"
-        case "Hard": return "🔥"
-        case "5": return "5️⃣"
-        case "10": return "🔟"
-        case "15": return "1️⃣5️⃣"
-        default: return "❔"
         }
     }
 }

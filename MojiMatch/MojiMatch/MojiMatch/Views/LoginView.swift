@@ -19,30 +19,33 @@ struct LoginView: View {
             Color(red: 113/256, green: 162/256, blue: 114/256)
                 .ignoresSafeArea()
 
-            VStack(spacing: 20) {
-                Image("MojiMatchLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 300, height: 300)
-                    .foregroundColor(.white)
+            VStack() {
+                mojiMatchLogo()
 
-                VStack(spacing: 16) {
+                VStack(spacing: 15) {
                     Text("Log In")
-                        .font(.title)
+                        .font(.largeTitle)
                         .foregroundColor(.white)
+                        .padding(.top)
+                        .fontDesign(.monospaced)
 
                     TextField("Email", text: $authModel.email)
-                        .padding()
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .autocapitalization(.none)
+                        .logInSignUpTextField()
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .onChange(of: authModel.email) { oldValue, newValue in
+                            authModel.email = newValue.lowercased()
+                            
+                        }
 
                     SecureField("Password", text: $authModel.password)
-                        .padding()
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .logInSignUpTextField()
 
                     Toggle("Remember email", isOn: $authModel.rememberEmail)
                         .toggleStyle(SwitchToggleStyle(tint: .white))
                         .foregroundColor(.white)
+                        .padding(.horizontal)
+                        .fontDesign(.monospaced)
 
                     if !authModel.errorMessage.isEmpty {
                         Text(authModel.errorMessage)
@@ -62,13 +65,7 @@ struct LoginView: View {
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         } else {
                             Text("Log In")
-                                .font(.headline)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Color(red: 186/256, green: 221/256, blue: 186/256))
-                                .foregroundColor(.black)
-                                .cornerRadius(10)
-                                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                                .buttonStyleCustom()
                         }
                     }
                     .disabled(authModel.isLoading)
@@ -77,13 +74,15 @@ struct LoginView: View {
                     Button(action: {
                         showSignup = true
                     }) {
-                        Text("Don't have an account? Sign up")
+                        Text("Don't have an account? Sign up!")
                             .foregroundColor(.white)
                             .underline()
+                            .fontDesign(.monospaced)
+                            .font(.system(size: 13))
                     }
                     .padding(.top, 8)
                 }
-                .padding(.horizontal, 30)
+                .padding(.horizontal)
 
                 Spacer()
             }

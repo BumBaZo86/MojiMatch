@@ -12,6 +12,7 @@ import FirebaseAuth
 
 struct ScoreboardView: View {
     
+    @ObservedObject var emojiConverterViewModel : EmojiConverterViewModel
     @ObservedObject var firebaseViewModel: FirebaseViewModel
     @EnvironmentObject var appSettings: AppSettings
     
@@ -46,10 +47,19 @@ struct ScoreboardView: View {
                     let user = firebaseViewModel.usersAndScores[index]
                     
                     HStack {
-                        Text("\(emojiRank(rank: index))")
+                        Text("\(emojiConverterViewModel.emojiRank(rank: index))")
                             .padding()
+                            .font(.system(size: 40))
+                        
+                        Image(user.avatar)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                            .shadow(radius: 2)
                         
                         Text(user.username)
+                            .font(.system(size: 17))
                         
                         Spacer()
                         
@@ -71,33 +81,6 @@ struct ScoreboardView: View {
     }
     
     
-    func emojiRank(rank : Int) -> String {
-            
-            switch rank {
-            case 0:
-                return "🥇"
-            case 1:
-                return "🥈"
-            case 2:
-                return "🥉"
-            case 3:
-                return "4️⃣"
-            case 4:
-                return "5️⃣"
-            case 5:
-                return "6️⃣"
-            case 6:
-                return "7️⃣"
-            case 7:
-                return "8️⃣"
-            case 8:
-                return "9️⃣"
-            case 9:
-                return "🔟"
-            default:
-                return "🔹"
-            }
-            
-        }
+    
 
 }

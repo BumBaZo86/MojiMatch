@@ -12,9 +12,12 @@ import FirebaseStorage
 struct ProfileView: View {
     @EnvironmentObject var appSettings: AppSettings
 
+    @StateObject var emojiConverterViewModel = EmojiConverterViewModel()
+    
     @State private var user: User? = Auth.auth().currentUser
     @State private var username: String = "Unknown"
     @State private var points: Int = 0
+    @State private var stars: Int = 0
     @State private var avatarImage: UIImage?
     @State private var avatarUIImage: Image?
     @State private var errorMessage: String = ""
@@ -107,12 +110,12 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
 
                             Group {
-                                VStack(spacing: 8) {
-                                    Text("Points: \(points)")
-                                    Text("Level: \(level)")
-                                    Text("Unlocked Categories: \(unlockedCategories.joined(separator: ", "))")
-                                    Text("Unlocked Levels: \(unlockedLevels.joined(separator: ", "))")
-                                    Text("Unlocked Question Counts: \(unlockedQuestionCounts.map { String($0) }.joined(separator: ", "))")
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text("💰: \(points)")
+                                    Text("⭐: \(stars)")
+                                    Text("Categories: \(unlockedCategories.map { emojiConverterViewModel.textToEmoji(for: $0) }.joined(separator: " "))")
+                                    Text("Difficulties: \(unlockedLevels.map { emojiConverterViewModel.textToEmoji(for: $0) }.joined(separator: " "))")
+                                    Text("Question Counts: \(unlockedQuestionCounts.map { emojiConverterViewModel.textToEmoji(for: String($0)) }.joined(separator: " "))")
                                 }
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(.center)
@@ -192,6 +195,7 @@ struct ProfileView: View {
                 self.errorMessage = "Failed to load user data: \(error.localizedDescription)"
             } else if let document = document, document.exists {
                 self.points = document["points"] as? Int ?? 0
+                self.stars = document["stars"] as? Int ?? 0
                 self.level = document["level"] as? String ?? "Easy"
                 self.unlockedCategories = document["unlockedCategories"] as? [String] ?? ["Animals"]
                 self.unlockedLevels = document["unlockedLevels"] as? [String] ?? ["Easy"]
@@ -210,7 +214,7 @@ struct ProfileView: View {
             self.avatarUIImage = Image(systemName: "person.circle.fill")
         }
     }
-
+    
     func loadRecentGames() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
 

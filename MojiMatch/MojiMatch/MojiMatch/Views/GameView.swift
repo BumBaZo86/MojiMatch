@@ -29,6 +29,9 @@ struct GameView: View {
     @State var timeRemaining = 10.0
     @State var timer: Timer?
     
+    @State var selectedAnswer : String? = nil
+    @State var isAnswerCorrect : Bool? = nil
+    
     @State var starOne: Bool = false
     @State var starTwo: Bool = false
     @State var starThree: Bool = false
@@ -167,7 +170,7 @@ struct GameView: View {
                     SoundManager.shared.playGameMusic()
                 }
             }
-            .onChange(of: soundOn) { newValue in
+            .onChange(of: soundOn) { oldValue, newValue in
                 if newValue {
                     SoundManager.shared.playGameMusic()
                 } else {
@@ -191,8 +194,21 @@ struct GameView: View {
             Text(text)
                 .foregroundColor(.black)
         }
-        .customAnswerOptions()
+        .customAnswerOptions(backgroundColor: buttonBackgroundColor(for: text))
         .font(.system(size: text.count < 2 ? 70 : 10))
+    }
+    
+    func buttonBackgroundColor(for text: String) -> Color {
+        
+        if let selected = selectedAnswer {
+            if selected == text {
+                return isAnswerCorrect == true ? Color.green : Color.red
+            } else {
+                return Color.white.opacity(0.5)
+            }
+        } else {
+            return Color.white
+        }
     }
     
     func fontSize(for text: String) -> CGFloat {
@@ -208,7 +224,10 @@ struct GameView: View {
     func checkAnswer(_ selected: String) {
         timer?.invalidate()
         
-        if selected == firebaseViewModel.currentQuestion?.answer {
+        selectedAnswer = selected
+        isAnswerCorrect = (selected == firebaseViewModel.currentQuestion?.answer)
+        
+        if isAnswerCorrect == true {
             if time == 5.0 {
                 score += 30
             } else if time == 7.0 {
@@ -219,13 +238,20 @@ struct GameView: View {
         }
         
         checkStars()
-        questionCount += 1
         
-        if questionCount < noOfQuestions {
-            firebaseViewModel.fetchQuestionAndAnswer(category: category)
-            startTimer()
-        } else {
-            isGameOver = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.75){
+            
+            selectedAnswer = nil
+            isAnswerCorrect = nil
+            
+            questionCount += 1
+            
+            if questionCount < noOfQuestions {
+                firebaseViewModel.fetchQuestionAndAnswer(category: category)
+                startTimer()
+            } else {
+                isGameOver = true
+            }
         }
     }
     

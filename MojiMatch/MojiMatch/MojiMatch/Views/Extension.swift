@@ -74,12 +74,12 @@ extension View {
             )
     }
     
-    func customAnswerOptions() -> some View {
+    func customAnswerOptions(backgroundColor: Color = Color.white) -> some View {
         self
             .padding()
             .frame(width: 130, height: 100)
             .foregroundStyle(Color.black)
-            .background(Color.white)
+            .background(backgroundColor)
             .clipShape(RoundedRectangle(cornerRadius: 15))
             .overlay(
                 RoundedRectangle(cornerRadius: 15)

@@ -4,7 +4,6 @@
 //
 //  Created by Natalie S on 2025-05-21.
 //
-//
 import SwiftUI
 import Firebase
 import FirebaseFirestore

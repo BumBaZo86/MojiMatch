@@ -4,17 +4,19 @@
 //
 //  Created by Camilla Falk on 2025-06-02.
 //
-
 import SwiftUI
 import Firebase
 import FirebaseFirestore
 import FirebaseAuth
+import AVFoundation
 
 struct WheelView: View {
     
     @StateObject var wheelViewModel = WheelViewModel()
     @State private var showPlusAnimation = false
-    @State private var showMinusAnimation = false  
+    @State private var showMinusAnimation = false
+    
+    @State private var audioPlayer: AVAudioPlayer?
     
     var body: some View {
         
@@ -101,6 +103,7 @@ struct WheelView: View {
                     }
                     Button("Spin") {
                         if !wheelViewModel.isSpinning && !wheelViewModel.hasSpunToday {
+                            playSpinSound()
                             wheelViewModel.spinWheel(isFreeSpin: true)
                         }
                     }
@@ -152,6 +155,22 @@ struct WheelView: View {
                 .opacity(wheelViewModel.hasSpunToday ? 1 : 0)
             }
             .padding()
+        }
+    }
+    
+    func playSpinSound() {
+        guard let url = Bundle.main.url(forResource: "wheelspinsound", withExtension: "wav") else {
+            print("Ljudfilen hittades inte!")
+            return
+        }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            audioPlayer?.play()
+        } catch {
+            print("Kunde inte spela upp ljudet: \(error.localizedDescription)")
         }
     }
 }

@@ -46,20 +46,18 @@ struct HomeView: View {
                 
                 ScrollView {
                     VStack(spacing: 20) {
- api-fix-animation
+ 
                         Image("MojiMatchLogo")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 300, height: 300)
+                            .frame(width: 280, height: 270)
                             .foregroundColor(.white)
                             .scaleEffect(logoBounce ? 1.05 : 0.95)
                             .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: logoBounce)
                             .onAppear {
                                 logoBounce = true
                             }
-                        mojiMatchLogo()
- main
-                            .padding(.bottom, -65)
+                       
                         
                         Button(action: {
                             playButtonSound()
@@ -138,9 +136,11 @@ struct HomeView: View {
                         }
                     }
                     .padding(.horizontal)
-                    .padding(.top, 20)
-                    .padding(.bottom, 40)
+                   
+                 
                 }
+                
+                Spacer()
                 
                 if showWheel {
                     Color.black.opacity(0.9)

@@ -28,8 +28,13 @@ class WheelViewModel: ObservableObject {
     private var audioPlayer: AVAudioPlayer?
     
 
+    
     func playSpinSound() {
         playSound(named: "wheelspinsound", withExtension: "wav")
+    }
+    
+    func playGameEndSound() {
+        playSound(named: "gameend", withExtension: "wav")
     }
     
     private func playSound(named name: String, withExtension ext: String) {
@@ -46,40 +51,7 @@ class WheelViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Funktioner
-    
-    func buyASpin() {
-        guard let userEmail = Auth.auth().currentUser?.email else {
-            print("No logged in user.")
-            return
-        }
-        
-        let db = Firestore.firestore()
-        let userRef = db.collection("users").document(userEmail)
-        
-        userRef.getDocument { document, error in
-            if let error = error {
-                print("Error fetching user data: \(error.localizedDescription)")
-                return
-            }
-            
-            if let document = document, document.exists {
-                if let currentStars = self.stars, currentStars >= 20 {
-                    let newStars = currentStars - 20
-                    userRef.updateData(["stars": newStars]) { error in
-                        if let error = error {
-                            print("Error updating stars: \(error.localizedDescription)")
-                        } else {
-                            self.stars = newStars
-                            self.hasSpunToday = false
-                            self.showWinning = false
-                            self.spinWheel(isFreeSpin: false)
-                        }
-                    }
-                }
-            }
-        }
-    }
+
     
     func checkSpinStatus() {
         guard let userEmail = Auth.auth().currentUser?.email else {
@@ -114,6 +86,42 @@ class WheelViewModel: ObservableObject {
             self.isLoading = false
         }
     }
+    
+    
+    func buyASpin() {
+        guard let userEmail = Auth.auth().currentUser?.email else {
+            print("No logged in user.")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(userEmail)
+        
+        userRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching user data: \(error.localizedDescription)")
+                return
+            }
+            
+            if let document = document, document.exists {
+                if let currentStars = self.stars, currentStars >= 20 {
+                    let newStars = currentStars - 20
+                    userRef.updateData(["stars": newStars]) { error in
+                        if let error = error {
+                            print("Error updating stars: \(error.localizedDescription)")
+                        } else {
+                            self.stars = newStars
+                            self.hasSpunToday = false
+                            self.showWinning = false
+                            self.spinWheel(isFreeSpin: false)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+
     
     func saveWheelWin(isFreeSpin: Bool) {
         guard let userEmail = Auth.auth().currentUser?.email else {
@@ -159,12 +167,13 @@ class WheelViewModel: ObservableObject {
         }
     }
     
+
+    
     func spinWheel(isFreeSpin: Bool) {
         guard !isSpinning else { return }
         isSpinning = true
         
- 
-        playSpinSound()
+        playSpinSound() // 🔊 Spela snurr-ljud
         
         let randomRotation = Double.random(in: 1720...2440)
         rotation += randomRotation
@@ -172,20 +181,19 @@ class WheelViewModel: ObservableObject {
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.7) {
             let normalizedRotation = self.rotation.truncatingRemainder(dividingBy: 360)
             let anglePerSegment = 360 / Double(self.segments.count)
-            
             let adjustRotation = (360 - normalizedRotation + anglePerSegment / 2).truncatingRemainder(dividingBy: 360)
-            
             let index = Int(adjustRotation / anglePerSegment) % self.segments.count
+            
             self.winnerIndex = index
-            
-            print("Winner \(self.segments[index])")
-            
             self.winner = Int(self.segments[index])
+            print("Winner \(self.segments[index])")
             
             self.saveWheelWin(isFreeSpin: isFreeSpin)
             self.showWinning = true
             self.hasSpunToday = isFreeSpin
             self.isSpinning = false
+            
+            self.playGameEndSound() 
             
             self.checkSpinStatus()
         }

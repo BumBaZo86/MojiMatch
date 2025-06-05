@@ -243,11 +243,11 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
     }
 }
 
-// MARK: - Preview
+
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
-            .environmentObject(AppSettings()) // Glöm inte att skicka in rätt environment
+            .environmentObject(AppSettings()) 
     }
 }

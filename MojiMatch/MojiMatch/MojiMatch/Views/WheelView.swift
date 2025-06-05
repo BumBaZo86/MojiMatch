@@ -14,6 +14,7 @@ struct WheelView: View {
     
     @StateObject var wheelViewModel = WheelViewModel()
     @State private var showPlusAnimation = false
+    @State private var showMinusAnimation = false  
     
     var body: some View {
         
@@ -36,8 +37,21 @@ struct WheelView: View {
                         .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 5)
+
+                                if showMinusAnimation {
+                                    Text("-20 ⭐")
+                                        .font(.system(size: 40, weight: .bold))
+                                        .foregroundColor(.yellow)
+                                        .shadow(radius: 3)
+                                        .offset(y: -40)
+                                        .opacity(showMinusAnimation ? 1 : 0)
+                                        .scaleEffect(showMinusAnimation ? 1.3 : 1.0)
+                                        .animation(.easeOut(duration: 1.5), value: showMinusAnimation)
+                                }
+                            }
                         )
                         .offset(y: -80)
                     }
@@ -115,6 +129,12 @@ struct WheelView: View {
                     Button("20 ⭐") {
                         if let currentStars = wheelViewModel.stars, currentStars >= 20 {
                             wheelViewModel.buyASpin()
+                            withAnimation(.easeOut(duration: 1.5)) {
+                                showMinusAnimation = true
+                            }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                                showMinusAnimation = false
+                            }
                         }
                     }
                     .frame(width: 100, height: 30)
@@ -203,7 +223,7 @@ struct SegmentShape : Shape {
 struct Triangle: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY)) 
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
         path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
         path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
         path.closeSubpath()

@@ -12,6 +12,8 @@ import FirebaseStorage
 struct ProfileView: View {
     @EnvironmentObject var appSettings: AppSettings
 
+    @StateObject var emojiConverterViewModel = EmojiConverterViewModel()
+    
     @State private var user: User? = Auth.auth().currentUser
     @State private var username: String = "Unknown"
     @State private var points: Int = 0
@@ -111,9 +113,9 @@ struct ProfileView: View {
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text("💰: \(points)")
                                     Text("⭐: \(stars)")
-                                    Text("Categories: \(unlockedCategories.map { textToEmoji(for: $0) }.joined(separator: " "))")
-                                    Text("Difficulties: \(unlockedLevels.map { textToEmoji(for: $0) }.joined(separator: " "))")
-                                    Text("Question Counts: \(unlockedQuestionCounts.map { textToEmoji(for: String($0)) }.joined(separator: " "))")
+                                    Text("Categories: \(unlockedCategories.map { emojiConverterViewModel.textToEmoji(for: $0) }.joined(separator: " "))")
+                                    Text("Difficulties: \(unlockedLevels.map { emojiConverterViewModel.textToEmoji(for: $0) }.joined(separator: " "))")
+                                    Text("Question Counts: \(unlockedQuestionCounts.map { emojiConverterViewModel.textToEmoji(for: String($0)) }.joined(separator: " "))")
                                 }
                                 .foregroundColor(.black)
                                 .multilineTextAlignment(.center)
@@ -213,25 +215,6 @@ struct ProfileView: View {
         }
     }
     
-    func textToEmoji(for category: String) -> String {
-        switch category {
-        case "Animals": return "🦁"
-        case "Flags": return "🇬🇶"
-        case "Countries": return "🌍"
-        case "Food": return "🍝"
-        case "Riddles": return "❓"
-        case "Movies": return "🎥"
-        case "Easy": return "🍼"
-        case "Medium": return "😐"
-        case "Hard": return "🔥"
-        case "5": return "5️⃣"
-        case "10": return "🔟"
-        case "15": return "1️⃣5️⃣"
-        default: return "❔"
-        }
-    }
-    
-
     func loadRecentGames() {
         guard let userEmail = Auth.auth().currentUser?.email else { return }
 

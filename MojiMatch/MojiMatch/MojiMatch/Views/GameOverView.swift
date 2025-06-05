@@ -43,6 +43,11 @@ struct GameOverView: View {
     @State private var coinOffset: CGFloat = 0
     @State private var coinOpacity: Double = 1.0
     
+    // Ny state för poänganimation
+    @State private var showPointGain = false
+    @State private var pointGainOffset: CGFloat = 0
+    @State private var pointGainOpacity: Double = 1.0
+    
     @AppStorage("soundOn") private var soundOn = true
     
     let wellDoneText = "Well done!"
@@ -75,6 +80,21 @@ struct GameOverView: View {
                         wellDoneScale = 1.2
                         animateText()
                     }
+                    .overlay(
+                    
+                        Group {
+                            if showPointGain {
+                                Text("+\(score)")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.green)
+                                    .offset(x: 40, y: pointGainOffset)
+                                    .opacity(pointGainOpacity)
+                                    .animation(.easeOut(duration: 3.5), value: pointGainOffset)
+                            }
+                        },
+                        alignment: .topTrailing
+                    )
                     
                     HStack {
                         Spacer()
@@ -178,8 +198,18 @@ struct GameOverView: View {
             playWellDoneSound()
             starAnimation()
             saveGameData()
+            
+        
+            showPointGain = false
+            pointGainOffset = 0
+            pointGainOpacity = 1.0
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 confettiTrigger = true
+                showPointGain = true
+                withAnimation(.easeOut(duration: 3.5)) {
+                    pointGainOffset = -100
+                    pointGainOpacity = 0.0
+                }
             }
         }
     }

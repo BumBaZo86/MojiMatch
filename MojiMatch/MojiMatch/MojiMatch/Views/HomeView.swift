@@ -204,7 +204,7 @@ Choose your category, race against the clock, and see how high you can score!
 
 The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
 
-👾 Created with passion by [Your Name].
+👾
 """)
                     Spacer()
                     Button("Close") {

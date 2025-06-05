@@ -18,6 +18,7 @@ struct HomeView: View {
     @StateObject private var emojiVM = EmojiViewModel()
     
     @State private var audioPlayer: AVAudioPlayer?
+    @State private var logoBounce = false
     
     func playButtonSound() {
         guard soundOn else { return }
@@ -45,7 +46,19 @@ struct HomeView: View {
                 
                 ScrollView {
                     VStack(spacing: 20) {
+ api-fix-animation
+                        Image("MojiMatchLogo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 300, height: 300)
+                            .foregroundColor(.white)
+                            .scaleEffect(logoBounce ? 1.05 : 0.95)
+                            .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: logoBounce)
+                            .onAppear {
+                                logoBounce = true
+                            }
                         mojiMatchLogo()
+ main
                             .padding(.bottom, -65)
                         
                         Button(action: {
@@ -100,7 +113,7 @@ struct HomeView: View {
                         .padding(.bottom, 5)
                         
                         VStack(spacing: 5) {
-                            Text("Emoji of the Day")
+                            Text("Random Emoji")
                                 .font(.subheadline)
                                 .foregroundColor(.black)
                             
@@ -152,8 +165,6 @@ struct HomeView: View {
             .onDisappear {
                 AudioManager.shared.stopBackgroundMusic()
             }
-            
-            // Rules sheet
             .sheet(isPresented: $showRules) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("🧠 Rules")
@@ -181,8 +192,6 @@ Think fast and aim for a high score!
                 }
                 .padding()
             }
-
-          
             .sheet(isPresented: $showInfo) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("ℹ️ Info")
@@ -214,15 +223,12 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
         }
     }
 
-    
-    struct SpinningWheelButton : View {
-        
-        @State var rotation : Double = 0
-        
+    struct SpinningWheelButton: View {
+        @State var rotation: Double = 0
         let timer = Timer.publish(every: 0.02, on: .main, in: .common).autoconnect()
         
-        var body : some View {
-            ZStack{
+        var body: some View {
+            ZStack {
                 ForEach(0..<10, id: \.self) { i in
                     SegmentViewButton(label: "", index: i, totalSegments: 10)
                 }
@@ -232,8 +238,16 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
             .rotationEffect(.degrees(rotation))
             .onReceive(timer) { _ in
                 rotation += 0.5
-                
             }
         }
+    }
+}
+
+// MARK: - Preview
+
+struct HomeView_Previews: PreviewProvider {
+    static var previews: some View {
+        HomeView()
+            .environmentObject(AppSettings()) // Glöm inte att skicka in rätt environment
     }
 }

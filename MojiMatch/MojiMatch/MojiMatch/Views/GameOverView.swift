@@ -58,7 +58,6 @@ struct GameOverView: View {
                 .ignoresSafeArea()
             
             VStack {
-                Spacer().frame(height: 80)
                 
                 VStack(spacing: 30) {
                     Spacer()
@@ -81,7 +80,6 @@ struct GameOverView: View {
                         animateText()
                     }
                     .overlay(
-                    
                         Group {
                             if showPointGain {
                                 Text("+\(score)")
@@ -182,12 +180,12 @@ struct GameOverView: View {
                         .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                 )
                 .padding(.horizontal, 20)
+                .padding(.top, 120) // <--- Här sänker vi containern från toppen
                 
                 Spacer()
             }
             .navigationBarBackButtonHidden(true)
             
-         
             ConfettiCannon(trigger: $confettiTrigger, num: 50, radius: 300)
                 .position(x: UIScreen.main.bounds.width / 2, y: 50)
         }
@@ -199,7 +197,6 @@ struct GameOverView: View {
             starAnimation()
             saveGameData()
             
-        
             showPointGain = false
             pointGainOffset = 0
             pointGainOpacity = 1.0

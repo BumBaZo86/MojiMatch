@@ -127,6 +127,33 @@ struct ProfileView: View {
                                     .foregroundColor(.red)
                                     .padding()
                             }
+
+                            // Log out button
+                            Button(action: {
+                                do {
+                                    try Auth.auth().signOut()
+                                    isLoggedIn = false
+                                } catch {
+                                    print("Logout failed: \(error.localizedDescription)")
+                                }
+                            }) {
+                                HStack {
+                                    Spacer()
+                                    Text("Log out")
+                                        .foregroundColor(.black)
+                                        .font(.title3)
+                                        .fontDesign(.monospaced)
+                                    Spacer()
+                                }
+                                .frame(height: 50)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 15))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(Color(red: 186/255, green: 221/255, blue: 186/255), lineWidth: 4)
+                                )
+                                .padding(.top, 20)
+                            }
                         }
                         .padding(.top, 20)
                         .padding(.horizontal)
@@ -183,7 +210,6 @@ struct ProfileView: View {
         }
         .onAppear {
             loadUserData()
-      
         }
     }
 

@@ -131,30 +131,7 @@ struct SettingsView: View {
                 Text(notificationText)
                 
                 Spacer()
-                Button(action: {
-                    do {
-                        try Auth.auth().signOut()
-                        isLoggedIn = false
-                    } catch {
-                        print("Logout failed: \(error.localizedDescription)")
-                    }
-                }) {
-                    HStack {
-                        Spacer()
-                        Text("Log out")
-                            .foregroundColor(.black)
-                            .font(.title)
-                            .fontDesign(.monospaced)
-                        Spacer()
-                    }
-                    .frame(width: 250, height: 60)
-                    .background(Color.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
-                    )
-                }
+              
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .center)

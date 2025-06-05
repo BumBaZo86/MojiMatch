@@ -130,12 +130,14 @@ struct GameOverView: View {
                             showCoin = false
                             coinOffset = 0
                             coinOpacity = 1
-                            
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                showCoin = true
-                                withAnimation(.easeOut(duration: 1.5)) {
-                                    coinOffset = -100
-                                    coinOpacity = 0
+                           
+                            if score > 0 {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    showCoin = true
+                                    withAnimation(.easeOut(duration: 1.5)) {
+                                        coinOffset = -100
+                                        coinOpacity = 0
+                                    }
                                 }
                             }
                         }
@@ -179,7 +181,7 @@ struct GameOverView: View {
                         .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                 )
                 .padding(.horizontal, 20)
-                .padding(.top, 120) // <--- Här sänker vi containern från toppen
+                .padding(.top, 120) 
                 
                 Spacer()
             }

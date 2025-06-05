@@ -138,6 +138,8 @@ struct WheelView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                                 showMinusAnimation = false
                             }
+                        } else {
+                            playErrorSound()  // Här spelar vi fel-ljudet
                         }
                     }
                     .frame(width: 100, height: 30)
@@ -171,6 +173,22 @@ struct WheelView: View {
             audioPlayer?.play()
         } catch {
             print("Kunde inte spela upp ljudet: \(error.localizedDescription)")
+        }
+    }
+    
+    func playErrorSound() {
+        guard let url = Bundle.main.url(forResource: "errorsound", withExtension: "wav") else {
+            print("Fel-ljudfilen hittades inte!")
+            return
+        }
+        
+        do {
+            audioPlayer = try AVAudioPlayer(contentsOf: url)
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+            audioPlayer?.play()
+        } catch {
+            print("Kunde inte spela upp fel-ljudet: \(error.localizedDescription)")
         }
     }
 }

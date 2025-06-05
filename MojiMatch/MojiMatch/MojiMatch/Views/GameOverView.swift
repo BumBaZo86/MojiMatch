@@ -181,7 +181,7 @@ struct GameOverView: View {
                         .stroke(Color(red: 186/256, green: 221/256, blue: 186/256), lineWidth: 7)
                 )
                 .padding(.horizontal, 20)
-                .padding(.top, 120) 
+                .padding(.top, 120)
                 
                 Spacer()
             }

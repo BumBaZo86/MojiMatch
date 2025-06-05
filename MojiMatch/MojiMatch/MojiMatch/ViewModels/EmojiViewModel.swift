@@ -16,23 +16,32 @@ class EmojiViewModel: ObservableObject {
         }
 
         URLSession.shared.dataTask(with: url) { data, _, error in
-            if let data = data,
-               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let htmlCodes = json["htmlCode"] as? [String],
-               let htmlCode = htmlCodes.first {
-                
-                let emoji = self.decodeHTMLEntity(htmlCode)
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let htmlCodes = json["htmlCode"] as? [String] else {
                 DispatchQueue.main.async {
-                    self.emoji = emoji
+                    self.emoji = "❓"
                 }
+                return
+            }
+
+            let emoji = self.decodeHTMLEntities(htmlCodes)
+            DispatchQueue.main.async {
+                self.emoji = emoji
             }
         }.resume()
     }
 
-    private func decodeHTMLEntity(_ html: String) -> String {
-        guard let number = Int(html.replacingOccurrences(of: "&#", with: "").replacingOccurrences(of: ";", with: "")) else {
-            return "❓"
+  
+    private func decodeHTMLEntities(_ htmlCodes: [String]) -> String {
+        var emoji = ""
+        for html in htmlCodes {
+            let numberString = html.replacingOccurrences(of: "&#", with: "").replacingOccurrences(of: ";", with: "")
+            if let number = UInt32(numberString),
+               let scalar = UnicodeScalar(number) {
+                emoji.append(String(scalar))
+            }
         }
-        return String(UnicodeScalar(number) ?? "?")
+        return emoji.isEmpty ? "❓" : emoji
     }
 }

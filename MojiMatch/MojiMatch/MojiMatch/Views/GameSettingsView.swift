@@ -15,6 +15,8 @@ struct GameSettingsView: View {
     
     @AppStorage("soundOn") private var soundOn = true  // controls sound on/off
     
+    @StateObject var emojiConverterViewModel = EmojiConverterViewModel()
+    
     @State var showGameView = false
     
     @State var category = "Animals"
@@ -52,7 +54,7 @@ struct GameSettingsView: View {
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
                     ForEach(unlockedCategories, id: \.self) { cat in
                         VStack {
-                            Text(textToEmoji(for: cat))
+                            Text(emojiConverterViewModel.textToEmoji(for: cat))
                                 .font(.largeTitle)
                             Text(cat)
                                 .font(.system(size: 8))
@@ -77,7 +79,7 @@ struct GameSettingsView: View {
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
                     ForEach(unlockedLevels, id: \.self) { level in
                         VStack {
-                            Text(textToEmoji(for: level))
+                            Text(emojiConverterViewModel.textToEmoji(for: level))
                                 .font(.largeTitle)
                             Text(level)
                                 .font(.system(size: 8))
@@ -113,7 +115,7 @@ struct GameSettingsView: View {
                 
                 LazyVGrid(columns: columns, alignment: .leading, spacing: 15) {
                     ForEach(unlockedQuestionCounts, id: \.self) { q in
-                        Text(textToEmoji(for: String(q)))
+                        Text(emojiConverterViewModel.textToEmoji(for: String(q)))
                             .font(.system(size: 19))
                             .customGameSettings(isSelected: numberOfQuestions == String(q))
                             .onTapGesture {
@@ -199,26 +201,7 @@ struct GameSettingsView: View {
         }
     }
     
-    /**
-     * Makes the squares with categories/difficulty/noOfQs to emojis instead of letters.
-     */
-    func textToEmoji(for category: String) -> String {
-        switch category {
-        case "Animals": return "🦁"
-        case "Flags": return "🇬🇶"
-        case "Countries": return "🌍"
-        case "Food": return "🍝"
-        case "Riddles": return "❓"
-        case "Movies": return "🎥"
-        case "Easy": return "🍼"
-        case "Medium": return "🐵"
-        case "Hard": return "🔥"
-        case "5": return "5️⃣"
-        case "10": return "🔟"
-        case "15": return "1️⃣5️⃣"
-        default: return "❔"
-        }
-    }
+    
     
     /**
      * Plays buttonsound only if soundOn is true.

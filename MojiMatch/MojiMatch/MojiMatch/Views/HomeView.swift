@@ -45,11 +45,7 @@ struct HomeView: View {
                 
                 ScrollView {
                     VStack(spacing: 20) {
-                        Image("MojiMatchLogo")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 300, height: 300)
-                            .foregroundColor(.white)
+                        mojiMatchLogo()
                             .padding(.bottom, -65)
                         
                         Button(action: {

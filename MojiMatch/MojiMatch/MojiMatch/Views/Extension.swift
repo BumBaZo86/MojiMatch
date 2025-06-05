@@ -22,6 +22,28 @@ extension View {
             .fontDesign(.monospaced)
     }
     
+    func logInSignUpTextField() -> some View {
+        self
+            .padding()
+            .background(Color.white)
+            .cornerRadius(8)
+            .foregroundColor(.black)
+            .fontDesign(.monospaced)
+            .padding(.horizontal)
+            .frame(height: 50)
+            
+    }
+    
+    
+    func mojiMatchLogo() -> some View {
+        
+        Image("MojiMatchLogo")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 300, height: 300)
+            .foregroundColor(.white)
+    }
+    
     func headLinesText() -> some View {
         self
             .font(.title2)

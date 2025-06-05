@@ -84,7 +84,7 @@ struct MainTabView: View {
                     Text("Home")
                 }
 
-            StoreView()
+            StoreView(emojiConverterViewModel: EmojiConverterViewModel())
                 .tabItem {
                     Image("StoreImage")
                     Text("Store")
@@ -96,7 +96,7 @@ struct MainTabView: View {
                     Text("Play")
                 }
 
-            ScoreboardView(firebaseViewModel: FirebaseViewModel())
+            ScoreboardView(emojiConverterViewModel: EmojiConverterViewModel(), firebaseViewModel: FirebaseViewModel())
                 .tabItem {
                     Image("ScoreboardImage")
                     Text("Scoreboard")

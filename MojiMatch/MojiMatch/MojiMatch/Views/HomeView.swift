@@ -46,7 +46,7 @@ struct HomeView: View {
                 
                 ScrollView {
                     VStack(spacing: 20) {
- 
+                        
                         Image("MojiMatchLogo")
                             .resizable()
                             .scaledToFit()
@@ -57,7 +57,6 @@ struct HomeView: View {
                             .onAppear {
                                 logoBounce = true
                             }
-                       
                         
                         Button(action: {
                             playButtonSound()
@@ -101,7 +100,7 @@ struct HomeView: View {
                                 .shadow(radius: 5)
                         }
                         
-                        Button(action:  {
+                        Button(action: {
                             withAnimation {
                                 showWheel = true
                             }
@@ -136,8 +135,6 @@ struct HomeView: View {
                         }
                     }
                     .padding(.horizontal)
-                   
-                 
                 }
                 
                 Spacer()
@@ -168,17 +165,33 @@ struct HomeView: View {
             .sheet(isPresented: $showRules) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("🧠 Rules")
-                        .font(.largeTitle)
+                        .font(.title2)
                         .bold()
-                    Text("""
-1. Choose a category and the number of questions.
-2. Each question has four answer options – pick the correct one before time runs out.
-3. You earn 10 points for every correct answer.
-4. The game ends when all questions are answered or the timer reaches zero.
+                    
+                    ScrollView {
+                        Text("""
+Welcome to **MojiMatch** – the ultimate emoji guessing challenge! 🎉
 
-Think fast and aim for a high score!
+🎯 **Goal**
+Guess what a combination of emojis means by choosing the correct matching emoji.
+
+🕹️ **How to Play**
+- A series of emojis will appear (e.g., 🍔 + 🍟).
+- Choose from 4 emojis what they represent (e.g., 🍔🍟 = 🍽️ “Fast Food”).
+- Select before time runs out!
+
+🏆 **Progress & Rewards**
+- Earn points for each correct answer.
+- Unlock new levels with harder emoji puzzles.
+- Use points to buy hints or unlock upgrades.
+
+🧠 Can you master the language of emojis?
 """)
+                        .font(.body)
+                    }
+                    
                     Spacer()
+                    
                     Button("Close") {
                         showRules = false
                     }
@@ -191,22 +204,31 @@ Think fast and aim for a high score!
                     .cornerRadius(10)
                 }
                 .padding()
+                .presentationDetents([.fraction(0.45)])
             }
             .sheet(isPresented: $showInfo) {
                 VStack(alignment: .leading, spacing: 20) {
                     Text("ℹ️ Info")
-                        .font(.largeTitle)
+                        .font(.title2)
                         .bold()
-                    Text("""
-MojiMatch is a fast-paced quiz game designed to challenge your memory and reaction time.
+                    
+                    ScrollView {
+                        Text("""
+MojiMatch is a creative emoji-guessing game that challenges your brain. 🧠
 
-Choose your category, race against the clock, and see how high you can score!
+Think fast, decode emoji puzzles, and level up!
 
-The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
+🛠️ Built using SwiftUI  
+🌐 Powered by Firebase  
+🎨 Designed with love
 
-👾
+Can you beat your high score? 🎮
 """)
+                            .font(.body)
+                    }
+                    
                     Spacer()
+                    
                     Button("Close") {
                         showInfo = false
                     }
@@ -219,6 +241,7 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
                     .cornerRadius(10)
                 }
                 .padding()
+                .presentationDetents([.fraction(0.45)])
             }
         }
     }
@@ -243,11 +266,9 @@ The app is built with SwiftUI and uses Firebase to fetch live quiz questions.
     }
 }
 
-
-
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
-            .environmentObject(AppSettings()) 
+            .environmentObject(AppSettings())
     }
 }

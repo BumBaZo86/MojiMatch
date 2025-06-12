@@ -177,9 +177,10 @@ struct GameSettingsView: View {
                 let defaultLevels = ["Easy"]
                 let defaultQuestionCounts = [5]
                 
-                let combinedCategories = Array(Set(defaultCategories + boughtCategories)).sorted()
-                let combinedLevels = Array(Set(defaultLevels + boughtLevels)).sorted()
-                let combinedQuestionCounts = Array(Set(defaultQuestionCounts + boughtQuestionCounts)).sorted()
+                
+                let combinedCategories = defaultCategories + boughtCategories.filter { !defaultCategories.contains($0) }
+                let combinedLevels = defaultLevels + boughtLevels.filter { !defaultLevels.contains($0) }
+                let combinedQuestionCounts = defaultQuestionCounts + boughtQuestionCounts.filter { !defaultQuestionCounts.contains($0) }
                 
                 DispatchQueue.main.async {
                     self.unlockedCategories = combinedCategories

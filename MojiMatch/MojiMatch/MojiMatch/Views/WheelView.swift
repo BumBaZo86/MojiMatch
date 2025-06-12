@@ -63,7 +63,7 @@ struct WheelView: View {
                         VStack(spacing: 10) {
                             if let winner = wheelViewModel.winner {
                                 Text("+\(winner)")
-                                    .font(.system(size: 40, weight: .bold))
+                                    .font(.system(size: 20, weight: .bold))
                                     .foregroundStyle(.green)
                                     .offset(y: showPlusAnimation ? -60 : 0)
                                     .opacity(showPlusAnimation ? 0 : 1)
@@ -91,7 +91,7 @@ struct WheelView: View {
             ZStack {
                 Triangle()
                     .fill(Color.red)
-                    .frame(width: 30, height: 50)
+                    .frame(width: 30, height: 40)
                     .rotationEffect(.degrees(180))
                     .offset(y: -200)
                 

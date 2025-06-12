@@ -176,14 +176,16 @@ Welcome to **MojiMatch** – the ultimate emoji guessing challenge! 🎉
 Guess what a combination of emojis means by choosing the correct matching emoji.
 
 🕹️ **How to Play**
-- A series of emojis will appear (e.g., 🍔 + 🍟).
-- Choose from 4 emojis what they represent (e.g., 🍔🍟 = 🍽️ “Fast Food”).
+- A series of emojis will appear (e.g., 🍌🌳🙊).
+- Choose from 4 emojis what they represent (e.g., 🍌🌳🙊 = 🦍).
 - Select before time runs out!
 
 🏆 **Progress & Rewards**
 - Earn points for each correct answer.
-- Unlock new levels with harder emoji puzzles.
-- Use points to buy hints or unlock upgrades.
+- Collect more points by spinning the wheel of fortune. 
+- Collect stars to buy more spins. 
+- Use points to unlock upgrades and new categories.
+- See other player's scores on the scoreboard. 
 
 🧠 Can you master the language of emojis?
 """)
@@ -204,7 +206,7 @@ Guess what a combination of emojis means by choosing the correct matching emoji.
                     .cornerRadius(10)
                 }
                 .padding()
-                .presentationDetents([.fraction(0.45)])
+                .presentationDetents([.fraction(0.65)])
             }
             .sheet(isPresented: $showInfo) {
                 VStack(alignment: .leading, spacing: 20) {
@@ -241,7 +243,7 @@ Can you beat your high score? 🎮
                     .cornerRadius(10)
                 }
                 .padding()
-                .presentationDetents([.fraction(0.45)])
+                .presentationDetents([.fraction(0.65)])
             }
         }
     }
